@@ -1,0 +1,11 @@
+<?php
+
+/**
+ * Every source package: its slug (omnilab/<slug>, github.com/glitchr-studio/omnilab-<slug>),
+ * its tests' namespace and its factory class.
+ */
+return [
+    'pubchem' => ['Omnilab\\PubChem\\Tests\\', 'Omnilab\\PubChem\\PubChemSourceFactory'],
+    'open-meteo' => ['Omnilab\\OpenMeteo\\Tests\\', 'Omnilab\\OpenMeteo\\OpenMeteoSourceFactory'],
+    'copernicus' => ['Omnilab\\Copernicus\\Tests\\', 'Omnilab\\Copernicus\\CopernicusSourceFactory'],
+];

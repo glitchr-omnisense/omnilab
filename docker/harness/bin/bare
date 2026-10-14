@@ -1,0 +1,133 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Omnilab in bare PHP: no bundle, no container, no console component. The
+ * registry is built by hand from the source packages installed, each source
+ * says what it can do, then each shape is asked of the real service, no key
+ * needed: caffeine of PubChem (an entity), tomorrow's hourly temperature in
+ * Strasbourg of Open-Meteo (a series), the Sentinel-2 L2A scenes over
+ * Strasbourg in the last ten days under 30 % cloud of the Copernicus Data
+ * Space (products) - and the script lists what PHP loaded on the way.
+ *
+ *   docker compose run --rm omnilab bare              # exits 1 when a class of a framework was loaded
+ *   docker compose run --rm omnilab bare --recorded   # the answers recorded on 2026-10-15 (cut down) instead of calls
+ *   docker compose run --rm omnilab bare --json       # the same, whole: every class and file loaded
+ *
+ * OMNILAB_AUTOLOAD names another autoloader than the harness's.
+ */
+
+use Omnilab\Model\Point;
+use Omnilab\Model\Product;
+use Omnilab\Model\Property;
+use Omnilab\Registry;
+use Omnilab\Source\Capability;
+use Omnilab\Source\ProductQuery;
+use Omnilab\Source\SeriesQuery;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
+
+require getenv('OMNILAB_AUTOLOAD') ?: '/harness/vendor/autoload.php';
+
+$recorded = \in_array('--recorded', $argv, true);
+$http = !$recorded ? null : new MockHttpClient(static function (string $method, string $url): MockResponse {
+    $url = rawurldecode($url);
+    $file = match (true) {
+        str_contains($url, '/compound/name/cids/JSON?name=caffeine') => 'pubchem-name-caffeine.json',
+        str_contains($url, '/compound/cid/2519/property/') => 'pubchem-properties-2519.json',
+        str_contains($url, '/compound/cid/2519/synonyms/JSON') => 'pubchem-synonyms-2519.json',
+        str_contains($url, '/compound/cid/2519/description/JSON') => 'pubchem-description-2519.json',
+        str_contains($url, 'api.open-meteo.com/v1/forecast') && str_contains($url, 'start_date=2026-10-16') => 'open-meteo-forecast-2026-10-16.json',
+        str_contains($url, 'stac.dataspace.copernicus.eu/v1/search') && str_contains($url, 'datetime=2026-10-05T00:00:00Z/2026-10-15T00:00:00Z') => 'copernicus-sentinel-2-l2a-strasbourg.json',
+        default => null,
+    };
+
+    return null === $file ? new MockResponse('{"error": "Not recorded."}', ['http_code' => 404]) : new MockResponse((string) file_get_contents(__DIR__.'/../recorded/'.$file));
+});
+
+$factories = [];
+foreach (require __DIR__.'/../plugins.php' as [, $class]) {
+    if (class_exists($class)) {
+        $factories[] = new $class($http ??= HttpClient::create(['timeout' => 60]));
+    }
+}
+$installed = array_map(static fn ($factory) => $factory->getName(), $factories);
+$config = array_filter(require __DIR__.'/../config/sources.php', static fn (array $source) => \in_array($source['factory'], $installed, true));
+$options = static fn (array $source) => array_filter($source['options'], static fn ($value) => null !== $value);
+$registry = new Registry($factories, array_map(static fn (array $source) => ['factory' => $source['factory'], 'options' => $options($source) + ($recorded && 'open-meteo' === $source['factory'] ? ['today' => '2026-10-15'] : [])], $config));
+
+// Recorded: the day the answers were recorded; live: now, in Strasbourg.
+$paris = new DateTimeZone('Europe/Paris');
+$now = $recorded ? new DateTimeImmutable('2026-10-15T00:00:00Z') : new DateTimeImmutable('now', $paris);
+$tomorrow = $recorded ? new DateTimeImmutable('2026-10-16', $paris) : new DateTimeImmutable('tomorrow', $paris);
+$strasbourg = new Point(48.5734, 7.7521);
+
+$report = ['recorded' => $recorded, 'sources' => [], 'entity' => null, 'series' => null, 'products' => null];
+foreach ($registry->all() as $name => $source) {
+    $report['sources'][$name] = array_map(static fn (Capability $capability) => $capability->value, $source->capabilities());
+}
+if ($registry->has('pubchem')) {
+    $caffeine = $registry->get('pubchem')->entity('caffeine');
+    $report['entity'] = null === $caffeine ? null : [
+        'id' => $caffeine->id->key(),
+        'label' => $caffeine->label,
+        'properties' => array_combine(array_map(static fn (Property $p) => $p->key, $caffeine->properties), array_map('strval', $caffeine->properties)),
+        'identifiers' => $caffeine->identifiers->keys(),
+        'image' => $caffeine->image,
+    ];
+}
+if ($registry->has('open-meteo')) {
+    [$temperature] = $registry->get('open-meteo')->series(new SeriesQuery(['temperature_2m'], $strasbourg, $tomorrow, $tomorrow));
+    $report['series'] = ['variable' => $temperature->variable, 'unit' => $temperature->unit, 'day' => $tomorrow->format('Y-m-d'), 'points' => array_map(static fn (array $p) => [$p[0]->format('H:i'), $p[1]], $temperature->points)];
+}
+if ($registry->has('copernicus')) {
+    $query = new ProductQuery(['sentinel-2-l2a'], $strasbourg, $now->modify('-10 days'), $recorded ? $now : null, maxCloudCover: 30, limit: 100);
+    $page = $registry->get('copernicus')->products($query);
+    $report['products'] = array_map(static fn (Product $p) => ['id' => $p->id, 'datetime' => $p->datetime?->format('Y-m-d H:i'), 'cloud' => $p->cloudCover(), 'tile' => $p->properties['grid:code'] ?? null, 'preview' => $p->preview], $page->items);
+}
+
+// What PHP loaded to get there: the proof that no framework was needed.
+$report['symbols'] = [...get_declared_classes(), ...get_declared_interfaces(), ...get_declared_traits()];
+$report['files'] = get_included_files();
+$framework = array_values(preg_grep('~^(?:Symfony\\\\Component\\\\(?:DependencyInjection|Config|HttpKernel|HttpFoundation)|Symfony\\\\Bundle|Doctrine|Twig)\\\\~', $report['symbols']));
+$symfony = array_values(array_unique(array_map(static fn (string $s) => implode('\\', \array_slice(explode('\\', $s), 0, 3)), preg_grep('~^Symfony\\\\(?!Polyfill)~', $report['symbols']))));
+sort($symfony);
+
+if (\in_array('--json', $argv, true)) {
+    echo json_encode($report, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE), "\n";
+    exit($framework ? 1 : 0);
+}
+
+$from = $recorded ? ', from the answers recorded on 2026-10-15' : '';
+echo "Omnilab in bare PHP: the registry built by hand, no bundle, no container.\n\n";
+foreach ($report['sources'] as $name => $capabilities) {
+    printf("  %-12s %s\n", $name, implode(' ', $capabilities));
+}
+if (!$report['sources']) {
+    echo "  no omnilab/* source package is installed\n";
+}
+if (null !== $report['entity']) {
+    echo "\nPubChem, caffeine", $from ?: ', asked of pubchem.ncbi.nlm.nih.gov', ":\n";
+    printf("  %s  %s\n", $report['entity']['id'], $report['entity']['label']);
+    foreach (['molecular_formula', 'molecular_weight', 'xlogp', 'tpsa', 'inchikey'] as $key) {
+        printf("  %-18s %s\n", $key, $report['entity']['properties'][$key] ?? '-');
+    }
+    echo '  identifiers        ', implode(' ', $report['entity']['identifiers']), "\n";
+}
+if (null !== $report['series']) {
+    echo "\nOpen-Meteo, the hourly temperature in Strasbourg on ", $report['series']['day'], $from ?: ', asked of api.open-meteo.com', ":\n  ";
+    echo implode('  ', array_map(static fn (array $p) => $p[0].' '.$p[1], $report['series']['points'])), ' (', $report['series']['unit'], ")\n";
+}
+if (null !== $report['products']) {
+    echo "\nCopernicus, the Sentinel-2 L2A scenes over Strasbourg in the last ten days under 30 % cloud", $from ?: ', asked of stac.dataspace.copernicus.eu', ":\n";
+    foreach ($report['products'] as $product) {
+        printf("  %s UTC  %5.2f %%  %s  %s\n", $product['datetime'], $product['cloud'], $product['tile'], $product['id']);
+    }
+    if (!$report['products']) {
+        echo "  none\n";
+    }
+}
+echo "\nLoaded from Symfony: ", implode(', ', $symfony) ?: 'nothing', "\n";
+echo 'Classes of a framework (DependencyInjection, Config, HttpKernel, HttpFoundation, a bundle, Doctrine, Twig): ', $framework ? implode(', ', $framework) : 'none', "\n";
+exit($framework ? 1 : 0);

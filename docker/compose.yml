@@ -1,0 +1,34 @@
+# glitchr/omnilab with every source package, against the real services:
+#
+#   cp .env.dist .env                                          # a contact address; an Open-Meteo key if you have one
+#   docker compose run --rm omnilab sources                    # which sources are installed and configured
+#   docker compose run --rm omnilab entity pubchem caffeine    # JSON
+#   docker compose run --rm omnilab entity pubchem CHEBI:27732
+#   docker compose run --rm omnilab search pubchem caffeine --limit 5
+#   docker compose run --rm omnilab collect pubchem caffeine   # its cross-references followed into the other sources
+#   docker compose run --rm omnilab series open-meteo 48.5734,7.7521 temperature_2m --from tomorrow --to tomorrow
+#   docker compose run --rm omnilab series open-meteo 48.5734,7.7521 temperature_2m precipitation --daily max --from 2026-09-01 --to 2026-09-07
+#   docker compose run --rm omnilab products copernicus --point 48.5734,7.7521 --from=-10days --cloud 30
+#   docker compose run --rm omnilab products copernicus --bbox 7.68,48.53,7.83,48.64 --collection sentinel-1-grd --from=-3days
+#   docker compose run --rm omnilab bare                       # plain PHP: no bundle, no container, and what PHP loaded
+#   docker compose run --rm omnilab test                       # every package's tests
+#
+# Sources come from GitHub (branch 1.x) unless their checkout sits under
+# OMNILAB_PLUGINS (set it to ../.. in .env when this core sits in the
+# workspace beside them): then that checkout is what runs.
+name: omnilab-harness
+
+services:
+  omnilab:
+    build: .
+    image: glitchr/omnilab-harness
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ..:/omnilab/core
+      - ${OMNILAB_PLUGINS:-./plugins}:/omnilab/plugins:ro
+      - harness:/harness
+
+volumes:
+  harness:
