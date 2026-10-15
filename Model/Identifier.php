@@ -57,7 +57,7 @@ final readonly class Identifier implements \Stringable
         'ncbigene' => Scheme::NCBI_GENE, 'gene' => Scheme::NCBI_GENE,
         'taxonomy' => Scheme::NCBI_TAXON, 'ncbitaxon' => Scheme::NCBI_TAXON, 'txid' => Scheme::NCBI_TAXON,
         'inaturalist.taxon' => Scheme::INATURALIST,
-        'sbdb' => Scheme::JPL_SBDB, 'jpl' => Scheme::JPL_SBDB,
+        'sbdb' => Scheme::JPL_SBDB, 'jpl' => Scheme::JPL_SBDB, 'minorplanetcenter' => Scheme::MPC,
         'usgs' => Scheme::USGS_EVENT,
         'ghcnd' => Scheme::GHCN,
         'wmo' => Scheme::WIGOS,
@@ -165,6 +165,8 @@ final readonly class Identifier implements \Stringable
             Scheme::ENSEMBL_GENOMES => self::ensemblGenomes($value) ?? (preg_match('~^[A-Za-z0-9][A-Za-z0-9_.:-]{2,40}$~', $value) && !preg_match(self::ENSEMBL, $upper) ? $value : null),
             Scheme::PDB => preg_match('~^\d[A-Z0-9]{3}$~', $upper) ? $upper : (preg_match('~^PDB_\d{4}[A-Z0-9]{4}$~', $upper) ? strtolower($upper) : null),
             Scheme::SIMBAD, Scheme::JPL_SBDB => self::name($value),
+            // Its number without the brackets the IAU writes it in: (433) is 433.
+            Scheme::MPC => self::name((string) preg_replace('~^\((\d+)\)$~', '$1', trim($value))),
             // A network's code then the event's own (ComCat keeps the catalogues' long ones: official20110311054624120_30, iscgemsup16957911).
             Scheme::USGS_EVENT => preg_match('~^[a-z]{2,10}[a-z0-9_]{6,24}$~', $v = strtolower($value)) ? $v : null,
             // A species' three letters (HSA, MMU; ALL for what no species holds: a small molecule), the number, a version left out.
@@ -371,6 +373,7 @@ final readonly class Identifier implements \Stringable
             Scheme::IUCN => 'https://www.iucnredlist.org/species/'.$v,
             Scheme::SIMBAD => 'https://simbad.cds.unistra.fr/simbad/sim-id?Ident='.$v,
             Scheme::JPL_SBDB => 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr='.$v,
+            Scheme::MPC => 'https://minorplanetcenter.net/db_search/show_object?object_id='.$v,
             Scheme::USGS_EVENT => 'https://earthquake.usgs.gov/earthquakes/eventpage/'.$v,
             Scheme::REACTOME => 'https://reactome.org/content/detail/'.$v,
             Scheme::STRING => 'https://string-db.org/network/'.$v,
@@ -470,6 +473,7 @@ final readonly class Identifier implements \Stringable
             str_ends_with($host, 'seismicportal.eu') => self::tryOf(Scheme::EMSC_EVENT, (string) ($query['unid'] ?? '')),
             str_ends_with($host, 'waterdata.usgs.gov') => $found('~/(USGS-\d{8,15})(?:[/?#]|$)~i', Scheme::USGS_SITE),
             str_ends_with($host, 'tidesandcurrents.noaa.gov') => preg_match('~stations/(\d{7})~', $path, $m) ? self::tryOf(Scheme::COOPS_STATION, $m[1]) : self::tryOf(Scheme::COOPS_STATION, (string) ($query['id'] ?? '')),
+            str_ends_with($host, 'minorplanetcenter.net') => self::tryOf(Scheme::MPC, (string) ($query['object_id'] ?? $query['utf8'] ?? '')),
             'ssd.jpl.nasa.gov' === $host => preg_match('~sstr=([^&]+)~', $fragment.'&'.http_build_query($query), $m) ? self::tryOf(Scheme::JPL_SBDB, $m[1]) : null,
             default => null,
         };

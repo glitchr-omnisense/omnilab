@@ -162,6 +162,9 @@ final class IdentifierTest extends TestCase
         yield 'NCBI Taxonomy' => ['https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=9606', 'ncbi.taxon:9606'];
         yield 'SIMBAD\'s page' => ['https://simbad.cds.unistra.fr/simbad/sim-id?Ident=M%2031', 'simbad:M 31'];
         yield 'JPL\'s lookup' => ['https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=433', 'jpl.sbdb:433'];
+        yield 'a minor planet at the MPC' => ['mpc:(433)', 'mpc:433'];
+        yield 'a comet at the MPC' => ['mpc:C/2020  F3', 'mpc:C/2020 F3'];
+        yield 'the MPC\'s page' => ['https://minorplanetcenter.net/db_search/show_object?object_id=2024+YR4', 'mpc:2024 YR4'];
         yield 'a KEGG reaction' => ['rn:R00200', 'kegg.reaction:R00200'];
         yield 'a KEGG reaction\'s page' => ['https://www.kegg.jp/entry/R00200', 'kegg.reaction:R00200'];
         yield 'a KEGG pathway' => ['path:hsa00010', 'kegg.pathway:hsa00010'];
@@ -244,7 +247,7 @@ final class IdentifierTest extends TestCase
             $url = Identifier::tryOf($scheme, match ($scheme) {
                 Scheme::INCHIKEY => 'RYYVLZVUVIJVGH-UHFFFAOYSA-N', Scheme::INCHI => 'InChI=1S/H2O/h1H2', Scheme::CAS => '7732-18-5',
                 Scheme::CHEMBL => 'CHEMBL1098659', Scheme::UNII => '059QF0KO0R', Scheme::DSSTOX => 'DTXSID6026296', Scheme::KEGG => 'C00001',
-                Scheme::UNIPROT => 'P69905', Scheme::ENSEMBL => 'ENSG00000141510', Scheme::PDB => '1A3N', Scheme::SIMBAD => 'M 31', Scheme::JPL_SBDB => '433',
+                Scheme::UNIPROT => 'P69905', Scheme::ENSEMBL => 'ENSG00000141510', Scheme::PDB => '1A3N', Scheme::SIMBAD => 'M 31', Scheme::JPL_SBDB => '433', Scheme::MPC => '433',
                 Scheme::USGS_EVENT => 'us6000u24c', Scheme::WIKIDATA => 'Q283', Scheme::GHCN => 'USW00094728', Scheme::NWS_STATION => 'KNYC', Scheme::REACTOME => 'R-HSA-70171', Scheme::ENSEMBL_GENOMES => 'FBgn0000008', Scheme::GAIA => '4472832130942575872', Scheme::EXOPLANET => '51 Peg b',
                 Scheme::STRING => '9606.ENSP00000269305', Scheme::INTERPRO => 'IPR000971', Scheme::PFAM => 'PF00042', Scheme::GO, Scheme::EFO, Scheme::MONDO, Scheme::HP => '0005829', Scheme::OMIM => '141900', Scheme::DBSNP => 'rs334', Scheme::GWAS => 'GCST000854',
                 Scheme::KEGG_REACTION => 'R00200', Scheme::KEGG_PATHWAY => 'map00010', Scheme::RHEA => '18157', Scheme::EC => '2.7.1.40', Scheme::COD => '1000000', Scheme::MATERIALS_PROJECT => 'mp-149', Scheme::CODATA => 'mp',
