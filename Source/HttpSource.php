@@ -157,6 +157,26 @@ abstract class HttpSource implements SourceInterface
     }
 
     /**
+     * GETs JSON with a JSON body, for a service that takes its query so on
+     * a GET (the Minor Planet Center's APIs: their POST answers 405). Null
+     * when the service answers 404 / 410, or 204.
+     *
+     * @param array<mixed>          $body  sent as JSON
+     * @param array<string, mixed>  $query
+     * @param array<string, string> $headers
+     */
+    protected function getForJson(string $path, array $body, array $query = [], array $headers = []): ?array
+    {
+        try {
+            $json = json_encode($body, \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
+        } catch (\JsonException $e) {
+            throw new \InvalidArgumentException('The body cannot be written as JSON: '.$e->getMessage(), 0, $e);
+        }
+
+        return $this->decode($this->fetch('GET', $path, $query, ['Accept' => 'application/json', 'Content-Type' => 'application/json'] + $headers, $json))[0] ?? null;
+    }
+
+    /**
      * @param array{0: string, 1: array<string, list<string>>}|null $answer
      *
      * @return array{0: array<mixed>, 1: array<string, list<string>>}|null

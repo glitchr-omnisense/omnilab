@@ -279,4 +279,34 @@ final class ModelsTest extends TestCase
         }
         self::assertSame([1, 2], $source->read('list'), 'a JSON list is an array too');
     }
+
+    public function testAGetWithAJsonBody(): void
+    {
+        $asked = [];
+        $http = new MockHttpClient(static function (string $method, string $url, array $options) use (&$asked): MockResponse {
+            $asked[] = [$method, $url, $options['body'] ?? null, $options['normalized_headers']['content-type'][0] ?? null];
+
+            return new MockResponse('[{"mpc_orb": []}, 200]');
+        });
+        $source = new class($http, 'https://example.org/api/') extends HttpSource {
+            public function getName(): string
+            {
+                return 'example';
+            }
+
+            public function capabilities(): array
+            {
+                return [];
+            }
+
+            /** @param array<mixed> $body */
+            public function orbit(array $body): ?array
+            {
+                return $this->getForJson('get-orb', $body);
+            }
+        };
+
+        self::assertSame([['mpc_orb' => []], 200], $source->orbit(['desig' => '433']));
+        self::assertSame(['GET', 'https://example.org/api/get-orb', '{"desig":"433"}', 'Content-Type: application/json'], $asked[0], 'the Minor Planet Center\'s way: a GET with a JSON body');
+    }
 }
