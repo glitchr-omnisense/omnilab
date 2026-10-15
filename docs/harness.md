@@ -96,6 +96,11 @@ Omnilab in bare PHP: the registry built by hand, no bundle, no container.
   usgs         entity series occurrences historical area
   ensembl      entity search cross_references
   pdb          entity search structure
+  noaa         series historical
+  nws          series forecast historical
+  cds          products area
+  cams         products area
+  earthdata    products area cloud_cover
   inaturalist  entity search occurrences area
 
 PubChem, caffeine, asked of pubchem.ncbi.nlm.nih.gov:

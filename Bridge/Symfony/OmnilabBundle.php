@@ -2,16 +2,20 @@
 
 namespace Omnilab\Bridge\Symfony;
 
+use Omnilab\Cams\CamsSourceFactory;
+use Omnilab\Cds\CdsSourceFactory;
 use Omnilab\Chebi\ChebiSourceFactory;
 use Omnilab\Chembl\ChemblSourceFactory;
 use Omnilab\Collector;
 use Omnilab\Copernicus\CopernicusSourceFactory;
+use Omnilab\Earthdata\EarthdataSourceFactory;
 use Omnilab\Ensembl\EnsemblSourceFactory;
 use Omnilab\Gbif\GbifSourceFactory;
 use Omnilab\INaturalist\INaturalistSourceFactory;
 use Omnilab\Jpl\JplSourceFactory;
 use Omnilab\Merger;
 use Omnilab\Ncbi\NcbiSourceFactory;
+use Omnilab\Noaa\NoaaSourceFactory;
 use Omnilab\OpenMeteo\OpenMeteoSourceFactory;
 use Omnilab\Pdb\PdbSourceFactory;
 use Omnilab\PubChem\PubChemSourceFactory;
@@ -72,6 +76,10 @@ final class OmnilabBundle extends AbstractBundle
         EnsemblSourceFactory::class,
         PdbSourceFactory::class,
         INaturalistSourceFactory::class,
+        NoaaSourceFactory::class,
+        CdsSourceFactory::class,
+        CamsSourceFactory::class,
+        EarthdataSourceFactory::class,
     ];
 
     public function configure(DefinitionConfigurator $definition): void
@@ -79,7 +87,7 @@ final class OmnilabBundle extends AbstractBundle
         $definition->rootNode()
             ->children()
                 ->arrayNode('sources')
-                    ->info('The sources, by name: a factory (pubchem, chebi, wikidata, uniprot, ensembl, pdb, gbif, inaturalist, simbad, usgs, open-meteo, copernicus...) and its options.')
+                    ->info('The sources, by name: a factory (pubchem, chebi, wikidata, uniprot, ensembl, pdb, gbif, inaturalist, simbad, usgs, open-meteo, noaa, copernicus, cds, cams, earthdata...) and its options.')
                     ->useAttributeAsKey('name')
                     ->arrayPrototype()
                         ->children()

@@ -20,4 +20,8 @@ return [
     'ensembl' => ['Omnilab\\Ensembl\\Tests\\', 'Omnilab\\Ensembl\\EnsemblSourceFactory'],
     'pdb' => ['Omnilab\\Pdb\\Tests\\', 'Omnilab\\Pdb\\PdbSourceFactory'],
     'inaturalist' => ['Omnilab\\INaturalist\\Tests\\', 'Omnilab\\INaturalist\\INaturalistSourceFactory'],
+    'noaa' => ['Omnilab\\Noaa\\Tests\\', 'Omnilab\\Noaa\\NoaaSourceFactory'],
+    'cds' => ['Omnilab\\Cds\\Tests\\', 'Omnilab\\Cds\\CdsSourceFactory'],
+    'cams' => ['Omnilab\\Cams\\Tests\\', 'Omnilab\\Cams\\CamsSourceFactory'],
+    'earthdata' => ['Omnilab\\Earthdata\\Tests\\', 'Omnilab\\Earthdata\\EarthdataSourceFactory'],
 ];

@@ -25,5 +25,10 @@ return [
     'usgs' => ['factory' => 'usgs', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'ensembl' => ['factory' => 'ensembl', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'pdb' => ['factory' => 'pdb', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'noaa' => ['factory' => 'noaa', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'nws' => ['factory' => 'noaa', 'needs' => [], 'options' => ['mailto' => $mailto, 'api' => 'nws']],
+    'cds' => ['factory' => 'cds', 'needs' => [], 'options' => ['mailto' => $mailto, 'key' => $env('CDS_KEY')]],
+    'cams' => ['factory' => 'cams', 'needs' => [], 'options' => ['mailto' => $mailto, 'key' => $env('ADS_KEY')]],
+    'earthdata' => ['factory' => 'earthdata', 'needs' => [], 'options' => ['mailto' => $mailto, 'token' => $env('EARTHDATA_TOKEN')]],
     'inaturalist' => ['factory' => 'inaturalist', 'needs' => [], 'options' => ['mailto' => $mailto, 'locale' => $env('INATURALIST_LOCALE')]],
 ];
