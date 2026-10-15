@@ -27,6 +27,22 @@ enum Scheme: string
     case DSSTOX = 'dsstox';
     /** A KEGG compound (C07481) or drug (D00528). */
     case KEGG = 'kegg';
+    /** A KEGG reaction: R00200 (pyruvate kinase's). */
+    case KEGG_REACTION = 'kegg.reaction';
+    /** A KEGG pathway map, reference (map00010) or of an organism (hsa00010), or its KO, enzyme or reaction view (ko00010, ec00010, rn00010). */
+    case KEGG_PATHWAY = 'kegg.pathway';
+    /** A Rhea biochemical reaction, its number: 18157, written RHEA:18157 (any of a reaction's four ids: the master, its two directions, both). */
+    case RHEA = 'rhea';
+    /** An enzyme's EC number of the IUBMB's Enzyme Nomenclature, complete or not: 2.7.1.40 (pyruvate kinase), 2.7.1.-, written EC 2.7.1.40. */
+    case EC = 'ec';
+    /** A crystal structure of the Crystallography Open Database, its seven digits: 1000000 (Wikidata's P9824). */
+    case COD = 'cod';
+    /** A material of the Materials Project, its computed structure: mp-149 (silicon; Wikidata's P9902). */
+    case MATERIALS_PROJECT = 'materialsproject';
+    /** An entry of the Open Quantum Materials Database, its number: 6 (OQMD's own id of a computed structure). */
+    case OQMD = 'oqmd';
+    /** A fundamental physical constant of CODATA, by NIST's short name: mp (the proton mass), c, h (Wikidata's P1645). */
+    case CODATA = 'codata';
     /** A UniProt protein: P69905. */
     case UNIPROT = 'uniprot';
     /** An NCBI Gene record: 7157 (TP53, human). */
@@ -114,6 +130,14 @@ enum Scheme: string
             self::UNII => 'UNII',
             self::DSSTOX => 'DSSTox',
             self::KEGG => 'KEGG',
+            self::KEGG_REACTION => 'KEGG reaction',
+            self::KEGG_PATHWAY => 'KEGG pathway',
+            self::RHEA => 'Rhea',
+            self::EC => 'EC number',
+            self::COD => 'COD',
+            self::MATERIALS_PROJECT => 'Materials Project',
+            self::OQMD => 'OQMD',
+            self::CODATA => 'CODATA constant',
             self::UNIPROT => 'UniProt',
             self::NCBI_GENE => 'NCBI Gene',
             self::NCBI_TAXON => 'NCBI Taxonomy',
@@ -154,12 +178,14 @@ enum Scheme: string
     public function domain(): ?Domain
     {
         return match ($this) {
-            self::PUBCHEM_CID, self::CHEBI, self::CHEMBL, self::INCHIKEY, self::INCHI, self::CAS, self::UNII, self::DSSTOX, self::KEGG => Domain::CHEMISTRY,
-            self::UNIPROT, self::NCBI_GENE, self::ENSEMBL, self::ENSEMBL_GENOMES, self::PDB, self::REACTOME,
+            self::PUBCHEM_CID, self::CHEBI, self::CHEMBL, self::INCHIKEY, self::INCHI, self::CAS, self::UNII, self::DSSTOX, self::KEGG,
+                self::KEGG_REACTION, self::RHEA, self::COD, self::MATERIALS_PROJECT, self::OQMD => Domain::CHEMISTRY,
+            self::UNIPROT, self::NCBI_GENE, self::ENSEMBL, self::ENSEMBL_GENOMES, self::PDB, self::REACTOME, self::KEGG_PATHWAY, self::EC,
                 self::STRING, self::INTERPRO, self::PFAM, self::GO, self::HGNC, self::OMIM, self::EFO, self::MONDO, self::ORPHANET, self::HP, self::CLINVAR, self::DBSNP, self::GWAS => Domain::BIOLOGY,
             self::NCBI_TAXON, self::GBIF, self::GBIF_OCCURRENCE, self::INATURALIST, self::INATURALIST_OBSERVATION => Domain::TAXONOMY,
             self::SIMBAD, self::JPL_SBDB, self::GAIA, self::EXOPLANET => Domain::ASTRONOMY,
             self::USGS_EVENT, self::GHCN, self::WIGOS, self::NWS_STATION => Domain::EARTH,
+            self::CODATA => Domain::OTHER,
             self::WIKIDATA => null,
         };
     }

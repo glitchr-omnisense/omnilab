@@ -187,6 +187,11 @@ Identifier::tryOf('cas', '58-08-3');                                 // null: wr
 | `inchikey`, `inchi` | chemistry | upper case; the InChI as written |
 | `cas` | chemistry | `58-08-2`, check digit checked |
 | `unii`, `dsstox`, `kegg` | chemistry | `3G6A5W338E` (`UNII-` read), `DTXSID...`, `C00001` / `D00528` |
+| `kegg.reaction`, `kegg.pathway` | chemistry, biology | a KEGG reaction `R00200` (`rn:` read); a KEGG pathway map, lower case: `map00010`, an organism's `hsa00010`, its KO, enzyme or reaction view `ko00010`, `ec00010`, `rn00010` (`path:` read); KEGG's entry pages read for both and for an enzyme (`ec:2.7.1.40`) |
+| `rhea` | chemistry | a Rhea reaction, its number: `18157` (`RHEA:18157` read and given back by `display()`); any of a reaction's four ids (the master, left to right, right to left, both ways); its page `rhea-db.org/rhea/` read |
+| `ec` | biology | an EC number of the IUBMB's Enzyme Nomenclature, four levels, the last ones `-` when incomplete, `n` before a preliminary one (`2.7.1.40`, `2.7.1.-`, `3.5.1.n3`); `EC 2.7.1.40` read by its shape, `EC:`, `ec-code:` by their prefix (`display()` gives `EC 2.7.1.40`); ExPASy's ENZYME page, the ExplorEnz page and KEGG's read |
+| `cod`, `materialsproject`, `oqmd` | chemistry | a crystal structure of the Crystallography Open Database, seven digits (`1000000`; its page and its CIF read; Wikidata's P9824); a Materials Project material `mp-149`, lower case, read by its shape and its page (Wikidata's P9902); an OQMD entry, its number, its page `oqmd.org/materials/entry/` read |
+| `codata` | other | a fundamental physical constant of CODATA by NIST's short name, case kept: `mp` (the proton mass), `c`, `Kj`; NIST's page `physics.nist.gov/cgi-bin/cuu/Value?mp` read; Wikidata's P1645 |
 | `uniprot`, `ncbi.gene`, `ensembl`, `pdb` | biology | upper case; Ensembl without its version (`ENS...` ids only: Ensembl Genomes' are their communities'); a PDB code of four characters, or its extended form `pdb_00004hhb`, kept lower case |
 | `ncbi.taxon`, `inaturalist` | taxonomy | the number (`txid` read for NCBI) |
 | `gbif.occurrence` | taxonomy | the number of a GBIF occurrence (`5007681734`), its page `gbif.org/occurrence/` read |
@@ -213,7 +218,7 @@ Identifier::tryOf('cas', '58-08-3');                                 // null: wr
 pages of each base and identifiers.org's links, and the values whose shape tells their scheme
 (an InChIKey, a CAS number, `CHEMBL...`, `DTXSID...`, `UNII-...`, an Ensembl id, a Wikidata
 Q-number, a WIGOS id, a Reactome stable id, a Gaia DR3 designation, an InterPro or Pfam accession,
-an OBO term's short form, a VCV accession, an rs id, a GCST study, a STRING protein). A bare number, a UniProt accession or a PDB code needs its scheme: other values share
+an OBO term's short form, a VCV accession, an rs id, a GCST study, a STRING protein, an EC number written `EC 2.7.1.40`, a Materials Project id). A bare number, a UniProt accession or a PDB code needs its scheme: other values share
 their shapes. An entity may carry two identifiers of one scheme (GBIF's new key and its legacy
 number, a secondary accession): the `Merger` knows it by either. `Identifiers` keeps each identifier once: `get()`, `value()`, `values()`, `has()`,
 `with()`, `merge()`, `toArray()` / `fromArray()` for storage.

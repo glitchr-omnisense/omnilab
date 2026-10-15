@@ -72,6 +72,13 @@ final readonly class Identifier implements \Stringable
         'clinvar.variation' => Scheme::CLINVAR,
         'snp' => Scheme::DBSNP,
         'gwas.study' => Scheme::GWAS, 'gcst' => Scheme::GWAS,
+        'rn' => Scheme::KEGG_REACTION,
+        'path' => Scheme::KEGG_PATHWAY,
+        'ec-code' => Scheme::EC, 'ec.code' => Scheme::EC, 'eccode' => Scheme::EC,
+        'cod.id' => Scheme::COD,
+        'mp.material' => Scheme::MATERIALS_PROJECT, 'materials-project' => Scheme::MATERIALS_PROJECT,
+        'oqmd.entry' => Scheme::OQMD,
+        'nist.codata' => Scheme::CODATA,
         'wd' => Scheme::WIKIDATA,
     ];
 
@@ -113,6 +120,19 @@ final readonly class Identifier implements \Stringable
             Scheme::UNII => preg_match('~^(?:UNII[-:\s]?)?([A-Z0-9]{10})$~', $upper, $m) ? $m[1] : null,
             Scheme::DSSTOX => preg_match('~^DTXSID\d+$~', $upper) ? $upper : null,
             Scheme::KEGG => preg_match('~^(?:CPD:|DR:)?([CD]\d{5})$~', $upper, $m) ? $m[1] : null,
+            Scheme::KEGG_REACTION => preg_match('~^(?:RN:)?(R\d{5})$~', $upper, $m) ? $m[1] : null,
+            // A map's prefix (map, ko, ec, rn, or an organism's three or four letters: hsa, eco) then five digits, lower case.
+            Scheme::KEGG_PATHWAY => preg_match('~^(?:path:)?([a-z]{2,4}\d{5})$~', strtolower($value), $m) ? $m[1] : null,
+            // A master reaction or one of its directions (five or six digits), "RHEA:" before it read.
+            Scheme::RHEA => preg_match('~^(?:RHEA:)?([1-9]\d{4,5})$~', $upper, $m) ? $m[1] : null,
+            // Four levels, the last ones "-" when the number is not complete, the fourth "n" for a preliminary one (identifiers.org's ec-code).
+            Scheme::EC => preg_match('~^(?:EC[:\s]*)?([1-7]\.(?:-\.-\.-|\d{1,2}\.(?:-\.-|\d{1,2}\.(?:-|N?\d{1,3}))))$~', $upper, $m) ? strtolower($m[1]) : null,
+            Scheme::COD => preg_match('~^(?:COD:?\s*)?([1-9]\d{6})$~', $upper, $m) ? $m[1] : null,
+            // A Materials Project id: mp-149, or another of its prefixes (mvc-..., an unsolved structure).
+            Scheme::MATERIALS_PROJECT => preg_match('~^((?:mp|mvc)-[1-9]\d{0,9})$~', strtolower($value), $m) ? $m[1] : null,
+            Scheme::OQMD => preg_match('~^0*([1-9]\d{0,9})$~', $value, $m) ? $m[1] : null,
+            // NIST's short name of a constant, case kept (mp, Kj, RK, alph): letters and digits.
+            Scheme::CODATA => preg_match('~^[A-Za-z][A-Za-z0-9]{0,24}$~', $value) ? $value : null,
             Scheme::UNIPROT => preg_match(self::UNIPROT, $upper) ? $upper : null,
             Scheme::NCBI_GENE, Scheme::INATURALIST => preg_match('~^0*([1-9]\d*)$~', $value, $m) ? $m[1] : null,
             Scheme::GBIF => self::normalizeGbif($upper),
@@ -196,6 +216,8 @@ final readonly class Identifier implements \Stringable
             null !== self::ensemblGenomes($input) => self::tryOf(Scheme::ENSEMBL_GENOMES, $input),
             (bool) preg_match('~^R-[A-Z]{3}-\d+(?:\.\d+)?$~', $upper) => self::tryOf(Scheme::REACTOME, $upper),
             (bool) preg_match('~^GAIA\s*DR3\s+\d+$~', $upper) => self::tryOf(Scheme::GAIA, $upper),
+            (bool) preg_match('~^EC\s+\d~', $upper) => self::tryOf(Scheme::EC, $upper),
+            (bool) preg_match('~^(?:mp|mvc)-\d+$~i', $input) => self::tryOf(Scheme::MATERIALS_PROJECT, $input),
             (bool) preg_match('~^IPR\d{6}$~', $upper) => self::tryOf(Scheme::INTERPRO, $upper),
             (bool) preg_match('~^PF\d{5}(?:\.\d+)?$~', $upper) => self::tryOf(Scheme::PFAM, $upper),
             // The OBO short forms, as Open Targets and the GWAS Catalog write the terms: GO_0005829, EFO_0000305, MONDO_0011382, HP_0001250, Orphanet_232.
@@ -263,6 +285,8 @@ final readonly class Identifier implements \Stringable
             Scheme::ORPHANET => 'ORPHA:'.$this->value,
             Scheme::HP => 'HP:'.$this->value,
             Scheme::CLINVAR => 'VCV'.str_pad($this->value, 9, '0', \STR_PAD_LEFT),
+            Scheme::RHEA => 'RHEA:'.$this->value,
+            Scheme::EC => 'EC '.$this->value,
             default => $this->value,
         };
     }
@@ -285,7 +309,14 @@ final readonly class Identifier implements \Stringable
             Scheme::CAS => 'https://commonchemistry.cas.org/detail?cas_rn='.$v,
             Scheme::UNII => 'https://precision.fda.gov/uniisearch/srs/unii/'.$v,
             Scheme::DSSTOX => 'https://comptox.epa.gov/dashboard/chemical/details/'.$v,
-            Scheme::KEGG => 'https://www.kegg.jp/entry/'.$v,
+            Scheme::KEGG, Scheme::KEGG_REACTION, Scheme::KEGG_PATHWAY => 'https://www.kegg.jp/entry/'.$v,
+            // Rhea's page answers a browser check to a program (403, 2026-10-16); a browser opens it.
+            Scheme::RHEA => 'https://www.rhea-db.org/rhea/'.$v,
+            Scheme::EC => 'https://enzyme.expasy.org/EC/'.$this->value,
+            Scheme::COD => 'https://www.crystallography.net/cod/'.$v.'.html',
+            Scheme::MATERIALS_PROJECT => 'https://materialsproject.org/materials/'.$v.'/',
+            Scheme::OQMD => 'https://oqmd.org/materials/entry/'.$v,
+            Scheme::CODATA => 'https://physics.nist.gov/cgi-bin/cuu/Value?'.$v,
             Scheme::UNIPROT => 'https://www.uniprot.org/uniprotkb/'.$v,
             Scheme::NCBI_GENE => 'https://www.ncbi.nlm.nih.gov/gene/'.$v,
             Scheme::NCBI_TAXON => 'https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id='.$v,
@@ -366,7 +397,15 @@ final readonly class Identifier implements \Stringable
             'commonchemistry.cas.org' === $host => self::tryOf(Scheme::CAS, (string) ($query['cas_rn'] ?? '')),
             'comptox.epa.gov' === $host => $found('~(DTXSID\d+)~i', Scheme::DSSTOX),
             'precision.fda.gov' === $host => self::tryOf(Scheme::UNII, $last),
-            str_ends_with($host, 'kegg.jp') || str_ends_with($host, 'genome.jp') => $found('~\b([CD]\d{5})\b~', Scheme::KEGG),
+            str_ends_with($host, 'kegg.jp') || str_ends_with($host, 'genome.jp') => $found('~\b([CD]\d{5})\b~', Scheme::KEGG)
+                ?? $found('~\b(R\d{5})\b~', Scheme::KEGG_REACTION) ?? $found('~\bec:(\d[\d.n-]*)~i', Scheme::EC) ?? $found('~(?:/|\bpath:|=)([a-z]{2,4}\d{5})\b~', Scheme::KEGG_PATHWAY),
+            str_ends_with($host, 'rhea-db.org') => $found('~(?:/rhea/|RHEA:)(\d{5,6})\b~i', Scheme::RHEA),
+            'enzyme.expasy.org' === $host => $found('~/EC/([\d.n-]+)~i', Scheme::EC),
+            str_ends_with($host, 'enzyme-database.org') => self::tryOf(Scheme::EC, (string) ($query['ec'] ?? '')),
+            str_ends_with($host, 'crystallography.net') => $found('~/cod/(\d{7})\b~', Scheme::COD),
+            str_ends_with($host, 'materialsproject.org') => $found('~/materials/((?:mp|mvc)-\d+)~i', Scheme::MATERIALS_PROJECT),
+            str_ends_with($host, 'oqmd.org') => $found('~/entry/(\d+)~', Scheme::OQMD),
+            'physics.nist.gov' === $host => $found('~/cuu/Value\?([A-Za-z][A-Za-z0-9]*)~', Scheme::CODATA),
             str_contains($host, 'simbad') => self::tryOf(Scheme::SIMBAD, (string) ($query['Ident'] ?? $query['ident'] ?? '')),
             str_ends_with($host, 'reactome.org') => $found('~(R-[A-Z]{3}-\d+)~i', Scheme::REACTOME),
             'exoplanetarchive.ipac.caltech.edu' === $host => preg_match('~^overview/(.+)$~', $path, $m) ? self::tryOf(Scheme::EXOPLANET, $m[1]) : null,

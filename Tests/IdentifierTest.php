@@ -148,6 +148,28 @@ final class IdentifierTest extends TestCase
         yield 'NCBI Taxonomy' => ['https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=9606', 'ncbi.taxon:9606'];
         yield 'SIMBAD\'s page' => ['https://simbad.cds.unistra.fr/simbad/sim-id?Ident=M%2031', 'simbad:M 31'];
         yield 'JPL\'s lookup' => ['https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=433', 'jpl.sbdb:433'];
+        yield 'a KEGG reaction' => ['rn:R00200', 'kegg.reaction:R00200'];
+        yield 'a KEGG reaction\'s page' => ['https://www.kegg.jp/entry/R00200', 'kegg.reaction:R00200'];
+        yield 'a KEGG pathway' => ['path:hsa00010', 'kegg.pathway:hsa00010'];
+        yield 'a KEGG reference pathway\'s map' => ['https://www.kegg.jp/pathway/map00010', 'kegg.pathway:map00010'];
+        yield 'a KEGG compound\'s page is still a compound' => ['https://www.kegg.jp/entry/C07481', 'kegg:C07481'];
+        yield 'an enzyme in KEGG' => ['https://www.kegg.jp/entry/ec:2.7.1.40', 'ec:2.7.1.40'];
+        yield 'an EC number' => ['EC 2.7.1.40', 'ec:2.7.1.40'];
+        yield 'an incomplete EC number' => ['EC:2.7.1.-', 'ec:2.7.1.-'];
+        yield 'a preliminary EC number' => ['ec:3.5.1.n3', 'ec:3.5.1.n3'];
+        yield 'not an EC number: no class 8' => ['EC 8.1.1.1', null];
+        yield 'ExPASy\'s ENZYME page' => ['https://enzyme.expasy.org/EC/2.7.1.40', 'ec:2.7.1.40'];
+        yield 'a Rhea reaction' => ['RHEA:18157', 'rhea:18157'];
+        yield 'a Rhea reaction\'s page' => ['https://www.rhea-db.org/rhea/18160', 'rhea:18160'];
+        yield 'a COD structure' => ['cod:1000000', 'cod:1000000'];
+        yield 'a COD structure\'s page' => ['https://www.crystallography.net/cod/1000000.html', 'cod:1000000'];
+        yield 'a COD structure\'s CIF' => ['https://www.crystallography.net/cod/9008565.cif', 'cod:9008565'];
+        yield 'not a COD id: six digits' => ['cod:100000', null];
+        yield 'a Materials Project id' => ['mp-149', 'materialsproject:mp-149'];
+        yield 'a Materials Project page' => ['https://materialsproject.org/materials/mp-149/', 'materialsproject:mp-149'];
+        yield 'an OQMD entry\'s page' => ['https://oqmd.org/materials/entry/6', 'oqmd:6'];
+        yield 'a CODATA constant' => ['codata:mp', 'codata:mp'];
+        yield 'NIST\'s page of one' => ['https://physics.nist.gov/cgi-bin/cuu/Value?mp', 'codata:mp'];
         yield 'an unknown site' => ['https://example.org/compound/2519', null];
     }
 
@@ -180,6 +202,12 @@ final class IdentifierTest extends TestCase
         ]);
         self::assertSame('https://www.ebi.ac.uk/QuickGO/term/GO:0005829', Identifier::of(Scheme::GO, '0005829')->url());
         self::assertSame('https://www.ncbi.nlm.nih.gov/clinvar/variation/15333/', Identifier::of(Scheme::CLINVAR, 'VCV000015333')->url());
+        self::assertSame([Domain::CHEMISTRY, Domain::BIOLOGY, Domain::CHEMISTRY, Domain::BIOLOGY, Domain::CHEMISTRY, Domain::CHEMISTRY, Domain::CHEMISTRY, Domain::OTHER], array_map(static fn (Scheme $s) => $s->domain(), [Scheme::KEGG_REACTION, Scheme::KEGG_PATHWAY, Scheme::RHEA, Scheme::EC, Scheme::COD, Scheme::MATERIALS_PROJECT, Scheme::OQMD, Scheme::CODATA]));
+        self::assertSame(['RHEA:18157', 'EC 2.7.1.40', 'mp-149', 'mp'], [Identifier::of(Scheme::RHEA, '18157')->display(), Identifier::of(Scheme::EC, '2.7.1.40')->display(), Identifier::of(Scheme::MATERIALS_PROJECT, 'MP-149')->display(), Identifier::of(Scheme::CODATA, 'mp')->display()]);
+        self::assertSame('https://enzyme.expasy.org/EC/2.7.1.-', Identifier::of(Scheme::EC, '2.7.1.-')->url());
+        self::assertSame('https://www.kegg.jp/entry/hsa00010', Identifier::of(Scheme::KEGG_PATHWAY, 'HSA00010')->url());
+        self::assertSame('https://physics.nist.gov/cgi-bin/cuu/Value?mp', Identifier::of(Scheme::CODATA, 'mp')->url());
+        self::assertNotSame(Identifier::of(Scheme::CODATA, 'Kj')->key(), Identifier::of(Scheme::CODATA, 'kj')->key(), 'NIST\'s short names keep their case');
         self::assertNull(Scheme::WIKIDATA->domain());
         foreach (Scheme::cases() as $scheme) {
             self::assertNotSame('', $scheme->label());
@@ -199,7 +227,8 @@ final class IdentifierTest extends TestCase
                 Scheme::CHEMBL => 'CHEMBL1098659', Scheme::UNII => '059QF0KO0R', Scheme::DSSTOX => 'DTXSID6026296', Scheme::KEGG => 'C00001',
                 Scheme::UNIPROT => 'P69905', Scheme::ENSEMBL => 'ENSG00000141510', Scheme::PDB => '1A3N', Scheme::SIMBAD => 'M 31', Scheme::JPL_SBDB => '433',
                 Scheme::USGS_EVENT => 'us6000u24c', Scheme::WIKIDATA => 'Q283', Scheme::GHCN => 'USW00094728', Scheme::NWS_STATION => 'KNYC', Scheme::REACTOME => 'R-HSA-70171', Scheme::ENSEMBL_GENOMES => 'FBgn0000008', Scheme::GAIA => '4472832130942575872', Scheme::EXOPLANET => '51 Peg b',
-                Scheme::STRING => '9606.ENSP00000269305', Scheme::INTERPRO => 'IPR000971', Scheme::PFAM => 'PF00042', Scheme::GO, Scheme::EFO, Scheme::MONDO, Scheme::HP => '0005829', Scheme::OMIM => '141900', Scheme::DBSNP => 'rs334', Scheme::GWAS => 'GCST000854', default => '962',
+                Scheme::STRING => '9606.ENSP00000269305', Scheme::INTERPRO => 'IPR000971', Scheme::PFAM => 'PF00042', Scheme::GO, Scheme::EFO, Scheme::MONDO, Scheme::HP => '0005829', Scheme::OMIM => '141900', Scheme::DBSNP => 'rs334', Scheme::GWAS => 'GCST000854',
+                Scheme::KEGG_REACTION => 'R00200', Scheme::KEGG_PATHWAY => 'map00010', Scheme::RHEA => '18157', Scheme::EC => '2.7.1.40', Scheme::COD => '1000000', Scheme::MATERIALS_PROJECT => 'mp-149', Scheme::CODATA => 'mp', default => '962',
             })?->url();
             self::assertTrue(null === $url || str_starts_with($url, 'https://'), $scheme->value);
         }
