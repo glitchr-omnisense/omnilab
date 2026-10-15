@@ -310,7 +310,7 @@ final readonly class Identifier implements \Stringable
             Scheme::UNII => 'https://precision.fda.gov/uniisearch/srs/unii/'.$v,
             Scheme::DSSTOX => 'https://comptox.epa.gov/dashboard/chemical/details/'.$v,
             Scheme::KEGG, Scheme::KEGG_REACTION, Scheme::KEGG_PATHWAY => 'https://www.kegg.jp/entry/'.$v,
-            // Rhea's page answers a browser check to a program (403, 2026-10-16); a browser opens it.
+            // Rhea's page answers a browser check to a program (403, 2026-10-15); a browser opens it.
             Scheme::RHEA => 'https://www.rhea-db.org/rhea/'.$v,
             Scheme::EC => 'https://enzyme.expasy.org/EC/'.$this->value,
             Scheme::COD => 'https://www.crystallography.net/cod/'.$v.'.html',

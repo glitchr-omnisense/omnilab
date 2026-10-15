@@ -143,6 +143,27 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | Collector path | HGNC, Ensembl, NCBI Gene -> Open Targets (the Ensembl gene); ChEMBL -> Open Targets | ClinVar -> GWAS Catalog (rs id) | ClinVar -> GWAS Catalog |
 | Terms | CC0 | attribution, cite ClinVar | EMBL-EBI's terms of use |
 
+| | cod | cactus | codata |
+|---|---|---|---|
+| Shape | entity | entity | entity |
+| `entity()` by | a COD id (`9008565`, its page, its CIF) | a name, a CAS number, an InChIKey, an InChI, a SMILES | NIST's short name (`mp`) or a constant's name |
+| `search()` | the entries' metadata (two calls a page) | - | words of the constants' names |
+| Outside the contract | `cif()`: the CIF as an `Asset`; `open()` reads it | - | `adjustment()`: 2022 |
+| Units | Å, °, Å³, K, kPa | g/mol | NIST's (`kg`, `m s^-1`, `J Hz^-1`...) |
+| Cross-references | none | standard InChI, CAS numbers (the id is the InChIKey) | none |
+| Related | `duplicate_of` (COD) | - | - |
+| Collector path | none yet (Wikidata's P9824 not read) | CIR -> PubChem, ChEBI, ChEMBL by the InChIKey | none yet (Wikidata's P1645 not read) |
+
+| | materials-project | oqmd |
+|---|---|---|
+| Shape | entity | entity |
+| `entity()` by | an mp id (`mp-149`, its page) | an OQMD id (`oqmd:16974`, its page) |
+| `search()` | a formula (`Fe2O3`) or a chemical system (`Fe-O`) | a composition or a phase space |
+| Units | g/cm³, Å³, eV/atom, eV, μB, GPa | Å³, eV/atom, eV |
+| Cross-references | none (other databases' ids as properties) | none (ICSD's as a property) |
+| Related | - | `duplicate_of` (OQMD) |
+| Tested live | no: a key is required | no: the service was down on 2026-10-15 |
+
 Their limits and politeness are in each package's `docs/index.md`.
 
 ## Errors
@@ -308,6 +329,11 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
 - **GWAS Catalog**: the v1 API is retired (410); v2 has no rate published; a p-value is kept as
   its mantissa and exponent (`1e-323`: a float underflows past about 1e-308); `studies?disease_trait=`
   matched nothing for "sickle" on 2026-10-15: the search goes through the traits.
+- **COD**: no rate published; a slow server (0.3 to 7.6 s a call) that answered 403 to eight calls in ten seconds (0.5 s between two calls by default) and dropped a few connections; a search costs two calls (the ids, then the page's rows), its total is the number of ids; an id names an entry whatever COD flags it (duplicates, errors, theoretical: asked with `include_*=1`).
+- **CIR (cactus)**: no rate published; one call a representation (eight an entity, `representations` and `names` lessen them); a structure's slashes must stay raw in the path (`%2F` is a 404); a name it cannot read is a 500 "Page not found" in text, an empty XML answer: null; it reads systematic names with OPSIN itself, so OPSIN's web service (EBI) is asked only when CIR fails.
+- **CODATA (NIST)**: two files in all (the text table of the values, the list that names each constant), kept for the source's life; the table abbreviates names the list writes in full (`mag. mom.`, `gyromag.`), matched; a constant is of `Domain::OTHER` (the core has no physics); a float keeps fifteen to seventeen digits, `value_text` every digit NIST gives.
+- **Materials Project**: an account's key in `X-API-KEY`, required (401 without: omnilab/materials-project is not tested live, no account having been created); ids asked in their legacy form (`id_format=legacy`: `mp-149`, not the AlphaID `mp-aaaaaaft`); 1000 materials a page at most.
+- **OQMD**: no rate published; down on 2026-10-15 (502, then time-outs), so omnilab/oqmd is not tested live; one entry is asked by `filter=entry_id=...`, which its documentation does not list among the filter's keywords.
 
 ## Throttling and politeness
 
@@ -340,6 +366,11 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
 | opentargets | none (no rate published) | `mailto` in the User-Agent |
 | clinvar | 0.34 s without a key, 0.1 s with one (`auto`) | `tool` and `email` (from `mailto`) on every call; `api_key` |
 | gwas | none (no rate published) | `mailto` in the User-Agent |
+| cod | 0.5 s (COD answered 403 to eight calls in ten seconds) | `mailto` in the User-Agent |
+| cactus | none (no rate published) | `mailto` in the User-Agent |
+| codata | none (two calls in all) | `mailto` in the User-Agent |
+| materials-project | none (no rate published) | `mailto` in the User-Agent; heavy use announced to the Materials Project |
+| oqmd | none (no rate published) | `mailto` in the User-Agent |
 
 Every factory takes `mailto`, `user_agent`, `throttle` (seconds between two calls of one source
 instance) and `base_uri`.

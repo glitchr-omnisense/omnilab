@@ -73,6 +73,11 @@
         "omnilab/opentargets": "Open Targets Platform: targets (Ensembl genes), diseases (EFO, Mondo, HPO, Orphanet) and drugs (ChEMBL), their associations with scores, drugs and clinical candidates; a search",
         "omnilab/clinvar": "ClinVar (NCBI E-utilities): variations by VariationID or VCV accession, their clinical significance, review status, conditions, genes, location and frequencies, their dbSNP id; a search",
         "omnilab/gwas": "GWAS Catalog: studies, variants (rs ids) and traits (EFO, Mondo, HPO) with their strongest associations; p-values, effect sizes, risk alleles; a search of traits",
+        "omnilab/cod": "Crystallography Open Database: crystal structures by COD id, their formula, unit cell with uncertainties, space group and publication, the CIF as a file; a search",
+        "omnilab/cactus": "NCI/CADD Chemical Identifier Resolver: a structure from a name, CAS number, InChIKey, InChI or SMILES, its InChIKey, InChI, SMILES, IUPAC name, formula, weight, CAS numbers and names; OPSIN for a name it cannot read",
+        "omnilab/codata": "CODATA fundamental physical constants as NIST publishes them (2022): each constant by NIST's short name or its name, its value, uncertainty and unit, exact or not; a search",
+        "omnilab/materials-project": "Materials Project (an account's key): computed properties of inorganic materials by mp id, their formula, symmetry, energies, band gap and moduli; the materials of a formula or a chemical system",
+        "omnilab/oqmd": "OQMD: DFT formation energies, hull distances and band gaps of materials by OQMD id, composition or phase space",
         "symfony/config": "In a Symfony application: the configuration of Omnilab\\Bridge\\Symfony\\OmnilabBundle",
         "symfony/dependency-injection": "In a Symfony application: the services of Omnilab\\Bridge\\Symfony\\OmnilabBundle",
         "symfony/http-kernel": "In a Symfony application: Omnilab\\Bridge\\Symfony\\OmnilabBundle itself"

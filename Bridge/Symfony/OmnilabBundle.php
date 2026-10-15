@@ -2,10 +2,13 @@
 
 namespace Omnilab\Bridge\Symfony;
 
+use Omnilab\Cactus\CactusSourceFactory;
 use Omnilab\Cams\CamsSourceFactory;
 use Omnilab\Cds\CdsSourceFactory;
 use Omnilab\Chebi\ChebiSourceFactory;
 use Omnilab\Chembl\ChemblSourceFactory;
+use Omnilab\Cod\CodSourceFactory;
+use Omnilab\Codata\CodataSourceFactory;
 use Omnilab\Collector;
 use Omnilab\Copernicus\CopernicusSourceFactory;
 use Omnilab\Earthdata\EarthdataSourceFactory;
@@ -16,10 +19,12 @@ use Omnilab\Gbif\GbifSourceFactory;
 use Omnilab\INaturalist\INaturalistSourceFactory;
 use Omnilab\Jpl\JplSourceFactory;
 use Omnilab\Kegg\KeggSourceFactory;
+use Omnilab\MaterialsProject\MaterialsProjectSourceFactory;
 use Omnilab\Merger;
 use Omnilab\Ncbi\NcbiSourceFactory;
 use Omnilab\Noaa\NoaaSourceFactory;
 use Omnilab\OpenMeteo\OpenMeteoSourceFactory;
+use Omnilab\Oqmd\OqmdSourceFactory;
 use Omnilab\Pdb\PdbSourceFactory;
 use Omnilab\PubChem\PubChemSourceFactory;
 use Omnilab\Registry;
@@ -104,6 +109,11 @@ final class OmnilabBundle extends AbstractBundle
         OpenTargetsSourceFactory::class,
         ClinVarSourceFactory::class,
         GwasSourceFactory::class,
+        CodSourceFactory::class,
+        CactusSourceFactory::class,
+        CodataSourceFactory::class,
+        MaterialsProjectSourceFactory::class,
+        OqmdSourceFactory::class,
     ];
 
     public function configure(DefinitionConfigurator $definition): void
@@ -111,7 +121,7 @@ final class OmnilabBundle extends AbstractBundle
         $definition->rootNode()
             ->children()
                 ->arrayNode('sources')
-                    ->info('The sources, by name: a factory (pubchem, chebi, wikidata, uniprot, ensembl, pdb, reactome, string, interpro, quickgo, hgnc, opentargets, clinvar, gwas, gbif, inaturalist, simbad, gaia, exoplanets, usgs, open-meteo, noaa, copernicus, cds, cams, earthdata, kegg, rhea...) and its options.')
+                    ->info('The sources, by name: a factory (pubchem, chebi, wikidata, uniprot, ensembl, pdb, reactome, string, interpro, quickgo, hgnc, opentargets, clinvar, gwas, gbif, inaturalist, simbad, gaia, exoplanets, usgs, open-meteo, noaa, copernicus, cds, cams, earthdata, kegg, rhea, cod, cactus, codata, materials-project, oqmd...) and its options.')
                     ->useAttributeAsKey('name')
                     ->arrayPrototype()
                         ->children()

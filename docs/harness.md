@@ -69,6 +69,12 @@ docker compose run --rm omnilab collect wikidata Q133574091         # the 2025 M
 docker compose run --rm omnilab entity rhea RHEA:18160            # pyruvate kinase's reaction: its master 18157, ChEBI participants, EC, UniProt enzymes
 docker compose run --rm omnilab search rhea "pyruvate kinase" --limit 3
 docker compose run --rm omnilab entity kegg C07481                  # KEGG: for academic use by academic users only
+docker compose run --rm omnilab entity cod 9008565                  # silicon: its cell, space group, publication, CIF
+docker compose run --rm omnilab search cod caffeine --limit 5
+docker compose run --rm omnilab entity cactus caffeine              # or 58-08-2, an InChIKey, a SMILES
+docker compose run --rm omnilab collect cactus caffeine             # then PubChem (and ChEBI) by the InChIKey
+docker compose run --rm omnilab entity codata mp                    # the proton mass, CODATA 2022
+docker compose run --rm omnilab search codata "proton mass"
 docker compose run --rm omnilab series usgs 35.6812,139.7671 count magnitude --daily max --from 2026-10-01 --to 2026-10-07
 docker compose run --rm omnilab series noaa ghcn:USW00094728 TMAX PRCP --step P1D --from 2026-10-01 --to 2026-10-07   # a station's own records
 docker compose run --rm omnilab entity noaa ghcn:FR000007190                                                    # the station itself

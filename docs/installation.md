@@ -16,6 +16,8 @@ composer require omnilab/inaturalist                         # taxa, and observa
 composer require omnilab/noaa                                # weather stations' records (NCEI), the NWS
 composer require omnilab/cds omnilab/cams omnilab/earthdata  # climate and atmosphere data stores; NASA's Earth observation
 composer require omnilab/rhea omnilab/kegg                  # biochemical reactions; KEGG (academic use only)
+composer require omnilab/cod omnilab/cactus omnilab/codata    # crystal structures; a structure from any identifier; physical constants
+composer require omnilab/materials-project omnilab/oqmd       # computed materials (Materials Project: a key)
 ```
 
 The weather and the air are both `omnilab/open-meteo` (`api: air_quality` for the air); the

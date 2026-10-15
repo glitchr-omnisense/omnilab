@@ -234,7 +234,7 @@ $collector->collect('kegg', 'R00200', 1, ['rhea']);     // KEGG, then Rhea by 18
 ```
 
 Not walked live: KEGG's API is for academic users only, and omnilab/kegg is not tested live
-against it. Rhea's half was answered on 2026-10-16 (one SPARQL query, one UniProt search).
+against it. Rhea's half was answered on 2026-10-15 (one SPARQL query, one UniProt search).
 
 **A protein, from UniProt into STRING, InterPro and QuickGO** - walked against the real services
 on 2026-10-15. A protein's UniProt accession takes it into the
@@ -274,6 +274,18 @@ $collector->collect('clinvar', '15333', 1, ['gwas']);        // 3 calls, 1.7 s
 associations (rs334-T, p = 1e-323 for hereditary hemolytic anemias) side by side. An rs id names
 a site (rs334 holds four alleles), a ClinVar variation one of them: the two are joined as ClinVar
 names them, not proved the same allele.
+
+**A structure from any of its names, into PubChem** - CIR (omnilab/cactus) reads a name, a CAS
+number, a SMILES or an InChI and gives the standard InChIKey, which PubChem, ChEBI and ChEMBL read:
+
+```php
+$caffeine = $collector->collect('cactus', 'caffeine', 1, ['pubchem']);
+$caffeine->sources;                              // ['cactus', 'pubchem']
+$caffeine->identifier(Scheme::PUBCHEM_CID);      // 2519
+$caffeine->properties('molecular_weight');       // 194.1926 g/mol [cactus], 194.19 g/mol [pubchem]
+```
+
+Walked on 2026-10-15 (`.samples/live.php`): CIR's eight calls, then PubChem by the InChIKey.
 
 ## The Merger
 

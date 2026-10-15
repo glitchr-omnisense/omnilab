@@ -36,4 +36,9 @@ return [
     'opentargets' => ['Omnilab\\OpenTargets\\Tests\\', 'Omnilab\\OpenTargets\\OpenTargetsSourceFactory'],
     'clinvar' => ['Omnilab\\ClinVar\\Tests\\', 'Omnilab\\ClinVar\\ClinVarSourceFactory'],
     'gwas' => ['Omnilab\\Gwas\\Tests\\', 'Omnilab\\Gwas\\GwasSourceFactory'],
+    'cod' => ['Omnilab\\Cod\\Tests\\', 'Omnilab\\Cod\\CodSourceFactory'],
+    'cactus' => ['Omnilab\\Cactus\\Tests\\', 'Omnilab\\Cactus\\CactusSourceFactory'],
+    'codata' => ['Omnilab\\Codata\\Tests\\', 'Omnilab\\Codata\\CodataSourceFactory'],
+    'materials-project' => ['Omnilab\\MaterialsProject\\Tests\\', 'Omnilab\\MaterialsProject\\MaterialsProjectSourceFactory'],
+    'oqmd' => ['Omnilab\\Oqmd\\Tests\\', 'Omnilab\\Oqmd\\OqmdSourceFactory'],
 ];

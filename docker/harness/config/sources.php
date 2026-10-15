@@ -43,4 +43,9 @@ return [
     'opentargets' => ['factory' => 'opentargets', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'clinvar' => ['factory' => 'clinvar', 'needs' => [], 'options' => ['mailto' => $mailto, 'api_key' => $env('NCBI_API_KEY')]],
     'gwas' => ['factory' => 'gwas', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'cod' => ['factory' => 'cod', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'cactus' => ['factory' => 'cactus', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'codata' => ['factory' => 'codata', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'materials-project' => ['factory' => 'materials-project', 'needs' => ['MP_API_KEY'], 'options' => ['mailto' => $mailto, 'api_key' => $env('MP_API_KEY')]],
+    'oqmd' => ['factory' => 'oqmd', 'needs' => [], 'options' => ['mailto' => $mailto]],
 ];
