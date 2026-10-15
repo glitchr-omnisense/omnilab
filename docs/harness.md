@@ -66,6 +66,11 @@ docker compose run --rm omnilab entity exoplanets "51 Peg b"
 docker compose run --rm omnilab collect wikidata Q242309          # 51 Peg b, then SIMBAD and the archive (P3083, P5667)
 docker compose run --rm omnilab entity usgs us7000pn9s
 docker compose run --rm omnilab collect wikidata Q133574091         # the 2025 Myanmar earthquake, then the USGS by P3196
+docker compose run --rm omnilab entity emsc 20261004_0000156        # the EMSC's M 5.0 of central Turkey
+docker compose run --rm omnilab entity usgs-water USGS-01646500     # the Potomac at Little Falls, the series it keeps
+docker compose run --rm omnilab search usgs-water "potomac river" --limit 5
+docker compose run --rm omnilab entity tides coops:8518750          # The Battery, New York
+docker compose run --rm omnilab entity brightsky dwd:01420          # Frankfurt/Main
 docker compose run --rm omnilab entity rhea RHEA:18160            # pyruvate kinase's reaction: its master 18157, ChEBI participants, EC, UniProt enzymes
 docker compose run --rm omnilab search rhea "pyruvate kinase" --limit 3
 docker compose run --rm omnilab entity kegg C07481                  # KEGG: for academic use by academic users only
@@ -76,6 +81,12 @@ docker compose run --rm omnilab collect cactus caffeine             # then PubCh
 docker compose run --rm omnilab entity codata mp                    # the proton mass, CODATA 2022
 docker compose run --rm omnilab search codata "proton mass"
 docker compose run --rm omnilab series usgs 35.6812,139.7671 count magnitude --daily max --from 2026-10-01 --to 2026-10-07
+docker compose run --rm omnilab series emsc -25,35,45,72 count magnitude --daily max --from 2026-10-01 --to 2026-10-07
+docker compose run --rm omnilab series usgs-water USGS-01646500 discharge gage_height --from 2026-10-14 --to 2026-10-14
+docker compose run --rm omnilab series tides coops:8518750 water_level high_low_predictions --from 2026-10-14 --to 2026-10-14
+docker compose run --rm omnilab series brightsky wmo:10637 temperature precipitation --from 2026-10-14 --to 2026-10-14
+docker compose run --rm omnilab series swpc 64.84,-147.72 aurora                # OVATION's latest nowcast over Fairbanks
+docker compose run --rm omnilab series openaq 48.5734,7.7521 pm25 no2          # needs OPENAQ_API_KEY
 docker compose run --rm omnilab series noaa ghcn:USW00094728 TMAX PRCP --step P1D --from 2026-10-01 --to 2026-10-07   # a station's own records
 docker compose run --rm omnilab entity noaa ghcn:FR000007190                                                    # the station itself
 docker compose run --rm omnilab series open-meteo 48.5734,7.7521 temperature_2m --from tomorrow --to tomorrow
@@ -85,6 +96,7 @@ docker compose run --rm omnilab series air-quality 48.5734,7.7521 european_aqi -
 docker compose run --rm omnilab occurrences gbif --point -24.99,31.59 --radius 100 --from 2025-01-01 --to 2025-12-31 -f taxon=4CGXP --max 20
 docker compose run --rm omnilab occurrences inaturalist --point -24.99,31.59 --radius 100 --from 2025-01-01 --to 2025-12-31 -f taxon=41964 --max 20
 docker compose run --rm omnilab occurrences usgs --bbox -25,35,45,72 --from 2026-10-01 --to 2026-10-07 -f min_magnitude=4 --sort magnitude
+docker compose run --rm omnilab occurrences emsc --bbox -25,35,45,72 --from 2026-10-01 --to 2026-10-07 -f min_magnitude=4 --sort magnitude
 docker compose run --rm omnilab datasets earthdata "sea surface temperature" --limit 5
 docker compose run --rm omnilab products copernicus --point 48.5734,7.7521 --from=-10days --cloud 30
 docker compose run --rm omnilab products copernicus --bbox 7.68,48.53,7.83,48.64 --collection sentinel-1-grd --from=-3days

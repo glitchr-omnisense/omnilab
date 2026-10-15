@@ -45,7 +45,7 @@ final class OmnilabBundleTest extends TestCase
 
         $registry = $container->get(Registry::class);
         self::assertSame(['pubchem', 'chebi'], $registry->names());
-        foreach (['pubchem', 'open-meteo', 'copernicus', 'chebi', 'wikidata', 'chembl', 'uniprot', 'ncbi', 'gbif', 'simbad', 'jpl', 'usgs', 'ensembl', 'pdb', 'inaturalist', 'noaa', 'cds', 'cams', 'earthdata', 'exoplanets', 'gaia', 'reactome', 'string', 'interpro', 'quickgo', 'hgnc', 'opentargets', 'clinvar', 'gwas', 'kegg', 'rhea', 'cod', 'cactus', 'codata', 'materials-project', 'oqmd'] as $factory) {
+        foreach (['pubchem', 'open-meteo', 'copernicus', 'chebi', 'wikidata', 'chembl', 'uniprot', 'ncbi', 'gbif', 'simbad', 'jpl', 'usgs', 'ensembl', 'pdb', 'inaturalist', 'noaa', 'cds', 'cams', 'earthdata', 'exoplanets', 'gaia', 'reactome', 'string', 'interpro', 'quickgo', 'hgnc', 'opentargets', 'clinvar', 'gwas', 'kegg', 'rhea', 'cod', 'cactus', 'codata', 'materials-project', 'oqmd', 'emsc', 'usgs-water', 'tides', 'swpc', 'brightsky', 'elevation', 'openaq'] as $factory) {
             self::assertContains($factory, $registry->factories(), 'the packages installed are registered');
         }
         self::assertContains('stub', $registry->factories(), 'the application\'s own, autoconfigured');

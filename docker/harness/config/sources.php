@@ -48,4 +48,11 @@ return [
     'codata' => ['factory' => 'codata', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'materials-project' => ['factory' => 'materials-project', 'needs' => ['MP_API_KEY'], 'options' => ['mailto' => $mailto, 'api_key' => $env('MP_API_KEY')]],
     'oqmd' => ['factory' => 'oqmd', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'emsc' => ['factory' => 'emsc', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'usgs-water' => ['factory' => 'usgs-water', 'needs' => [], 'options' => ['mailto' => $mailto, 'api_key' => $env('USGS_WATER_API_KEY')]],
+    'tides' => ['factory' => 'tides', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'swpc' => ['factory' => 'swpc', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'brightsky' => ['factory' => 'brightsky', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'elevation' => ['factory' => 'elevation', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'openaq' => ['factory' => 'openaq', 'needs' => ['OPENAQ_API_KEY'], 'options' => ['mailto' => $mailto, 'api_key' => $env('OPENAQ_API_KEY')]],
 ];

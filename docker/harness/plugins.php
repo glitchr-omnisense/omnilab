@@ -41,4 +41,11 @@ return [
     'codata' => ['Omnilab\\Codata\\Tests\\', 'Omnilab\\Codata\\CodataSourceFactory'],
     'materials-project' => ['Omnilab\\MaterialsProject\\Tests\\', 'Omnilab\\MaterialsProject\\MaterialsProjectSourceFactory'],
     'oqmd' => ['Omnilab\\Oqmd\\Tests\\', 'Omnilab\\Oqmd\\OqmdSourceFactory'],
+    'emsc' => ['Omnilab\\Emsc\\Tests\\', 'Omnilab\\Emsc\\EmscSourceFactory'],
+    'usgs-water' => ['Omnilab\\UsgsWater\\Tests\\', 'Omnilab\\UsgsWater\\UsgsWaterSourceFactory'],
+    'tides' => ['Omnilab\\Tides\\Tests\\', 'Omnilab\\Tides\\TidesSourceFactory'],
+    'swpc' => ['Omnilab\\Swpc\\Tests\\', 'Omnilab\\Swpc\\SwpcSourceFactory'],
+    'brightsky' => ['Omnilab\\BrightSky\\Tests\\', 'Omnilab\\BrightSky\\BrightSkySourceFactory'],
+    'elevation' => ['Omnilab\\Elevation\\Tests\\', 'Omnilab\\Elevation\\ElevationSourceFactory'],
+    'openaq' => ['Omnilab\\OpenAq\\Tests\\', 'Omnilab\\OpenAq\\OpenAqSourceFactory'],
 ];

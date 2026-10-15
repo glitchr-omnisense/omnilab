@@ -43,11 +43,11 @@ reuses a key before it makes one:
 | `OccurrenceQuery::TAXON` (`taxon`) | an `Identifier` of the source's scheme, a key, or a scientific name | gbif, inaturalist |
 | `OccurrenceQuery::COUNTRY` (`country`) | ISO 3166-1 alpha-2 (`ZA`), or a list | gbif |
 | `OccurrenceQuery::KIND` (`kind`) | the source's word for what it is, or a list: `earthquake`, `quarry blast` (usgs); `human_observation`, `preserved_specimen` (gbif's basis of record) | usgs, gbif |
-| `OccurrenceQuery::MIN_MAGNITUDE`, `MAX_MAGNITUDE` | a magnitude, included | usgs |
+| `OccurrenceQuery::MIN_MAGNITUDE`, `MAX_MAGNITUDE` | a magnitude, included | usgs, emsc |
 | `OccurrenceQuery::LICENSE` (`license`) | the licence a record is shared under, as Creative Commons writes it lower case (`cc0`, `cc-by`, `cc-by-nc`...), or a list | inaturalist |
 
-A source may read keys of its own besides (the USGS reads `alert`, PAGER's level; iNaturalist
-`quality_grade`); its README lists them.
+A source may read keys of its own besides (the USGS reads `alert`, PAGER's level; the EMSC
+`magnitude_type`; iNaturalist `quality_grade`); its README lists them.
 
 ## The answer: a `Page` of `Entity`
 

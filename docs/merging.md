@@ -287,6 +287,14 @@ $caffeine->properties('molecular_weight');       // 194.1926 g/mol [cactus], 194
 
 Walked on 2026-10-15 (`.samples/live.php`): CIR's eight calls, then PubChem by the InChIKey.
 
+**No path: the earth, water and sky sources of 2026-10-15/16** - omnilab/emsc, usgs-water, tides,
+brightsky, swpc, elevation and openaq give no id of another base (Bright Sky's stations carry
+their DWD and WIGOS ids, both its own), and Wikidata has no property for the EMSC's events: the
+`Collector` has nothing to follow into them or out of them. The EMSC's and the USGS's records of
+one earthquake (the M 5.0 of central Turkey on 2026-10-04 at 11:43:23 UTC: `emsc.event:20261004_0000156`,
+mb; `usgs.event:us6000tzip`, mww) stay two entities: joining them by time and place would be a
+guess, which the `Merger` does not make.
+
 ## The Merger
 
 ```php

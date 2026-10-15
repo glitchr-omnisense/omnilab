@@ -7,7 +7,7 @@ composer require omnilab/uniprot omnilab/ncbi omnilab/gbif   # proteins, genes a
 composer require omnilab/chembl                              # bioactive molecules, their targets
 composer require omnilab/simbad omnilab/jpl                  # stars and galaxies; asteroids and comets
 composer require omnilab/gaia omnilab/exoplanets             # Gaia DR3's sources; the confirmed exoplanets
-composer require omnilab/usgs                                # earthquakes
+composer require omnilab/usgs omnilab/emsc                   # earthquakes: the USGS's catalogue, the EMSC's
 composer require omnilab/ensembl omnilab/pdb                 # genomes; protein structures
 composer require omnilab/reactome                            # pathways and reactions
 composer require omnilab/hgnc omnilab/string omnilab/interpro omnilab/quickgo   # human genes; protein interactions, domains, GO
@@ -18,11 +18,14 @@ composer require omnilab/cds omnilab/cams omnilab/earthdata  # climate and atmos
 composer require omnilab/rhea omnilab/kegg                  # biochemical reactions; KEGG (academic use only)
 composer require omnilab/cod omnilab/cactus omnilab/codata    # crystal structures; a structure from any identifier; physical constants
 composer require omnilab/materials-project omnilab/oqmd       # computed materials (Materials Project: a key)
+composer require omnilab/usgs-water omnilab/tides            # rivers and wells (USGS); tides and water levels (NOAA CO-OPS)
+composer require omnilab/brightsky omnilab/openaq            # the DWD's weather (Bright Sky); air quality measurements (OpenAQ: a key)
+composer require omnilab/swpc omnilab/elevation              # space weather (NOAA SWPC); elevations (Open Topo Data)
 ```
 
 The weather and the air are both `omnilab/open-meteo` (`api: air_quality` for the air); the
 occurrences of a species are `omnilab/gbif`'s and `omnilab/inaturalist`'s (its observations), those
-of earthquakes `omnilab/usgs`'s.
+of earthquakes `omnilab/usgs`'s and `omnilab/emsc`'s.
 
 PHP 8.2 or later.
 

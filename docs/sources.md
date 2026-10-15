@@ -36,7 +36,7 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | `datasets` | `datasets()` finds the catalogue's datasets by text |
 | `jobs` | the source implements `JobSourceInterface`: requests for a file, submitted and followed |
 | `open` | `open()` reads a file with the source's credentials |
-| `station` | `series()` takes a station's `Identifier` (`ghcn`, `wigos`, `nws.station`) in place of a `Point`, and answers its own records; without it, a station is refused ([stations](models.md#stations)) |
+| `station` | `series()` takes a station's `Identifier` (`ghcn`, `wigos`, `nws.station`, `usgs.site`, `coops.station`, `dwd.station`) in place of a `Point`, and answers its own records; without it, a station is refused ([stations](models.md#stations)) |
 | `cloud_cover` | `products()` applies `ProductQuery::$maxCloudCover`; without it, the query is refused rather than answered unfiltered |
 
 ## What each one does
@@ -86,6 +86,24 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | Cross-references | a gene: NCBI Gene, its Swiss-Prot entries; a protein: its UniProt entries | its own id (and the removed id it was asked by) | none (iNaturalist gives no other base's id) |
 | Related | `organism` (NCBI taxon), a gene's canonical `transcript`, a transcript's `gene` and `protein`, a protein's `transcript` and `gene` | `protein` (its chains' UniProt), `organism`, `ligand` (ChEBI, else PubChem, else InChIKey) | `parent`, or an inactive taxon's `accepted`; an observation's `taxon` |
 | Collector path | NCBI Gene or UniProt -> Ensembl by the Ensembl gene id; Ensembl -> NCBI Gene, UniProt, Wikidata (P594) | none: an entry is taken alone, reached from UniProt's `structure`s; its `protein`s lead back | Wikidata -> iNaturalist (P3151), and back; GBIF -> Wikidata -> iNaturalist at depth 2; a GBIF occurrence -> its iNaturalist observation |
+
+| | emsc | usgs-water | tides | brightsky |
+|---|---|---|---|---|
+| Shape | entity, series, occurrences | entity, search, series | entity, series | entity, series |
+| `entity()` by | SeismicPortal id (`20261004_0000156`), its page | a monitoring location (`USGS-01646500`, its page) | a CO-OPS station (`coops:8518750`) | a DWD station (`dwd:01420`) or a WMO index (`wmo:10637`) |
+| `search()` | - (no text search) | the USGS's locations by name (CQL2 `LIKE`), paged by the API's cursor | - | - |
+| `series()` | per step: count, magnitude, depth, at a `BBox` or around a `Point` (a radius sent in degrees) | discharge, gage height, water temperature... or any USGS parameter code, as recorded on the step's grid or the USGS's daily statistics; a `usgs.site` or the nearest of a `Point` | water level, verified hourly heights and highs and lows, tide predictions (forecast), water and air temperature; a `coops.station` or the nearest of a `Point`; cut to the API's month and year limits | hourly observations and MOSMIX forecasts (14 variables), or days made from the hours; a `Point`, a `dwd.station` or a `wigos` WMO index |
+| `occurrences()` | the events of a `BBox` or around a `Point` (100 km by default); `min_magnitude`, `max_magnitude`, `magnitude_type`; sorted `newest`, `oldest`, `magnitude`; 20,000 a page | - | - | - |
+| Units | km | the API's (`ft^3/s`, `ft`, `degC`...) | m above the datum (MLLW by default), °C | °C, %, mm, hPa, km/h, °, m, min, kWh/m² |
+| Cross-references | none | none | none | a station's DWD and WIGOS ids |
+| Collector path | none (no id of another base; Wikidata has no EMSC property) | none | none | none |
+
+| | swpc | elevation | openaq |
+|---|---|---|---|
+| Shape | series (the aurora at a `Point`) | none of the contract's | series |
+| Outside the contract | `kp()`, `solarWind()`, `alerts()`, `scales()`: space weather is at no place on the Earth, which a `Series` needs (`Timeline`, `Alert` of the package) | `at()`, `profile()`: `Point`s with their elevation | - |
+| `series()` | `aurora` (%, OVATION's latest nowcast, one point, a forecast) | - | a pollutant by OpenAQ's name at the nearest location of a `Point` (25 km at most): hourly or daily averages |
+| Tested live | yes | yes | no: a key is required, none was created |
 
 | | gaia | exoplanets |
 |---|---|---|
@@ -334,6 +352,13 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
 - **CIR (cactus)**: no rate published; one call a representation (eight an entity, `representations` and `names` lessen them); a structure's slashes must stay raw in the path (`%2F` is a 404); a name it cannot read is a 500 "Page not found" in text, an empty XML answer: null; it reads systematic names with OPSIN itself, so OPSIN's web service (EBI) is asked only when CIR fails.
 - **CODATA (NIST)**: two files in all (the text table of the values, the list that names each constant), kept for the source's life; the table abbreviates names the list writes in full (`mag. mom.`, `gyromag.`), matched; a constant is of `Domain::OTHER` (the core has no physics); a float keeps fifteen to seventeen digits, `value_text` every digit NIST gives.
 - **Materials Project**: an account's key in `X-API-KEY`, required (401 without: omnilab/materials-project is not tested live, no account having been created); ids asked in their legacy form (`id_format=legacy`: `mp-149`, not the AlphaID `mp-aaaaaaft`); 1000 materials a page at most.
+- **EMSC**: no rate published; 20,000 events a query at most (a 413 "More than 20000 entries" without a limit, a larger limit cut); an end given as a date alone is read as its whole day (the source always sends a time); a radius in degrees; no event-type filter (a 400); the geometry's depth changes sign with the event's age (the property is read). EarthScope's (IRIS) FDSN event service is retired (404 "This service has been retired", checked on 2026-10-15): not offered.
+- **USGS Water Data**: the WaterServices (`waterservices.usgs.gov`) shut down on 2027-02-22, the OGC APIs replace them; 50,000 features a call at most (a 400 beyond), the next page by the `next` link; no order promised (the points are sorted); rate limits per key or per address, a 429 beyond, higher with an api.data.gov key.
+- **NOAA CO-OPS**: a month of six-minute values a request, a year of hourly ones or of highs and lows (the source cuts longer periods); errors come as `{"error": {"message": ...}}`, often with a 200; "No data was found" (a product a station lacks, verified data not yet published) is a series without values; the API asks its callers to space their calls (0.5 s by default).
+- **NOAA SWPC**: public files, the latest only (the Kp index of the last week and the next three days, a day of solar wind, the last aurora nowcast); the older `products/solar-wind/*-7-day.json` answer 404.
+- **Bright Sky**: observations dense in Germany, the forecasts sparse elsewhere; records from 2010; an unknown station or a point without records is a 404; the DWD's data under CC BY 4.0, the source acknowledged.
+- **Open Topo Data**: the public instance takes 100 locations a call, a call a second, 1,000 calls a day; a dataset answers null outside its extent.
+- **OpenAQ**: a key required (401 without, met on 2026-10-15), 60 calls a minute and 2,000 an hour per key; omnilab/openaq is not tested live, no key having been created.
 - **OQMD**: no rate published; down on 2026-10-15 (502, then time-outs), so omnilab/oqmd is not tested live; one entry is asked by `filter=entry_id=...`, which its documentation does not list among the filter's keywords.
 
 ## Throttling and politeness
@@ -372,6 +397,13 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
 | codata | none (two calls in all) | `mailto` in the User-Agent |
 | materials-project | none (no rate published) | `mailto` in the User-Agent; heavy use announced to the Materials Project |
 | oqmd | none (no rate published) | `mailto` in the User-Agent |
+| emsc | none (no rate published) | `mailto` in the User-Agent |
+| usgs-water | none (rate limits per key or address) | `mailto` in the User-Agent; `api_key` as `X-Api-Key` |
+| tides | 0.5 s (CO-OPS asks its callers to space their calls) | `application=omnilab` on every call; `mailto` in the User-Agent |
+| swpc | none (no rate published) | `mailto` in the User-Agent |
+| brightsky | none (no rate published) | `mailto` in the User-Agent |
+| elevation | 1 s (the public instance's one a second) | `mailto` in the User-Agent |
+| openaq | 1 s (60 a minute per key) | the key as `X-API-Key`; `mailto` in the User-Agent |
 
 Every factory takes `mailto`, `user_agent`, `throttle` (seconds between two calls of one source
 instance) and `base_uri`.

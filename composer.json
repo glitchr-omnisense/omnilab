@@ -78,6 +78,13 @@
         "omnilab/codata": "CODATA fundamental physical constants as NIST publishes them (2022): each constant by NIST's short name or its name, its value, uncertainty and unit, exact or not; a search",
         "omnilab/materials-project": "Materials Project (an account's key): computed properties of inorganic materials by mp id, their formula, symmetry, energies, band gap and moduli; the materials of a formula or a chemical system",
         "omnilab/oqmd": "OQMD: DFT formation energies, hull distances and band gaps of materials by OQMD id, composition or phase space",
+        "omnilab/emsc": "EMSC (SeismicPortal FDSN): an earthquake by its id with its time and place, the earthquakes of a box or around a point as series or occurrences",
+        "omnilab/usgs-water": "USGS Water Data (OGC APIs): streamflow, gage height and other parameters of a monitoring location as recorded or daily; monitoring locations",
+        "omnilab/tides": "NOAA CO-OPS (Tides and Currents): water levels, verified hourly heights, highs and lows, tide predictions and water temperature of a station",
+        "omnilab/swpc": "NOAA Space Weather Prediction Center: the aurora at a point as a series; the Kp index, the solar wind, alerts and scales outside the contract",
+        "omnilab/brightsky": "Bright Sky (Deutscher Wetterdienst open data): hourly observations and MOSMIX forecasts at a point or a DWD/WMO station",
+        "omnilab/elevation": "Open Topo Data: the elevation of points and profiles from SRTM, ASTER, EU-DEM, GEBCO and other elevation models (outside the contract)",
+        "omnilab/openaq": "OpenAQ API v3: hourly and daily air quality averages at the nearest location of a point (a key required)",
         "symfony/config": "In a Symfony application: the configuration of Omnilab\\Bridge\\Symfony\\OmnilabBundle",
         "symfony/dependency-injection": "In a Symfony application: the services of Omnilab\\Bridge\\Symfony\\OmnilabBundle",
         "symfony/http-kernel": "In a Symfony application: Omnilab\\Bridge\\Symfony\\OmnilabBundle itself"
