@@ -18,4 +18,5 @@ return [
     'chembl' => ['factory' => 'chembl', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'uniprot' => ['factory' => 'uniprot', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'ncbi' => ['factory' => 'ncbi', 'needs' => [], 'options' => ['mailto' => $mailto, 'api_key' => $env('NCBI_API_KEY')]],
+    'gbif' => ['factory' => 'gbif', 'needs' => [], 'options' => ['mailto' => $mailto]],
 ];

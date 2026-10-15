@@ -43,16 +43,16 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | Paging (cursor) | offset over the CIDs found | ChEBI's page number | the search's offset | - | the next link's token |
 | Per page, at most | 100 | 100 | 50 | - | 100 |
 
-| | uniprot | ncbi |
-|---|---|---|
-| Shape | entity | entity |
-| `entity()` by | accession (a merged one gives its entry), entry name (`HBB_HUMAN`) | GeneID; NCBI taxon id (`txid9689`); a taxon's scientific or common name |
-| `search()` | UniProt's query syntax, page by the `Link` header's cursor | Entrez's syntax (`esearch`): NCBI Gene, or NCBI Taxonomy for `Domain::TAXONOMY` |
-| Units | aa, Da | - |
-| Cross-references | NCBI Gene, Ensembl gene | a gene: UniProt (Swiss-Prot), Ensembl; a taxon: GBIF (from its links) |
-| Related | `organism` (NCBI taxon), `structure` (PDB, 20 by default), `ligand`, `cofactor` (ChEBI) | a gene's `organism`, a taxon's `parent` |
-| Paging (cursor) | UniProt's cursor | the search's offset |
-| Per page, at most | 500 | 100 |
+| | uniprot | ncbi | gbif |
+|---|---|---|---|
+| Shape | entity | entity | entity |
+| `entity()` by | accession (a merged one gives its entry), entry name (`HBB_HUMAN`) | GeneID; NCBI taxon id (`txid9689`); a taxon's scientific or common name | GBIF key (`4CGXP`), legacy Backbone number, NCBI taxon id, scientific name (a synonym gives the accepted taxon) |
+| `search()` | UniProt's query syntax, page by the `Link` header's cursor | Entrez's syntax (`esearch`): NCBI Gene, or NCBI Taxonomy for `Domain::TAXONOMY` | GBIF's search of the checklist's names |
+| Units | aa, Da | - | - |
+| Cross-references | NCBI Gene, Ensembl gene | a gene: UniProt (Swiss-Prot), Ensembl; a taxon: GBIF (from its links) | legacy GBIF number, NCBI Taxonomy (ENA's checklist) |
+| Related | `organism` (NCBI taxon), `structure` (PDB, 20 by default), `ligand`, `cofactor` (ChEBI) | a gene's `organism`, a taxon's `parent` | `parent`, or a synonym's `accepted` |
+| Paging (cursor) | UniProt's cursor | the search's offset | the search's offset |
+| Per page, at most | 500 | 100 | 1000 |
 
 ## What the services do not allow
 
@@ -68,9 +68,9 @@ of the sources over HTTP, throws it for every operation a source does not overri
 - **Wikidata**: a User-Agent that names the caller is required (403 otherwise); 200 calls a
   minute for an unauthenticated client (Wikimedia's limits, new in 2026), in series; an item costs
   two or three calls and its answer is large (caffeine's, 260 kB); an identifier two items carry
-  names neither; PDB structures (P638) are not taken for cross-references; GBIF's 2026 taxon ids
-  (P14607) do not fit the `gbif` scheme, the older keys (P846) are read; the search index follows
-  edits after a delay.
+  names neither; PDB structures (P638) are not taken for cross-references; GBIF's key is read from
+  P14607 (its 2026 taxonomy, `4CGXP`) and P846 (the legacy number), few items carrying P14607 yet
+  (2663 on 2026-10-15); the search index follows edits after a delay.
 - **Open-Meteo**: a point only, not a box; the forecast API answers from 92 days ago to 16 days
   ahead, the archive from 1940 to about five days ago; free for non-commercial use only, within
   10 000 calls a day; the point of the model's grid answers, not the exact one asked.
@@ -88,6 +88,11 @@ of the sources over HTTP, throws it for every operation a source does not overri
   `tool` and `email` asked of every E-utilities client; Datasets has no text search (E-utilities'
   `esearch` does it, Datasets then reads the page in one call); a taxon's links name GBIF, EOL and
   Wikipedia, not Wikidata nor iNaturalist; GBIF's page there is a legacy key.
+- **GBIF**: no rate published, 429 when it slows a caller down (its search APIs first); its
+  taxonomy is the Catalogue of Life eXtended Release since June 2026, but a call that names no
+  checklist is still answered from the frozen Backbone - the source names it every time; three calls
+  a taxon (match, record, the ENA usage that gives the NCBI id); no Wikidata nor iNaturalist id;
+  occurrences are not read (no shape of the core holds them yet: see its docs).
 
 ## Throttling and politeness
 
@@ -100,6 +105,7 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | copernicus | none | User-Agent |
 | uniprot | none (no rate published) | `mailto` in the User-Agent |
 | ncbi | 0.34 s without a key, 0.1 s with one (`auto`) | `tool` and `email` (from `mailto`) on E-utilities; `api_key` |
+| gbif | none (no rate published) | `mailto` in the User-Agent, as GBIF asks |
 
 Every factory takes `mailto`, `user_agent`, `throttle` (seconds between two calls of one source
 instance) and `base_uri`.

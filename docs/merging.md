@@ -41,6 +41,47 @@ class). ChEBI 2.0 gives no PubChem CID nor Wikidata item for caffeine: the InChI
 which PubChem gave, are what joins them. About eight seconds, PubChem's throttle and Wikidata's
 answer (260 kB) for most of it.
 
+Two paths more, through biology and taxonomy (answered on 2026-10-15). **A protein, from UniProt
+into NCBI Gene and Wikidata** - hemoglobin beta, chosen for an entry that does not move (reviewed,
+annotation score 5, its sequence unchanged since 2007):
+
+```php
+$hbb = $collector->collect('uniprot', 'P68871', 1, ['ncbi', 'wikidata']);
+$hbb->sources;                            // ['uniprot', 'ncbi', 'wikidata']
+$hbb->identifiers()->keys();              // uniprot:P68871, ncbi.gene:3043, ensembl:ENSG00000244734, wikidata:Q424422
+$hbb->properties('gene');                 // HBB [uniprot], HBB [ncbi]
+$hbb->property('mass');                   // 15998 Da [uniprot]
+$hbb->property('map_location');           // 11p15.4 [ncbi]
+$hbb->property('genomic_location');       // 11:5225464-5227071 (minus strand), NC_000011.10, GRCh38.p14 [ncbi]
+$hbb->related('organism')->keys();        // ncbi.taxon:9606: related, not followed
+$hbb->related('ligand')->keys();          // chebi:58248, chebi:60344 (2,3-bisphosphoglycerate, heme b)
+```
+
+Five calls, about five seconds: UniProt's entry (its fields only, 59 kB); NCBI is offered the
+accession, refuses it without a call, then reads GeneID 3043 (one Datasets report); Wikidata reads
+the accession (`haswbstatement:P352=P68871`: Q424422, the protein's item - the gene has its own,
+Q14905542), then the item (435 kB), then the label of its class. The organism, the structures and
+the ligands are not offered to anyone: they are other things than the protein, kept in `related`.
+
+**A species, from GBIF into NCBI Taxonomy and Wikidata** - *Panthera leo*:
+
+```php
+$lion = $collector->collect('gbif', 'Panthera leo', 1, ['ncbi', 'wikidata']);
+$lion->sources;                           // ['gbif', 'ncbi', 'wikidata']
+$lion->identifiers()->keys();             // gbif:4CGXP, gbif:5219404, ncbi.taxon:9689, wikidata:Q140, inaturalist:41964
+$lion->properties('taxon_name');          // Panthera leo [gbif], Panthera leo [ncbi], Panthera leo [wikidata]
+$lion->properties('kingdom');             // Animalia [gbif], Metazoa [ncbi]: each base's own
+$lion->property('iucn_status');           // Vulnerable (VU) [gbif]
+$lion->properties('common_name');         // African Lion [gbif], lion [ncbi]
+$lion->related('parent')->keys();         // gbif:6DBT, ncbi.taxon:9688: Panthera, in each base
+```
+
+Nine calls, about five seconds: three of GBIF (its match, the checklist's record, the ENA taxonomy's
+usage that gives the NCBI id); NCBI refuses both GBIF keys without a call and reads 9689 (its report,
+then its links, which give the legacy GBIF number back); Wikidata is offered GBIF's new key first
+(`haswbstatement:P14607=4CGXP`: no item carries it yet), then the legacy number (`P846=5219404`:
+Q140), then the item and the label of its class. The iNaturalist id comes from Wikidata's item.
+
 A source that is down or rate limited is skipped and named in `$incomplete`; the others still
 answer. Do not cache an answer while `$incomplete` is not empty.
 

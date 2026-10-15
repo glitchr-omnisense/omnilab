@@ -48,6 +48,7 @@ source package `symfony/http-client`. Each source is a package of its own:
 | [`omnilab/wikidata`](https://github.com/glitchr-studio/omnilab-wikidata) | Wikidata: any item by Q-number, by a science base's identifier (PubChem, ChEBI, CAS, UniProt, NCBI...) or by label; labels in a language, cross-references, a few properties with units | entity | none (a User-Agent that names the caller; 200 calls a minute) |
 | [`omnilab/chembl`](https://github.com/glitchr-studio/omnilab-chembl) | ChEMBL (EMBL-EBI): bioactive molecules by ChEMBL id, InChIKey or name; development phase, computed properties, mechanisms of action and their targets, cross-references from UniChem | entity | none |
 | [`omnilab/uniprot`](https://github.com/glitchr-studio/omnilab-uniprot) | UniProtKB: proteins by accession or entry name; function, gene, organism, sequence, mass, cofactors, ligands; their genes in NCBI and Ensembl | entity | none |
+| [`omnilab/gbif`](https://github.com/glitchr-studio/omnilab-gbif) | GBIF's taxonomy (the Catalogue of Life eXtended Release since 2026): taxa by key, legacy Backbone number, NCBI id or scientific name; status, IUCN category, lineage; NCBI cross-reference | entity | none |
 | [`omnilab/ncbi`](https://github.com/glitchr-studio/omnilab-ncbi) | NCBI Gene and Taxonomy (Datasets v2, E-utilities): genes by GeneID, taxa by id or name; location, summary, lineage; UniProt, Ensembl and GBIF ids | entity | none (3 calls a second; 10 with an API key) |
 
 A source answers what it can - `capabilities()` says what - and throws `NotSupportedException`
