@@ -324,8 +324,9 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
   its messages; a drug's stage for a target is that pair's (voxelotor: withdrawal for HBB, approval
   as a drug); its PDB and DrugBank cross-references are left out.
 - **ClinVar**: the E-utilities' rules - `tool` and `email` on every call, three calls a second
-  without a key, ten with one (per address: a 429 came once on 2026-10-15 while other clients
-  shared it); an rs id names a site (rs334: two alleles and eight haplotypes), not a variation.
+  without a key, ten with one, per address (two 429s came on 2026-10-15 while other clients shared
+  it: the source makes such a call again once, after the wait NCBI asks); an rs id names a site
+  (rs334: two alleles and eight haplotypes), not a variation.
 - **GWAS Catalog**: the v1 API is retired (410); v2 has no rate published; a p-value is kept as
   its mantissa and exponent (`1e-323`: a float underflows past about 1e-308); `studies?disease_trait=`
   matched nothing for "sickle" on 2026-10-15: the search goes through the traits.
