@@ -32,5 +32,6 @@ return [
     'earthdata' => ['factory' => 'earthdata', 'needs' => [], 'options' => ['mailto' => $mailto, 'token' => $env('EARTHDATA_TOKEN')]],
     'exoplanets' => ['factory' => 'exoplanets', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'gaia' => ['factory' => 'gaia', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'reactome' => ['factory' => 'reactome', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'inaturalist' => ['factory' => 'inaturalist', 'needs' => [], 'options' => ['mailto' => $mailto, 'locale' => $env('INATURALIST_LOCALE')]],
 ];

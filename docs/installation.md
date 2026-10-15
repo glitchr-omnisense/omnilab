@@ -9,6 +9,7 @@ composer require omnilab/simbad omnilab/jpl                  # stars and galaxie
 composer require omnilab/gaia omnilab/exoplanets             # Gaia DR3's sources; the confirmed exoplanets
 composer require omnilab/usgs                                # earthquakes
 composer require omnilab/ensembl omnilab/pdb                 # genomes; protein structures
+composer require omnilab/reactome                            # pathways and reactions
 composer require omnilab/inaturalist                         # taxa, and observations of species
 composer require omnilab/noaa                                # weather stations' records (NCEI), the NWS
 composer require omnilab/cds omnilab/cams omnilab/earthdata  # climate and atmosphere data stores; NASA's Earth observation

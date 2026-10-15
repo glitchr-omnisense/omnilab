@@ -206,6 +206,21 @@ directly by P13228 (`collect('wikidata', 'Q14268', 1, ['gaia'])`: the item carri
 `gaia:4472832130942575872`). That evening the ESA Gaia Archive answered its maintenance page (an
 `UnavailableException`): the `Collector` named gaia in `$incomplete` and gave SIMBAD's answer alone.
 
+**A pathway, from Wikidata into Reactome** - Wikidata's item for glycolysis (Q45317172) carries its
+Reactome ID (P3937, `R-HSA-70171`):
+
+```php
+$glycolysis = $collector->collect('wikidata', 'Q45317172', 1, ['reactome']);
+$glycolysis->sources;                          // ['wikidata', 'reactome']
+$glycolysis->value('go_biological_process');   // canonical glycolysis (GO:0061621) [reactome]
+$glycolysis->related('protein');               // 79 UniProt accessions, GCK (P35557) among them
+```
+
+(4 calls in 2.0 s on 2026-10-15: Wikidata's item and its classes' labels, Reactome's event and its
+participants.) A protein's pathways are not a `Collector` path - a protein is not its pathways -
+but omnilab/reactome's `pathways()` gives them: hemoglobin beta (UniProt P68871) takes part in ten
+pathways and 28 reactions in Reactome's release 97.
+
 A source that is down or rate limited is skipped and named in `$incomplete`; the others still
 answer. Do not cache an answer while `$incomplete` is not empty.
 

@@ -98,6 +98,17 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | Related | - | `host`: the star by each designation (name, HD, HIP, TIC, Gaia DR3, the last in the `gaia` scheme too) |
 | Collector path | SIMBAD -> Gaia (the designation), Wikidata -> Gaia (P13228) | Wikidata -> SIMBAD + the archive (P3083, P5667) |
 
+| | reactome |
+|---|---|
+| Shape | entity |
+| `entity()` by | a pathway's or a reaction's stable id (`reactome:R-HSA-70171`, versioned or not, its page); a physical entity's id is null |
+| `search()` | Reactome's search of pathways and reactions in a species (Homo sapiens by default), page by its `Start row` |
+| Outside the contract | `pathways()`: the pathways (or reactions) of a UniProt protein or a ChEBI molecule |
+| Units | - |
+| Cross-references | none (no other base names a pathway) |
+| Related | `organism` (NCBI taxon), `event` (sub-pathways and reactions), `ortholog` (the same event in other species), `protein` (UniProt), `molecule` (ChEBI) |
+| Collector path | Wikidata -> Reactome (P3937); UniProt -> Reactome by `pathways()`, outside the Collector |
+
 Their limits and politeness are in each package's `docs/index.md`.
 
 ## Errors
@@ -228,6 +239,11 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
   GraphQL answers its errors with a 200; the Search API answers ids only, and a 204 when nothing
   matches; a removed entry replaced by several is none of them (null); no Wikidata link (P638 lists
   a thing's structures, which are not it).
+- **Reactome**: no rate published; an event costs two calls (itself, its participants: thousands
+  for a top-level pathway, `participants: false` leaves them); the search's paging parameter is
+  named `Start row`, with its space (`start` is ignored: the first page comes back); a search that
+  matches nothing answers 404; the Content Service gives an event's sub-events but not the pathways
+  above it.
 - **iNaturalist**: 100 calls a minute at most, 60 asked, 10,000 a day, and blocks without notice a
   use that weighs on it; "not data scraping" (its exports and GBIF are for bulk); version 1 answers
   an observation whole (44 MB a page of 200), so the observations are read in version 2, its fields
@@ -255,6 +271,7 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
 | usgs | none (no rate published) | `mailto` in the User-Agent |
 | ensembl | 0.07 s (Ensembl's 15 a second) | `mailto` in the User-Agent; `Content-Type: application/json` |
 | pdb | 0.25 s (RCSB's "a handful a second") | `mailto` in the User-Agent |
+| reactome | none (no rate published) | `mailto` in the User-Agent |
 | inaturalist | 1 s (iNaturalist's 60 a minute) | `mailto` in the User-Agent |
 
 Every factory takes `mailto`, `user_agent`, `throttle` (seconds between two calls of one source

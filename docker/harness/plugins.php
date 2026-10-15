@@ -26,4 +26,5 @@ return [
     'earthdata' => ['Omnilab\\Earthdata\\Tests\\', 'Omnilab\\Earthdata\\EarthdataSourceFactory'],
     'exoplanets' => ['Omnilab\\Exoplanets\\Tests\\', 'Omnilab\\Exoplanets\\ExoplanetsSourceFactory'],
     'gaia' => ['Omnilab\\Gaia\\Tests\\', 'Omnilab\\Gaia\\GaiaSourceFactory'],
+    'reactome' => ['Omnilab\\Reactome\\Tests\\', 'Omnilab\\Reactome\\ReactomeSourceFactory'],
 ];

@@ -46,6 +46,8 @@ docker compose run --rm omnilab entity ensembl HBB                 # or ENSG0000
 docker compose run --rm omnilab collect ensembl ENSG00000244734     # then NCBI Gene, UniProt and Wikidata (P594), merged
 docker compose run --rm omnilab entity pdb 4HHB                     # its chains' proteins and its ligands related
 docker compose run --rm omnilab search pdb hemoglobin --limit 5
+docker compose run --rm omnilab entity reactome R-HSA-70171        # glycolysis, its UniProt proteins and ChEBI molecules related
+docker compose run --rm omnilab collect wikidata Q45317172          # glycolysis, then Reactome by P3937
 docker compose run --rm omnilab entity inaturalist 41964            # or "Panthera leo"
 docker compose run --rm omnilab entity chembl CHEMBL113
 docker compose run --rm omnilab entity simbad Betelgeuse
