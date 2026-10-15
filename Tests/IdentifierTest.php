@@ -38,6 +38,18 @@ final class IdentifierTest extends TestCase
         yield 'a USGS event' => ['usgs:US6000U24C', 'usgs.event:us6000u24c'];
         yield 'one of the catalogues ComCat keeps, its code long' => ['usgs:official20110311054624120_30', 'usgs.event:official20110311054624120_30'];
         yield 'not a USGS event: no network' => ['usgs:20110311', null];
+        yield 'a Reactome pathway' => ['R-HSA-70171', 'reactome:R-HSA-70171'];
+        yield 'a Reactome pathway, its version dropped' => ['r-hsa-70171.5', 'reactome:R-HSA-70171'];
+        yield 'a Reactome small molecule' => ['reactome:R-ALL-29356', 'reactome:R-ALL-29356'];
+        yield 'Reactome\'s page' => ['https://reactome.org/content/detail/R-HSA-70171', 'reactome:R-HSA-70171'];
+        yield 'identifiers.org\'s Reactome' => ['https://identifiers.org/reactome:R-HSA-70171', 'reactome:R-HSA-70171'];
+        yield 'not Reactome: no species' => ['reactome:R-70171', null];
+        yield 'a Gaia DR3 designation' => ['Gaia DR3 4472832130942575872', 'gaia:4472832130942575872'];
+        yield 'a Gaia source_id with its scheme' => ['gaia:5853498713190525696', 'gaia:5853498713190525696'];
+        yield 'a Gaia source_id needs its scheme' => ['4472832130942575872', null];
+        yield 'not a Gaia source_id: beyond 64 bits' => ['gaia:99999999999999999999', null];
+        yield 'an exoplanet of the archive' => ['exoplanet:51  Peg b', 'exoplanet:51 Peg b'];
+        yield 'the archive\'s page' => ['https://exoplanetarchive.ipac.caltech.edu/overview/Proxima%20Cen', 'exoplanet:Proxima Cen'];
         yield 'a GHCN station' => ['ghcn:usw00094728', 'ghcn:USW00094728'];
         yield 'a GHCN station with a hyphen' => ['ghcn:BR00A6-0010', 'ghcn:BR00A6-0010'];
         yield 'a GHCN station as CDO writes it' => ['ghcnd:GHCND:FR000007190', 'ghcn:FR000007190'];
@@ -103,6 +115,9 @@ final class IdentifierTest extends TestCase
         self::assertSame('https://www.inaturalist.org/observations/332912788', Identifier::of(Scheme::INATURALIST_OBSERVATION, '332912788')->url());
         self::assertSame(Domain::ASTRONOMY, Scheme::SIMBAD->domain());
         self::assertSame(Domain::EARTH, Scheme::USGS_EVENT->domain());
+        self::assertSame([Domain::BIOLOGY, Domain::ASTRONOMY, Domain::ASTRONOMY], [Scheme::REACTOME->domain(), Scheme::GAIA->domain(), Scheme::EXOPLANET->domain()]);
+        self::assertSame('https://reactome.org/content/detail/R-HSA-70171', Identifier::of(Scheme::REACTOME, 'R-HSA-70171')->url());
+        self::assertSame('https://exoplanetarchive.ipac.caltech.edu/overview/51%20Peg%20b', Identifier::of(Scheme::EXOPLANET, '51 Peg b')->url());
         self::assertNull(Scheme::WIKIDATA->domain());
         foreach (Scheme::cases() as $scheme) {
             self::assertNotSame('', $scheme->label());
@@ -121,7 +136,7 @@ final class IdentifierTest extends TestCase
                 Scheme::INCHIKEY => 'RYYVLZVUVIJVGH-UHFFFAOYSA-N', Scheme::INCHI => 'InChI=1S/H2O/h1H2', Scheme::CAS => '7732-18-5',
                 Scheme::CHEMBL => 'CHEMBL1098659', Scheme::UNII => '059QF0KO0R', Scheme::DSSTOX => 'DTXSID6026296', Scheme::KEGG => 'C00001',
                 Scheme::UNIPROT => 'P69905', Scheme::ENSEMBL => 'ENSG00000141510', Scheme::PDB => '1A3N', Scheme::SIMBAD => 'M 31', Scheme::JPL_SBDB => '433',
-                Scheme::USGS_EVENT => 'us6000u24c', Scheme::WIKIDATA => 'Q283', Scheme::GHCN => 'USW00094728', Scheme::NWS_STATION => 'KNYC', default => '962',
+                Scheme::USGS_EVENT => 'us6000u24c', Scheme::WIKIDATA => 'Q283', Scheme::GHCN => 'USW00094728', Scheme::NWS_STATION => 'KNYC', Scheme::REACTOME => 'R-HSA-70171', Scheme::GAIA => '4472832130942575872', Scheme::EXOPLANET => '51 Peg b', default => '962',
             })?->url();
             self::assertTrue(null === $url || str_starts_with($url, 'https://'), $scheme->value);
         }

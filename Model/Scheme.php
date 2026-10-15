@@ -55,6 +55,12 @@ enum Scheme: string
     case JPL_SBDB = 'jpl.sbdb';
     /** A USGS earthquake event (ComCat): us6000u24c, official20110311054624120_30. */
     case USGS_EVENT = 'usgs.event';
+    /** A Reactome pathway, reaction or physical entity, by its stable identifier without its version: R-HSA-70171 (glycolysis, human). */
+    case REACTOME = 'reactome';
+    /** A source of ESA's Gaia DR3 by its source_id: 4472832130942575872, written Gaia DR3 4472832130942575872 (Barnard's star). */
+    case GAIA = 'gaia';
+    /** A planet or a planetary system of the NASA Exoplanet Archive, by the archive's name: 51 Peg b, Proxima Cen (Wikidata's P5667). */
+    case EXOPLANET = 'exoplanet';
     /** A station of the Global Historical Climatology Network (NCEI): USW00094728, New York's Central Park. */
     case GHCN = 'ghcn';
     /** A station of the WMO's register by its WIGOS id: 0-20000-0-07190, Strasbourg-Entzheim (a WMO index, 07190, read as such). */
@@ -88,6 +94,9 @@ enum Scheme: string
             self::SIMBAD => 'SIMBAD',
             self::JPL_SBDB => 'JPL SBDB',
             self::USGS_EVENT => 'USGS event',
+            self::REACTOME => 'Reactome',
+            self::GAIA => 'Gaia DR3',
+            self::EXOPLANET => 'NASA Exoplanet Archive',
             self::GHCN => 'GHCN station',
             self::WIGOS => 'WIGOS station',
             self::NWS_STATION => 'NWS station',
@@ -100,9 +109,9 @@ enum Scheme: string
     {
         return match ($this) {
             self::PUBCHEM_CID, self::CHEBI, self::CHEMBL, self::INCHIKEY, self::INCHI, self::CAS, self::UNII, self::DSSTOX, self::KEGG => Domain::CHEMISTRY,
-            self::UNIPROT, self::NCBI_GENE, self::ENSEMBL, self::PDB => Domain::BIOLOGY,
+            self::UNIPROT, self::NCBI_GENE, self::ENSEMBL, self::PDB, self::REACTOME => Domain::BIOLOGY,
             self::NCBI_TAXON, self::GBIF, self::GBIF_OCCURRENCE, self::INATURALIST, self::INATURALIST_OBSERVATION => Domain::TAXONOMY,
-            self::SIMBAD, self::JPL_SBDB => Domain::ASTRONOMY,
+            self::SIMBAD, self::JPL_SBDB, self::GAIA, self::EXOPLANET => Domain::ASTRONOMY,
             self::USGS_EVENT, self::GHCN, self::WIGOS, self::NWS_STATION => Domain::EARTH,
             self::WIKIDATA => null,
         };

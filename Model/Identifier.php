@@ -40,6 +40,8 @@ final readonly class Identifier implements \Stringable
         'usgs' => Scheme::USGS_EVENT,
         'ghcnd' => Scheme::GHCN,
         'wmo' => Scheme::WIGOS,
+        'gaia.dr3' => Scheme::GAIA,
+        'nasa.exoplanet' => Scheme::EXOPLANET, 'exoplanetarchive' => Scheme::EXOPLANET,
         'wd' => Scheme::WIKIDATA,
     ];
 
@@ -91,6 +93,11 @@ final readonly class Identifier implements \Stringable
             Scheme::SIMBAD, Scheme::JPL_SBDB => self::name($value),
             // A network's code then the event's own (ComCat keeps the catalogues' long ones: official20110311054624120_30, iscgemsup16957911).
             Scheme::USGS_EVENT => preg_match('~^[a-z]{2,10}[a-z0-9_]{6,24}$~', $v = strtolower($value)) ? $v : null,
+            // A species' three letters (HSA, MMU; ALL for what no species holds: a small molecule), the number, a version left out.
+            Scheme::REACTOME => preg_match('~^(?:REACTOME:)?(R-[A-Z]{3}-[1-9]\d*)(?:\.\d+)?$~', $upper, $m) ? $m[1] : null,
+            // DR3's source_id, a 64-bit number; "Gaia DR3 " before it read.
+            Scheme::GAIA => preg_match('~^(?:GAIA\s*DR3\s+)?0*([1-9]\d{0,18})$~', $upper, $m) && (\strlen($m[1]) < 19 || strcmp($m[1], (string) \PHP_INT_MAX) <= 0) ? $m[1] : null,
+            Scheme::EXOPLANET => self::name($value),
             // The country (FIPS), the network, the station's own: USW00094728, BR00A6-0010.
             Scheme::GHCN => preg_match('~^(?:GHCND:)?([A-Z]{2}[0-9A-Z][0-9A-Z-]{8})$~', $upper, $m) ? $m[1] : null,
             // A WMO index of five digits is the WIGOS id 0-20000-0-<index>.
@@ -137,6 +144,8 @@ final readonly class Identifier implements \Stringable
             (bool) preg_match(self::ENSEMBL, $upper) => self::tryOf(Scheme::ENSEMBL, $upper),
             (bool) preg_match('~^Q[1-9]\d*$~', $upper) => self::tryOf(Scheme::WIKIDATA, $upper),
             (bool) preg_match(self::WIGOS, $input) => self::tryOf(Scheme::WIGOS, $input),
+            (bool) preg_match('~^R-[A-Z]{3}-\d+(?:\.\d+)?$~', $upper) => self::tryOf(Scheme::REACTOME, $upper),
+            (bool) preg_match('~^GAIA\s*DR3\s+\d+$~', $upper) => self::tryOf(Scheme::GAIA, $upper),
             default => null,
         };
     }
@@ -221,6 +230,9 @@ final readonly class Identifier implements \Stringable
             Scheme::SIMBAD => 'https://simbad.cds.unistra.fr/simbad/sim-id?Ident='.$v,
             Scheme::JPL_SBDB => 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr='.$v,
             Scheme::USGS_EVENT => 'https://earthquake.usgs.gov/earthquakes/eventpage/'.$v,
+            Scheme::REACTOME => 'https://reactome.org/content/detail/'.$v,
+            Scheme::GAIA => 'https://vizier.cds.unistra.fr/viz-bin/VizieR-S?Gaia%20DR3%20'.$v,
+            Scheme::EXOPLANET => 'https://exoplanetarchive.ipac.caltech.edu/overview/'.$v,
             Scheme::GHCN => 'https://www.ncei.noaa.gov/cdo-web/datasets/GHCND/stations/GHCND:'.$v.'/detail',
             Scheme::WIGOS => 'https://oscar.wmo.int/surface/#/search/station/stationReportDetails/'.$v,
             Scheme::NWS_STATION => 'https://www.weather.gov/wrh/timeseries?site='.$v,
@@ -263,6 +275,8 @@ final readonly class Identifier implements \Stringable
             'precision.fda.gov' === $host => self::tryOf(Scheme::UNII, $last),
             str_ends_with($host, 'kegg.jp') || str_ends_with($host, 'genome.jp') => $found('~\b([CD]\d{5})\b~', Scheme::KEGG),
             str_contains($host, 'simbad') => self::tryOf(Scheme::SIMBAD, (string) ($query['Ident'] ?? $query['ident'] ?? '')),
+            str_ends_with($host, 'reactome.org') => $found('~(R-[A-Z]{3}-\d+)~i', Scheme::REACTOME),
+            'exoplanetarchive.ipac.caltech.edu' === $host => preg_match('~^overview/(.+)$~', $path, $m) ? self::tryOf(Scheme::EXOPLANET, $m[1]) : null,
             'www.ncei.noaa.gov' === $host => $found('~GHCND:([A-Z0-9-]{11})~i', Scheme::GHCN),
             'oscar.wmo.int' === $host => preg_match('~stationReportDetails/([0-9A-Za-z-]+)~', $fragment, $m) ? self::tryOf(Scheme::WIGOS, $m[1]) : self::tryOf(Scheme::WIGOS, (string) ($query['wigosId'] ?? '')),
             'api.weather.gov' === $host => preg_match('~^stations/([A-Z0-9]+)$~i', $path, $m) ? self::tryOf(Scheme::NWS_STATION, $m[1]) : null,

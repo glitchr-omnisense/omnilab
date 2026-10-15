@@ -192,6 +192,9 @@ Identifier::tryOf('cas', '58-08-3');                                 // null: wr
 | `gbif.occurrence` | taxonomy | the number of a GBIF occurrence (`5007681734`), its page `gbif.org/occurrence/` read |
 | `inaturalist.observation` | taxonomy | the number of an iNaturalist observation (`332912788`), its page `inaturalist.org/observations/` read; a GBIF occurrence published by iNaturalist carries it |
 | `gbif` | taxonomy | the key of the Catalogue of Life eXtended Release, GBIF's taxonomy since June 2026, upper case (`4CGXP`: one to six of the digits 2 to 9 and the consonants, Wikidata's P14607); or the number of the legacy GBIF Backbone (`5219404`, P846). A key of digits alone is read as a legacy number |
+| `reactome` | biology | a Reactome stable id, upper case, its version dropped: `R-HSA-70171` (a species' three letters, `ALL` for a small molecule), its page `reactome.org/content/detail/` read; Wikidata's P3937 |
+| `gaia` | astronomy | a source of Gaia DR3 by its `source_id`, a 64-bit number: `4472832130942575872`; `Gaia DR3 4472832130942575872` read by its shape; Wikidata's P13228 |
+| `exoplanet` | astronomy | a planet or a system of the NASA Exoplanet Archive by the archive's name, spaces collapsed: `51 Peg b`, `Proxima Cen`; its overview page read; Wikidata's P5667 |
 | `simbad`, `jpl.sbdb` | astronomy | the name, spaces collapsed: `M 31`, `433`, `1P/Halley` |
 | `usgs.event` | earth | lower case, a network's code then the event's: `us6000u24c`, `official20110311054624120_30` (the catalogues ComCat keeps, as Wikidata's P3196 names some) |
 | `ghcn`, `wigos`, `nws.station` | earth | stations ([above](#stations)): `USW00094728`; `0-20000-0-07190` (`wmo:07190` read); `KNYC` |
@@ -200,7 +203,7 @@ Identifier::tryOf('cas', '58-08-3');                                 // null: wr
 `parse()` reads `scheme:value` (the schemes' names, identifiers.org's prefixes, `CHEBI:`), the
 pages of each base and identifiers.org's links, and the values whose shape tells their scheme
 (an InChIKey, a CAS number, `CHEMBL...`, `DTXSID...`, `UNII-...`, an Ensembl id, a Wikidata
-Q-number, a WIGOS id). A bare number, a UniProt accession or a PDB code needs its scheme: other values share
+Q-number, a WIGOS id, a Reactome stable id, a Gaia DR3 designation). A bare number, a UniProt accession or a PDB code needs its scheme: other values share
 their shapes. An entity may carry two identifiers of one scheme (GBIF's new key and its legacy
 number, a secondary accession): the `Merger` knows it by either. `Identifiers` keeps each identifier once: `get()`, `value()`, `values()`, `has()`,
 `with()`, `merge()`, `toArray()` / `fromArray()` for storage.
