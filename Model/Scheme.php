@@ -71,6 +71,24 @@ enum Scheme: string
     case INATURALIST = 'inaturalist';
     /** An iNaturalist observation: one record of an organism by a person at a place and a time, 332912788. */
     case INATURALIST_OBSERVATION = 'inaturalist.observation';
+    /** A WoRMS taxon (World Register of Marine Species), by its AphiaID, which OBIS uses too: 137094 (Delphinus delphis). */
+    case WORMS = 'worms';
+    /** An OBIS occurrence: one record of a marine organism at a place and a time, by its UUID, 00007235-5211-4633-98bb-0f8f9ad53e0f. */
+    case OBIS_OCCURRENCE = 'obis.occurrence';
+    /** An ITIS taxon (Integrated Taxonomic Information System), by its TSN: 180438 (Delphinus delphis). */
+    case ITIS = 'itis';
+    /** A Catalogue of Life taxon or name usage, by its stable id (ChecklistBank): 4CGXP (Panthera leo) - the key GBIF gives the same taxon since June 2026. */
+    case COL = 'col';
+    /** A taxon of the Paleobiology Database, by its number: 54833 (Tyrannosaurus rex), written txn:54833. */
+    case PBDB = 'pbdb';
+    /** A fossil occurrence of the Paleobiology Database, by its number: 139292, written occ:139292. */
+    case PBDB_OCCURRENCE = 'pbdb.occurrence';
+    /** An eBird taxon (the Clements/eBird taxonomy), by its species code: amerob (American Robin). */
+    case EBIRD = 'ebird';
+    /** An eBird checklist, the record of one birding outing at a place and a time: S123456789. */
+    case EBIRD_CHECKLIST = 'ebird.checklist';
+    /** A taxon of the IUCN Red List, by its SIS id: 134817215 (Delphinus delphis). */
+    case IUCN = 'iucn';
     /** An object of SIMBAD, the CDS astronomical database, by its main identifier: M 31. */
     case SIMBAD = 'simbad';
     /** A small body of JPL's database (asteroid, comet): 433, 1P/Halley, 2004 MN4. */
@@ -148,6 +166,15 @@ enum Scheme: string
             self::GBIF_OCCURRENCE => 'GBIF occurrence',
             self::INATURALIST => 'iNaturalist',
             self::INATURALIST_OBSERVATION => 'iNaturalist observation',
+            self::WORMS => 'WoRMS AphiaID',
+            self::OBIS_OCCURRENCE => 'OBIS occurrence',
+            self::ITIS => 'ITIS TSN',
+            self::COL => 'Catalogue of Life',
+            self::PBDB => 'Paleobiology Database',
+            self::PBDB_OCCURRENCE => 'PBDB occurrence',
+            self::EBIRD => 'eBird',
+            self::EBIRD_CHECKLIST => 'eBird checklist',
+            self::IUCN => 'IUCN Red List',
             self::SIMBAD => 'SIMBAD',
             self::JPL_SBDB => 'JPL SBDB',
             self::USGS_EVENT => 'USGS event',
@@ -182,7 +209,8 @@ enum Scheme: string
                 self::KEGG_REACTION, self::RHEA, self::COD, self::MATERIALS_PROJECT, self::OQMD => Domain::CHEMISTRY,
             self::UNIPROT, self::NCBI_GENE, self::ENSEMBL, self::ENSEMBL_GENOMES, self::PDB, self::REACTOME, self::KEGG_PATHWAY, self::EC,
                 self::STRING, self::INTERPRO, self::PFAM, self::GO, self::HGNC, self::OMIM, self::EFO, self::MONDO, self::ORPHANET, self::HP, self::CLINVAR, self::DBSNP, self::GWAS => Domain::BIOLOGY,
-            self::NCBI_TAXON, self::GBIF, self::GBIF_OCCURRENCE, self::INATURALIST, self::INATURALIST_OBSERVATION => Domain::TAXONOMY,
+            self::NCBI_TAXON, self::GBIF, self::GBIF_OCCURRENCE, self::INATURALIST, self::INATURALIST_OBSERVATION,
+                self::WORMS, self::OBIS_OCCURRENCE, self::ITIS, self::COL, self::PBDB, self::PBDB_OCCURRENCE, self::EBIRD, self::EBIRD_CHECKLIST, self::IUCN => Domain::TAXONOMY,
             self::SIMBAD, self::JPL_SBDB, self::GAIA, self::EXOPLANET => Domain::ASTRONOMY,
             self::USGS_EVENT, self::GHCN, self::WIGOS, self::NWS_STATION => Domain::EARTH,
             self::CODATA => Domain::OTHER,

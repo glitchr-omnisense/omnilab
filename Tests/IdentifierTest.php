@@ -228,7 +228,8 @@ final class IdentifierTest extends TestCase
                 Scheme::UNIPROT => 'P69905', Scheme::ENSEMBL => 'ENSG00000141510', Scheme::PDB => '1A3N', Scheme::SIMBAD => 'M 31', Scheme::JPL_SBDB => '433',
                 Scheme::USGS_EVENT => 'us6000u24c', Scheme::WIKIDATA => 'Q283', Scheme::GHCN => 'USW00094728', Scheme::NWS_STATION => 'KNYC', Scheme::REACTOME => 'R-HSA-70171', Scheme::ENSEMBL_GENOMES => 'FBgn0000008', Scheme::GAIA => '4472832130942575872', Scheme::EXOPLANET => '51 Peg b',
                 Scheme::STRING => '9606.ENSP00000269305', Scheme::INTERPRO => 'IPR000971', Scheme::PFAM => 'PF00042', Scheme::GO, Scheme::EFO, Scheme::MONDO, Scheme::HP => '0005829', Scheme::OMIM => '141900', Scheme::DBSNP => 'rs334', Scheme::GWAS => 'GCST000854',
-                Scheme::KEGG_REACTION => 'R00200', Scheme::KEGG_PATHWAY => 'map00010', Scheme::RHEA => '18157', Scheme::EC => '2.7.1.40', Scheme::COD => '1000000', Scheme::MATERIALS_PROJECT => 'mp-149', Scheme::CODATA => 'mp', default => '962',
+                Scheme::KEGG_REACTION => 'R00200', Scheme::KEGG_PATHWAY => 'map00010', Scheme::RHEA => '18157', Scheme::EC => '2.7.1.40', Scheme::COD => '1000000', Scheme::MATERIALS_PROJECT => 'mp-149', Scheme::CODATA => 'mp',
+                Scheme::OBIS_OCCURRENCE => '00007235-5211-4633-98bb-0f8f9ad53e0f', Scheme::EBIRD => 'amerob', Scheme::EBIRD_CHECKLIST => 'S123456789', default => '962',
             })?->url();
             self::assertTrue(null === $url || str_starts_with($url, 'https://'), $scheme->value);
         }
@@ -256,6 +257,37 @@ final class IdentifierTest extends TestCase
         self::assertSame('gbif:59R5F', Identifier::tryOf('gbif', 'GBIF:59R5F')?->key());
         foreach (['0', '1A2B', '4CGX0', 'ABCDE', '', '12345678901'] as $value) {
             self::assertNull(Identifier::tryOf(Scheme::GBIF, $value), $value);
+        }
+    }
+
+    public function testTheTaxonomiesOfBiodiversityAndPalaeontology(): void
+    {
+        // WoRMS and ITIS: a number, or the LSID each gives its names, read by its shape.
+        self::assertSame('worms:137094', Identifier::parse('urn:lsid:marinespecies.org:taxname:137094')?->key());
+        self::assertSame('worms:137094', Identifier::parse('aphia:137094')?->key());
+        self::assertSame('worms:137094', Identifier::parse('https://www.marinespecies.org/aphia.php?p=taxdetails&id=137094')?->key());
+        self::assertSame('itis:180438', Identifier::parse('urn:lsid:itis.gov:itis_tsn:180438')?->key());
+        self::assertSame('itis:180438', Identifier::parse('tsn:180438')?->key());
+        self::assertSame('itis:180438', Identifier::parse('https://www.itis.gov/servlet/SingleRpt/SingleRpt?search_topic=TSN&search_value=180438')?->key());
+        self::assertNull(Identifier::parse('137094'), 'a bare number needs its scheme');
+        // OBIS: an occurrence's UUID, lower case.
+        self::assertSame('obis.occurrence:00007235-5211-4633-98bb-0f8f9ad53e0f', Identifier::tryOf('obis.occurrence', '00007235-5211-4633-98BB-0F8F9AD53E0F')?->key());
+        self::assertSame('obis.occurrence:00007235-5211-4633-98bb-0f8f9ad53e0f', Identifier::parse('https://api.obis.org/v3/occurrence/00007235-5211-4633-98bb-0f8f9ad53e0f')?->key());
+        self::assertNull(Identifier::tryOf(Scheme::OBIS_OCCURRENCE, '1406_14803'), 'the publisher\'s occurrenceID is not OBIS\'s id');
+        // The Catalogue of Life: its ids, the same as GBIF's keys since June 2026, never read by their shape alone.
+        self::assertSame('col:4CGXP', Identifier::parse('col:4cgxp')?->key());
+        self::assertSame('col:4CGXP', Identifier::parse('https://www.catalogueoflife.org/data/taxon/4CGXP')?->key());
+        self::assertSame('col:34JWM', Identifier::parse('https://www.checklistbank.org/dataset/3LXR/taxon/34JWM')?->key());
+        self::assertSame('https://www.catalogueoflife.org/data/taxon/4CGXP', Identifier::of(Scheme::COL, '4CGXP')->url());
+        self::assertNull(Identifier::parse('4CGXP'));
+        // The Paleobiology Database: txn: and occ:, as its API writes them.
+        self::assertSame(['pbdb:54833', 'pbdb.occurrence:139292'], [Identifier::parse('txn:54833')?->key(), Identifier::parse('occ:139292')?->key()]);
+        self::assertSame('pbdb:54833', Identifier::parse('https://paleobiodb.org/classic/basicTaxonInfo?taxon_no=54833')?->key());
+        // eBird and the IUCN Red List.
+        self::assertSame(['ebird:amerob', 'ebird.checklist:S123456789', 'iucn:134817215'], [Identifier::of(Scheme::EBIRD, 'AMEROB')->key(), Identifier::of(Scheme::EBIRD_CHECKLIST, 's123456789')->key(), Identifier::parse('iucn:134817215')?->key()]);
+        self::assertSame(['ebird:amerob', 'ebird.checklist:S123456789', 'iucn:134817215'], [Identifier::parse('https://ebird.org/species/amerob')?->key(), Identifier::parse('https://ebird.org/checklist/S123456789')?->key(), Identifier::parse('https://www.iucnredlist.org/species/134817215/1')?->key()]);
+        foreach ([Scheme::WORMS, Scheme::OBIS_OCCURRENCE, Scheme::ITIS, Scheme::COL, Scheme::PBDB, Scheme::PBDB_OCCURRENCE, Scheme::EBIRD, Scheme::EBIRD_CHECKLIST, Scheme::IUCN] as $scheme) {
+            self::assertSame(Domain::TAXONOMY, $scheme->domain(), $scheme->value);
         }
     }
 
