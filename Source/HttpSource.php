@@ -14,9 +14,10 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * What the sources over HTTP share: the calls, their errors mapped the same
- * way (404 is null; 429 a RateLimitedException; 5xx and transport errors an
- * UnavailableException; any other 4xx a ProviderException), a minimum
+ * What the sources over HTTP share: the calls (GET, and POST for the
+ * services that take a query as a JSON body), their errors mapped the same
+ * way (404 and 204 are null; 429 a RateLimitedException; 5xx and transport
+ * errors an UnavailableException; any other 4xx a ProviderException), a minimum
  * interval between two calls when the service asks for one (PubChem: five
  * calls a second at most), and the reading of identifiers given as strings.
  * What a source does not override it does not do: NotSupportedException.
@@ -102,7 +103,36 @@ abstract class HttpSource implements SourceInterface
      */
     protected function getJsonWithHeaders(string $path, array $query = [], array $headers = []): ?array
     {
-        $answer = $this->fetch($path, $query, ['Accept' => 'application/json'] + $headers);
+        return $this->decode($this->fetch('GET', $path, $query, ['Accept' => 'application/json'] + $headers));
+    }
+
+    /**
+     * POSTs a JSON body and reads JSON, for a service that takes its query
+     * so (a GraphQL endpoint, a search API, a batch lookup). Null when the
+     * service answers 404 / 410, or 204 (no content: nothing matched).
+     *
+     * @param array<mixed>          $body  sent as JSON
+     * @param array<string, mixed>  $query
+     * @param array<string, string> $headers
+     */
+    protected function postForJson(string $path, array $body, array $query = [], array $headers = []): ?array
+    {
+        try {
+            $json = json_encode($body, \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
+        } catch (\JsonException $e) {
+            throw new \InvalidArgumentException('The body cannot be written as JSON: '.$e->getMessage(), 0, $e);
+        }
+
+        return $this->decode($this->fetch('POST', $path, $query, ['Accept' => 'application/json', 'Content-Type' => 'application/json'] + $headers, $json))[0] ?? null;
+    }
+
+    /**
+     * @param array{0: string, 1: array<string, list<string>>}|null $answer
+     *
+     * @return array{0: array<mixed>, 1: array<string, list<string>>}|null
+     */
+    private function decode(?array $answer): ?array
+    {
         if (null === $answer) {
             return null;
         }
@@ -123,18 +153,18 @@ abstract class HttpSource implements SourceInterface
      */
     protected function get(string $path, array $query = [], array $headers = []): ?string
     {
-        return $this->fetch($path, $query, $headers)[0] ?? null;
+        return $this->fetch('GET', $path, $query, $headers)[0] ?? null;
     }
 
     /**
-     * The body and the headers of a GET; null on 404 / 410.
+     * The body and the headers of a call; null on 404 / 410, and on 204.
      *
      * @param array<string, mixed>  $query
      * @param array<string, string> $headers
      *
      * @return array{0: string, 1: array<string, list<string>>}|null
      */
-    private function fetch(string $path, array $query, array $headers): ?array
+    private function fetch(string $method, string $path, array $query, array $headers, ?string $body = null): ?array
     {
         $this->wait();
         $url = str_starts_with($path, 'http') ? $path : rtrim($this->baseUri, '/').'/'.ltrim($path, '/');
@@ -151,9 +181,9 @@ abstract class HttpSource implements SourceInterface
             $url .= (str_contains($url, '?') ? '&' : '?').implode('&', $pairs);
         }
         try {
-            $response = $this->http->request('GET', $url, ['headers' => $headers + $this->headers]);
+            $response = $this->http->request($method, $url, ['headers' => $headers + $this->headers] + (null === $body ? [] : ['body' => $body]));
             $status = $response->getStatusCode();
-            if (404 === $status || 410 === $status) {
+            if (404 === $status || 410 === $status || 204 === $status) {
                 return null;
             }
             if (429 === $status) {

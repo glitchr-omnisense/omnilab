@@ -47,6 +47,8 @@ enum Scheme: string
     case GBIF_OCCURRENCE = 'gbif.occurrence';
     /** An iNaturalist taxon: 42007 (Puma concolor). */
     case INATURALIST = 'inaturalist';
+    /** An iNaturalist observation: one record of an organism by a person at a place and a time, 332912788. */
+    case INATURALIST_OBSERVATION = 'inaturalist.observation';
     /** An object of SIMBAD, the CDS astronomical database, by its main identifier: M 31. */
     case SIMBAD = 'simbad';
     /** A small body of JPL's database (asteroid, comet): 433, 1P/Halley, 2004 MN4. */
@@ -76,6 +78,7 @@ enum Scheme: string
             self::GBIF => 'GBIF',
             self::GBIF_OCCURRENCE => 'GBIF occurrence',
             self::INATURALIST => 'iNaturalist',
+            self::INATURALIST_OBSERVATION => 'iNaturalist observation',
             self::SIMBAD => 'SIMBAD',
             self::JPL_SBDB => 'JPL SBDB',
             self::USGS_EVENT => 'USGS event',
@@ -89,7 +92,7 @@ enum Scheme: string
         return match ($this) {
             self::PUBCHEM_CID, self::CHEBI, self::CHEMBL, self::INCHIKEY, self::INCHI, self::CAS, self::UNII, self::DSSTOX, self::KEGG => Domain::CHEMISTRY,
             self::UNIPROT, self::NCBI_GENE, self::ENSEMBL, self::PDB => Domain::BIOLOGY,
-            self::NCBI_TAXON, self::GBIF, self::GBIF_OCCURRENCE, self::INATURALIST => Domain::TAXONOMY,
+            self::NCBI_TAXON, self::GBIF, self::GBIF_OCCURRENCE, self::INATURALIST, self::INATURALIST_OBSERVATION => Domain::TAXONOMY,
             self::SIMBAD, self::JPL_SBDB => Domain::ASTRONOMY,
             self::USGS_EVENT => Domain::EARTH,
             self::WIKIDATA => null,

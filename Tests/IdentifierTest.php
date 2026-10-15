@@ -57,6 +57,12 @@ final class IdentifierTest extends TestCase
         yield 'a GBIF occurrence' => ['gbif.occurrence:5938104699', 'gbif.occurrence:5938104699'];
         yield 'its page' => ['https://www.gbif.org/occurrence/5938104699', 'gbif.occurrence:5938104699'];
         yield 'an iNaturalist taxon' => ['https://www.inaturalist.org/taxa/42007-Puma-concolor', 'inaturalist:42007'];
+        yield 'an iNaturalist observation' => ['inaturalist.observation:332912788', 'inaturalist.observation:332912788'];
+        yield 'an iNaturalist observation\'s page' => ['https://www.inaturalist.org/observations/332912788', 'inaturalist.observation:332912788'];
+        yield 'an Ensembl protein' => ['ENSP00000333994', 'ensembl:ENSP00000333994'];
+        yield 'a mouse gene in Ensembl' => ['ENSMUSG00000052305.9', 'ensembl:ENSMUSG00000052305'];
+        yield 'a PDB entry\'s extended id' => ['pdb:pdb_00004hhb', 'pdb:pdb_00004hhb'];
+        yield 'a PDB entry\'s page' => ['https://www.rcsb.org/structure/4HHB', 'pdb:4HHB'];
         yield 'a USGS event page' => ['https://earthquake.usgs.gov/earthquakes/eventpage/us6000u24c/executive', 'usgs.event:us6000u24c'];
         yield 'the page of a long one' => ['https://earthquake.usgs.gov/earthquakes/eventpage/iscgemsup16957911', 'usgs.event:iscgemsup16957911'];
         yield 'CAS Common Chemistry' => ['https://commonchemistry.cas.org/detail?cas_rn=58-08-2', 'cas:58-08-2'];
@@ -80,6 +86,8 @@ final class IdentifierTest extends TestCase
         self::assertSame(Domain::TAXONOMY, Scheme::GBIF->domain());
         self::assertSame(Domain::TAXONOMY, Scheme::GBIF_OCCURRENCE->domain());
         self::assertSame('https://www.gbif.org/occurrence/5938104699', Identifier::of(Scheme::GBIF_OCCURRENCE, '5938104699')->url());
+        self::assertSame(Domain::TAXONOMY, Scheme::INATURALIST_OBSERVATION->domain());
+        self::assertSame('https://www.inaturalist.org/observations/332912788', Identifier::of(Scheme::INATURALIST_OBSERVATION, '332912788')->url());
         self::assertSame(Domain::ASTRONOMY, Scheme::SIMBAD->domain());
         self::assertSame(Domain::EARTH, Scheme::USGS_EVENT->domain());
         self::assertNull(Scheme::WIKIDATA->domain());

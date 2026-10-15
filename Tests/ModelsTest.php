@@ -3,6 +3,7 @@
 namespace Omnilab\Tests;
 
 use Omnilab\Exception\NotSupportedException;
+use Omnilab\Exception\ProviderException;
 use Omnilab\Model\Asset;
 use Omnilab\Model\BBox;
 use Omnilab\Model\Point;
@@ -19,6 +20,7 @@ use Omnilab\Source\Query;
 use Omnilab\Source\SeriesQuery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 
 final class ModelsTest extends TestCase
 {
@@ -154,5 +156,54 @@ final class ModelsTest extends TestCase
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('The "example" source does not list occurrences.');
         $source->occurrences(new OccurrenceQuery());
+    }
+
+    public function testASourcePostsJsonAndReadsNoContentAsNothing(): void
+    {
+        $asked = [];
+        $answers = [
+            new MockResponse('{"data":{"entry":{"rcsb_id":"4HHB"}}}'),
+            new MockResponse('', ['http_code' => 204]),
+            new MockResponse('{"error":"ID \'ENSG00000000000\' not found"}', ['http_code' => 400]),
+            new MockResponse('[1, 2]'),
+        ];
+        $http = new MockHttpClient(static function (string $method, string $url, array $options) use (&$asked, &$answers): MockResponse {
+            $asked[] = [$method, $url, $options['body'] ?? null, $options['normalized_headers']['content-type'][0] ?? null];
+
+            return array_shift($answers);
+        });
+        $source = new class($http, 'https://example.org/', ['User-Agent' => 'test']) extends HttpSource {
+            public function getName(): string
+            {
+                return 'example';
+            }
+
+            public function capabilities(): array
+            {
+                return [];
+            }
+
+            /** @param array<mixed> $body */
+            public function post(string $path, array $body, array $query = []): ?array
+            {
+                return $this->postForJson($path, $body, $query);
+            }
+
+            public function read(string $path): ?array
+            {
+                return $this->getJson($path);
+            }
+        };
+
+        self::assertSame(['data' => ['entry' => ['rcsb_id' => '4HHB']]], $source->post('graphql', ['query' => '{entry(entry_id:"4HHB"){rcsb_id}}', 'variables' => ['id' => 'é/1']], ['v' => 1]));
+        self::assertSame(['POST', 'https://example.org/graphql?v=1', '{"query":"{entry(entry_id:\"4HHB\"){rcsb_id}}","variables":{"id":"é/1"}}', 'Content-Type: application/json'], $asked[0]);
+        self::assertNull($source->post('query', ['q' => 'nothing']), '204: nothing matched');
+        try {
+            $source->read('lookup/id/ENSG00000000000');
+            self::fail('a 400');
+        } catch (ProviderException $e) {
+            self::assertSame([400, '[example] the service answered 400: ID \'ENSG00000000000\' not found'], [$e->status, $e->getMessage()]);
+        }
+        self::assertSame([1, 2], $source->read('list'), 'a JSON list is an array too');
     }
 }

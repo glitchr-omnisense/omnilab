@@ -40,6 +40,8 @@ final readonly class OccurrenceQuery
     public const MIN_MAGNITUDE = 'min_magnitude';
     /** The largest magnitude, included (USGS). */
     public const MAX_MAGNITUDE = 'max_magnitude';
+    /** The licence a record is shared under, or a list of them, as Creative Commons writes it lower case: "cc0", "cc-by", "cc-by-nc" (iNaturalist). */
+    public const LICENSE = 'license';
 
     /**
      * @param array<string, mixed> $filters by key: OccurrenceQuery::TAXON, COUNTRY, KIND... or a key of the source's own
