@@ -28,7 +28,7 @@ final readonly class SeriesQuery
     public const DAILY = 'P1D';
 
     /** The schemes of a station. */
-    public const STATIONS = [Scheme::GHCN, Scheme::WIGOS, Scheme::NWS_STATION];
+    public const STATIONS = [Scheme::GHCN, Scheme::WIGOS, Scheme::NWS_STATION, Scheme::USGS_SITE, Scheme::COOPS_STATION, Scheme::DWD_STATION];
 
     /** @param list<string> $variables */
     public function __construct(

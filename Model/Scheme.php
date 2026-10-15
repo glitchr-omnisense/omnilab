@@ -133,6 +133,14 @@ enum Scheme: string
     case WIGOS = 'wigos';
     /** An observation station of the U.S. National Weather Service: KNYC. */
     case NWS_STATION = 'nws.station';
+    /** An event of the EMSC's catalogue by its SeismicPortal id: 20261004_0000156 (the day, then a number). */
+    case EMSC_EVENT = 'emsc.event';
+    /** A water monitoring location of the USGS (streamgage, well, spring) by its id in the Water Data APIs: USGS-01646500, the Potomac at Little Falls. */
+    case USGS_SITE = 'usgs.site';
+    /** A water level station of NOAA's CO-OPS (Tides and Currents) by its seven digits: 8518750, The Battery, New York. */
+    case COOPS_STATION = 'coops.station';
+    /** A station of the Deutscher Wetterdienst by its DWD id, five characters: 01420, Frankfurt/Main. */
+    case DWD_STATION = 'dwd.station';
     /** A Wikidata item, whatever its domain: Q60235. */
     case WIKIDATA = 'wikidata';
 
@@ -197,6 +205,10 @@ enum Scheme: string
             self::GHCN => 'GHCN station',
             self::WIGOS => 'WIGOS station',
             self::NWS_STATION => 'NWS station',
+            self::EMSC_EVENT => 'EMSC event',
+            self::USGS_SITE => 'USGS monitoring location',
+            self::COOPS_STATION => 'NOAA CO-OPS station',
+            self::DWD_STATION => 'DWD station',
             self::WIKIDATA => 'Wikidata',
         };
     }
@@ -212,7 +224,7 @@ enum Scheme: string
             self::NCBI_TAXON, self::GBIF, self::GBIF_OCCURRENCE, self::INATURALIST, self::INATURALIST_OBSERVATION,
                 self::WORMS, self::OBIS_OCCURRENCE, self::ITIS, self::COL, self::PBDB, self::PBDB_OCCURRENCE, self::EBIRD, self::EBIRD_CHECKLIST, self::IUCN => Domain::TAXONOMY,
             self::SIMBAD, self::JPL_SBDB, self::GAIA, self::EXOPLANET => Domain::ASTRONOMY,
-            self::USGS_EVENT, self::GHCN, self::WIGOS, self::NWS_STATION => Domain::EARTH,
+            self::USGS_EVENT, self::GHCN, self::WIGOS, self::NWS_STATION, self::EMSC_EVENT, self::USGS_SITE, self::COOPS_STATION, self::DWD_STATION => Domain::EARTH,
             self::CODATA => Domain::OTHER,
             self::WIKIDATA => null,
         };

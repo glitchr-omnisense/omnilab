@@ -83,9 +83,13 @@ station's `Point` (its elevation too):
 | `ghcn` | the Global Historical Climatology Network (NCEI's GHCN-Daily and its monthly and yearly summaries, the whole world) | eleven characters, upper case: the country (FIPS), the network, the station's own (`USW00094728`, Central Park; `FR000007190`, Strasbourg-Entzheim; `BR00A6-0010`) |
 | `wigos` | the WMO's register (OSCAR/Surface): any observing station | its WIGOS id, `0-20000-0-07190`; a WMO index of five digits, written `wmo:07190`, is read as its WIGOS id (Wikidata's P4136) |
 | `nws.station` | the U.S. National Weather Service's observation stations | upper case: an ICAO airport (`KNYC`), a buoy (`44069`), a network's (`A4080`) |
+| `usgs.site` | the USGS's water monitoring locations (streamgages, wells, springs; the Water Data APIs) | `USGS-01646500`: the agency's code then eight to fifteen digits; a number alone given the scheme (`usgs.site:01646500`) is the USGS's; its page and its record in the API read |
+| `coops.station` | NOAA CO-OPS's water level and tide stations (Tides and Currents) | seven digits (`8518750`, The Battery); `coops:` read; its page and its record in the metadata API read |
+| `dwd.station` | the Deutscher Wetterdienst's stations | five characters (`01420`, Frankfurt/Main; `P0291`), digits padded with zeros (`dwd:1420`); the DWD has no page for a station |
 
-Only the WIGOS id is told by its shape alone; a GHCN or an NWS station needs its scheme
-(`ghcn:USW00094728`, `nws.station:KNYC`) or its page, as its shape is any code's.
+Only the WIGOS id and a USGS site (`USGS-01646500`) are told by their shape alone; a GHCN, an
+NWS, a CO-OPS or a DWD station needs its scheme (`ghcn:USW00094728`, `nws.station:KNYC`,
+`coops:8518750`, `dwd:01420`) or its page, as its shape is any code's.
 
 ```php
 $series = $noaa->series(new SeriesQuery(['TMAX', 'PRCP'], Identifier::of(Scheme::GHCN, 'USW00094728'), new \DateTimeImmutable('2026-10-01'), new \DateTimeImmutable('2026-10-07'), SeriesQuery::DAILY));
@@ -221,6 +225,8 @@ Identifier::tryOf('cas', '58-08-3');                                 // null: wr
 | `simbad`, `jpl.sbdb` | astronomy | the name, spaces collapsed: `M 31`, `433`, `1P/Halley` |
 | `usgs.event` | earth | lower case, a network's code then the event's: `us6000u24c`, `official20110311054624120_30` (the catalogues ComCat keeps, as Wikidata's P3196 names some) |
 | `ghcn`, `wigos`, `nws.station` | earth | stations ([above](#stations)): `USW00094728`; `0-20000-0-07190` (`wmo:07190` read); `KNYC` |
+| `usgs.site`, `coops.station`, `dwd.station` | earth | stations ([above](#stations)): `USGS-01646500` (read by its shape); `8518750`; `01420` |
+| `emsc.event` | earth | an event of the EMSC's catalogue by its SeismicPortal id, the day then a number: `20261004_0000156`, read by its shape; its SeismicPortal page read |
 | `wikidata` | any | `Q60235` |
 
 `parse()` reads `scheme:value` (the schemes' names, identifiers.org's prefixes, `CHEBI:`), the

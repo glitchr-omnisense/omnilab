@@ -61,6 +61,9 @@ final readonly class Identifier implements \Stringable
         'usgs' => Scheme::USGS_EVENT,
         'ghcnd' => Scheme::GHCN,
         'wmo' => Scheme::WIGOS,
+        'emsc' => Scheme::EMSC_EVENT,
+        'coops' => Scheme::COOPS_STATION, 'noaa.coops' => Scheme::COOPS_STATION,
+        'dwd' => Scheme::DWD_STATION,
         'ensembl.plant' => Scheme::ENSEMBL_GENOMES, 'ensembl.fungi' => Scheme::ENSEMBL_GENOMES, 'ensembl.metazoa' => Scheme::ENSEMBL_GENOMES, 'ensembl.protist' => Scheme::ENSEMBL_GENOMES, 'ensembl.bacteria' => Scheme::ENSEMBL_GENOMES,
         'gaia.dr3' => Scheme::GAIA,
         'nasa.exoplanet' => Scheme::EXOPLANET, 'exoplanetarchive' => Scheme::EXOPLANET,
@@ -191,6 +194,13 @@ final readonly class Identifier implements \Stringable
             // A WMO index of five digits is the WIGOS id 0-20000-0-<index>.
             Scheme::WIGOS => preg_match('~^\d{5}$~', $value) ? '0-20000-0-'.$value : (preg_match(self::WIGOS, $value) ? $value : null),
             Scheme::NWS_STATION => preg_match('~^[A-Z0-9]{3,10}$~', $upper) ? $upper : null,
+            // The day of the event, then its number that day.
+            Scheme::EMSC_EVENT => preg_match('~^\d{8}_\d{7}$~', $value) ? $value : null,
+            // The agency's code, then the site's number: a number alone is the USGS's.
+            Scheme::USGS_SITE => preg_match('~^(?:USGS-)?(\d{8,15})$~', $upper, $m) ? 'USGS-'.$m[1] : null,
+            Scheme::COOPS_STATION => preg_match('~^\d{7}$~', $value) ? $value : null,
+            // Five characters, digits padded with zeros: 1420 is 01420.
+            Scheme::DWD_STATION => preg_match('~^\d{1,5}$~', $value) ? str_pad($value, 5, '0', \STR_PAD_LEFT) : (preg_match('~^[0-9A-Z]{5}$~', $upper) ? $upper : null),
             Scheme::WIKIDATA => preg_match('~^(?:WD:)?(Q[1-9]\d*)$~', $upper, $m) ? $m[1] : null,
         };
 
@@ -232,6 +242,8 @@ final readonly class Identifier implements \Stringable
             (bool) preg_match(self::ENSEMBL, $upper) => self::tryOf(Scheme::ENSEMBL, $upper),
             (bool) preg_match('~^Q[1-9]\d*$~', $upper) => self::tryOf(Scheme::WIKIDATA, $upper),
             (bool) preg_match(self::WIGOS, $input) => self::tryOf(Scheme::WIGOS, $input),
+            (bool) preg_match('~^\d{8}_\d{7}$~', $input) => self::tryOf(Scheme::EMSC_EVENT, $input),
+            (bool) preg_match('~^USGS-\d{8,15}$~', $upper) => self::tryOf(Scheme::USGS_SITE, $upper),
             null !== self::ensemblGenomes($input) => self::tryOf(Scheme::ENSEMBL_GENOMES, $input),
             (bool) preg_match('~^R-[A-Z]{3}-\d+(?:\.\d+)?$~', $upper) => self::tryOf(Scheme::REACTOME, $upper),
             (bool) preg_match('~^GAIA\s*DR3\s+\d+$~', $upper) => self::tryOf(Scheme::GAIA, $upper),
@@ -379,6 +391,11 @@ final readonly class Identifier implements \Stringable
             Scheme::GHCN => 'https://www.ncei.noaa.gov/cdo-web/datasets/GHCND/stations/GHCND:'.$v.'/detail',
             Scheme::WIGOS => 'https://oscar.wmo.int/surface/#/search/station/stationReportDetails/'.$v,
             Scheme::NWS_STATION => 'https://www.weather.gov/wrh/timeseries?site='.$v,
+            Scheme::EMSC_EVENT => 'https://www.seismicportal.eu/eventdetails.html?unid='.$v,
+            Scheme::USGS_SITE => 'https://waterdata.usgs.gov/monitoring-location/'.$v.'/',
+            Scheme::COOPS_STATION => 'https://tidesandcurrents.noaa.gov/stationhome.html?id='.$v,
+            // The DWD has no page for a station.
+            Scheme::DWD_STATION => null,
             Scheme::WIKIDATA => 'https://www.wikidata.org/wiki/'.$v,
         };
     }
@@ -450,6 +467,9 @@ final readonly class Identifier implements \Stringable
             'oscar.wmo.int' === $host => preg_match('~stationReportDetails/([0-9A-Za-z-]+)~', $fragment, $m) ? self::tryOf(Scheme::WIGOS, $m[1]) : self::tryOf(Scheme::WIGOS, (string) ($query['wigosId'] ?? '')),
             'api.weather.gov' === $host => preg_match('~^stations/([A-Z0-9]+)$~i', $path, $m) ? self::tryOf(Scheme::NWS_STATION, $m[1]) : null,
             'www.weather.gov' === $host => self::tryOf(Scheme::NWS_STATION, (string) ($query['site'] ?? '')),
+            str_ends_with($host, 'seismicportal.eu') => self::tryOf(Scheme::EMSC_EVENT, (string) ($query['unid'] ?? '')),
+            str_ends_with($host, 'waterdata.usgs.gov') => $found('~/(USGS-\d{8,15})(?:[/?#]|$)~i', Scheme::USGS_SITE),
+            str_ends_with($host, 'tidesandcurrents.noaa.gov') => preg_match('~stations/(\d{7})~', $path, $m) ? self::tryOf(Scheme::COOPS_STATION, $m[1]) : self::tryOf(Scheme::COOPS_STATION, (string) ($query['id'] ?? '')),
             'ssd.jpl.nasa.gov' === $host => preg_match('~sstr=([^&]+)~', $fragment.'&'.http_build_query($query), $m) ? self::tryOf(Scheme::JPL_SBDB, $m[1]) : null,
             default => null,
         };
