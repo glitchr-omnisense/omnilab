@@ -66,6 +66,13 @@
         "omnilab/earthdata": "NASA Earthdata (CMR): the granules of NASA's Earth observation collections (HLS, MODIS, VIIRS, GPM...) as products by place, period and cloud cover; their files with an Earthdata Login token",
         "omnilab/kegg": "KEGG (academic use only): compounds, drugs, reactions, pathways and enzymes by KEGG id, their formula, masses, equations and classes, CAS, ChEBI, ChEMBL and Rhea ids, their reactions, pathways and enzymes as related things; a search",
         "omnilab/rhea": "Rhea: biochemical reactions by any of their four Rhea ids or their KEGG reaction, their equation, sides and participants; ChEBI participants, EC numbers, GO term, Reactome events and the reviewed UniProt proteins that catalyse them as related things; a search",
+        "omnilab/string": "STRING: a protein by STRING id, UniProt accession or name, its interaction partners with their scores as related things; networks with each evidence channel's score; functional enrichment",
+        "omnilab/interpro": "InterPro: InterPro entries and Pfam families by accession, their type, members, GO terms and hierarchy; a UniProt protein's domains and families, with their positions, as related things; a search",
+        "omnilab/quickgo": "QuickGO (EBI): Gene Ontology terms by id, their definition, aspect, parents and children; a UniProt protein's GO annotations by aspect and evidence; a search",
+        "omnilab/hgnc": "HGNC: human genes by HGNC id, symbol, previous symbol or alias, their approved name, location, groups and MANE Select transcript; their NCBI Gene, Ensembl, UniProt and OMIM ids",
+        "omnilab/opentargets": "Open Targets Platform: targets (Ensembl genes), diseases (EFO, Mondo, HPO, Orphanet) and drugs (ChEMBL), their associations with scores, drugs and clinical candidates; a search",
+        "omnilab/clinvar": "ClinVar (NCBI E-utilities): variations by VariationID or VCV accession, their clinical significance, review status, conditions, genes, location and frequencies, their dbSNP id; a search",
+        "omnilab/gwas": "GWAS Catalog: studies, variants (rs ids) and traits (EFO, Mondo, HPO) with their strongest associations; p-values, effect sizes, risk alleles; a search of traits",
         "symfony/config": "In a Symfony application: the configuration of Omnilab\\Bridge\\Symfony\\OmnilabBundle",
         "symfony/dependency-injection": "In a Symfony application: the services of Omnilab\\Bridge\\Symfony\\OmnilabBundle",
         "symfony/http-kernel": "In a Symfony application: Omnilab\\Bridge\\Symfony\\OmnilabBundle itself"

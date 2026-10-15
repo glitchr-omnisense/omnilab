@@ -10,6 +10,8 @@ composer require omnilab/gaia omnilab/exoplanets             # Gaia DR3's source
 composer require omnilab/usgs                                # earthquakes
 composer require omnilab/ensembl omnilab/pdb                 # genomes; protein structures
 composer require omnilab/reactome                            # pathways and reactions
+composer require omnilab/hgnc omnilab/string omnilab/interpro omnilab/quickgo   # human genes; protein interactions, domains, GO
+composer require omnilab/opentargets omnilab/clinvar omnilab/gwas               # targets and diseases; clinical variants; GWAS associations
 composer require omnilab/inaturalist                         # taxa, and observations of species
 composer require omnilab/noaa                                # weather stations' records (NCEI), the NWS
 composer require omnilab/cds omnilab/cams omnilab/earthdata  # climate and atmosphere data stores; NASA's Earth observation

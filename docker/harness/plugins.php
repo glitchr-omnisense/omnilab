@@ -29,4 +29,11 @@ return [
     'reactome' => ['Omnilab\\Reactome\\Tests\\', 'Omnilab\\Reactome\\ReactomeSourceFactory'],
     'kegg' => ['Omnilab\\Kegg\\Tests\\', 'Omnilab\\Kegg\\KeggSourceFactory'],
     'rhea' => ['Omnilab\\Rhea\\Tests\\', 'Omnilab\\Rhea\\RheaSourceFactory'],
+    'string' => ['Omnilab\\StringDb\\Tests\\', 'Omnilab\\StringDb\\StringSourceFactory'],
+    'interpro' => ['Omnilab\\InterPro\\Tests\\', 'Omnilab\\InterPro\\InterProSourceFactory'],
+    'quickgo' => ['Omnilab\\QuickGo\\Tests\\', 'Omnilab\\QuickGo\\QuickGoSourceFactory'],
+    'hgnc' => ['Omnilab\\Hgnc\\Tests\\', 'Omnilab\\Hgnc\\HgncSourceFactory'],
+    'opentargets' => ['Omnilab\\OpenTargets\\Tests\\', 'Omnilab\\OpenTargets\\OpenTargetsSourceFactory'],
+    'clinvar' => ['Omnilab\\ClinVar\\Tests\\', 'Omnilab\\ClinVar\\ClinVarSourceFactory'],
+    'gwas' => ['Omnilab\\Gwas\\Tests\\', 'Omnilab\\Gwas\\GwasSourceFactory'],
 ];

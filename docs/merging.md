@@ -236,6 +236,45 @@ $collector->collect('kegg', 'R00200', 1, ['rhea']);     // KEGG, then Rhea by 18
 Not walked live: KEGG's API is for academic users only, and omnilab/kegg is not tested live
 against it. Rhea's half was answered on 2026-10-16 (one SPARQL query, one UniProt search).
 
+**A protein, from UniProt into STRING, InterPro and QuickGO** - walked against the real services
+on 2026-10-15. A protein's UniProt accession takes it into the
+sources that read accessions - STRING, InterPro, QuickGO - each adding what it knows of that
+protein: its interaction partners, its domains, its GO terms, all as related things:
+
+```php
+$collector->collect('uniprot', 'P68871', 1, ['string']);     // 3 calls, 3.1 s: ten partners, HBA2 first (0.999)
+$collector->collect('uniprot', 'P68871', 1, ['interpro']);   // 3 calls, 3.3 to 4.1 s: domain IPR000971 and PF00042, two families
+$collector->collect('uniprot', 'P68871', 1, ['quickgo']);    // 2 calls, 5.1 s: 8 functions, 11 processes, 9 components
+```
+
+InterPro gives a protein's length and organism under UniProt's keys (`sequence_length`,
+`organism`), so that the merge sets both side by side (`147 aa` [uniprot], `147 aa` [interpro]).
+
+**A gene, from HGNC into NCBI Gene, UniProt and Open Targets, and back** - HGNC names it and records its other ids; the `Collector` walks from HGNC into NCBI Gene
+and UniProt, from NCBI Gene back into HGNC, and from HGNC into Open Targets by the Ensembl gene:
+
+```php
+$collector->collect('hgnc', 'HBB', 1, ['ncbi', 'uniprot']);  // 6.8 s: 11p15.4 [hgnc], 11p15.4 [ncbi]
+$collector->collect('ncbi', '3043', 1, ['hgnc']);            // hgnc:4827 among the identifiers
+$collector->collect('hgnc', 'HBB', 1, ['opentargets']);      // 2 calls, 0.7 s: 552 associated diseases, 4 drugs
+```
+
+**A disease, named in several ontologies** - Open Targets names sickle cell disease `MONDO_0011382` and gives its former ids
+(`EFO_0000697`, `Orphanet_232`) and its OMIM and Orphanet ids as identifiers; ClinVar's conditions,
+the GWAS Catalog's traits and STRING's enrichment name the same terms (Mondo, EFO, HPO), as related
+things.
+
+**A variant, from ClinVar into the GWAS Catalog** - ClinVar gives the sickle cell variant's rs id, which the GWAS Catalog reads:
+
+```php
+$collector->collect('clinvar', '15333', 1, ['gwas']);        // 3 calls, 1.7 s
+```
+
+`sources` = clinvar, gwas: ClinVar's classification (`Pathogenic`) and the catalogue's
+associations (rs334-T, p = 1e-323 for hereditary hemolytic anemias) side by side. An rs id names
+a site (rs334 holds four alleles), a ClinVar variation one of them: the two are joined as ClinVar
+names them, not proved the same allele.
+
 ## The Merger
 
 ```php

@@ -31,6 +31,13 @@ use Omnilab\Source\SourceInterface;
 use Omnilab\UniProt\UniProtSourceFactory;
 use Omnilab\Usgs\UsgsSourceFactory;
 use Omnilab\Wikidata\WikidataSourceFactory;
+use Omnilab\StringDb\StringSourceFactory;
+use Omnilab\InterPro\InterProSourceFactory;
+use Omnilab\QuickGo\QuickGoSourceFactory;
+use Omnilab\Hgnc\HgncSourceFactory;
+use Omnilab\OpenTargets\OpenTargetsSourceFactory;
+use Omnilab\ClinVar\ClinVarSourceFactory;
+use Omnilab\Gwas\GwasSourceFactory;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -90,6 +97,13 @@ final class OmnilabBundle extends AbstractBundle
         ReactomeSourceFactory::class,
         KeggSourceFactory::class,
         RheaSourceFactory::class,
+        StringSourceFactory::class,
+        InterProSourceFactory::class,
+        QuickGoSourceFactory::class,
+        HgncSourceFactory::class,
+        OpenTargetsSourceFactory::class,
+        ClinVarSourceFactory::class,
+        GwasSourceFactory::class,
     ];
 
     public function configure(DefinitionConfigurator $definition): void
@@ -97,7 +111,7 @@ final class OmnilabBundle extends AbstractBundle
         $definition->rootNode()
             ->children()
                 ->arrayNode('sources')
-                    ->info('The sources, by name: a factory (pubchem, chebi, wikidata, uniprot, ensembl, pdb, reactome, gbif, inaturalist, simbad, gaia, exoplanets, usgs, open-meteo, noaa, copernicus, cds, cams, earthdata, kegg, rhea...) and its options.')
+                    ->info('The sources, by name: a factory (pubchem, chebi, wikidata, uniprot, ensembl, pdb, reactome, string, interpro, quickgo, hgnc, opentargets, clinvar, gwas, gbif, inaturalist, simbad, gaia, exoplanets, usgs, open-meteo, noaa, copernicus, cds, cams, earthdata, kegg, rhea...) and its options.')
                     ->useAttributeAsKey('name')
                     ->arrayPrototype()
                         ->children()

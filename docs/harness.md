@@ -48,6 +48,15 @@ docker compose run --rm omnilab entity pdb 4HHB                     # its chains
 docker compose run --rm omnilab search pdb hemoglobin --limit 5
 docker compose run --rm omnilab entity reactome R-HSA-70171        # glycolysis, its UniProt proteins and ChEBI molecules related
 docker compose run --rm omnilab collect wikidata Q45317172          # glycolysis, then Reactome by P3937
+docker compose run --rm omnilab entity hgnc HBB                    # HGNC:4827, its NCBI Gene, Ensembl, UniProt and OMIM ids
+docker compose run --rm omnilab collect hgnc HBB                   # then NCBI Gene, Ensembl, UniProt, Open Targets... merged
+docker compose run --rm omnilab entity string uniprot:P68871       # hemoglobin beta in STRING, its partners related
+docker compose run --rm omnilab entity interpro uniprot:P68871     # its domains and families
+docker compose run --rm omnilab entity quickgo GO:0005829          # cytosol, its parents
+docker compose run --rm omnilab entity opentargets MONDO_0011382   # sickle cell disease, its targets and drugs
+docker compose run --rm omnilab entity clinvar VCV000015333        # the sickle cell variant
+docker compose run --rm omnilab collect clinvar 15333              # then the GWAS Catalog by rs334
+docker compose run --rm omnilab entity gwas rs334                  # its associations, the smallest p-value first
 docker compose run --rm omnilab entity inaturalist 41964            # or "Panthera leo"
 docker compose run --rm omnilab entity chembl CHEMBL113
 docker compose run --rm omnilab entity simbad Betelgeuse

@@ -120,6 +120,29 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | Collector path | KEGG <-> Rhea (each names the other); ChEBI -> KEGG by `conv` | KEGG <-> Rhea |
 | Terms | academic use by academic users only: **not tested live** | CC BY 4.0 |
 
+| | hgnc | string | interpro | quickgo |
+|---|---|---|---|---|
+| Shape | entity | entity | entity | entity |
+| `entity()` by | an HGNC id (`HGNC:4827`, a bare number), a symbol (approved, then previous, then alias, when one gene alone bears it), an NCBI GeneID, Ensembl gene, UniProt accession or MIM number it records | a STRING id (`9606.ENSP00000269305`), a UniProt accession, an Ensembl protein or a name, in a species (9606 by default) | an InterPro entry (`IPR000971`), a Pfam family (`PF00042`), a UniProt protein | a GO term (`GO:0005829`, `GO_0005829`; a secondary id gives its term), a UniProt protein (its annotations) |
+| `search()` | HGNC's search over every field, paged here | none (STRING maps names, it does not rank texts) | InterPro's text search over its entries, by accession, paged by cursor | QuickGO's term search, paged |
+| Outside the contract | - | `partners()`, `network()` (`Interaction`: score and evidence channels), `enrichment()` (`Enrichment`: GO, KEGG, Reactome, Pfam, InterPro, HPO...) | - | `annotations()` (`Annotation`: qualifier, GO and ECO evidence, reference, curator) |
+| Units | - | - | aa | - |
+| Cross-references | NCBI Gene, Ensembl gene, UniProt, OMIM | its Ensembl protein; the UniProt accession it was asked by | none | none (a secondary GO id it was asked by) |
+| Related | `organism` | `organism`, `interactor` (STRING ids; each partner's score a property) | an entry's `member` (Pfam), `integrated`, `go`, `structure`, `overlap`, `parent`, `child`; a protein's entries by type (`domain`, `family`, `homologous_superfamily`...), `go`, `organism` | a term's `parent`, one relation each (`is_a`, `part_of`...), `child`; a protein's `function`, `process`, `component`, `organism` |
+| Collector path | HGNC <-> NCBI Gene, Ensembl, UniProt; HGNC -> Open Targets | UniProt -> STRING | UniProt -> InterPro | UniProt -> QuickGO |
+
+| | opentargets | clinvar | gwas |
+|---|---|---|---|
+| Shape | entity | entity | entity |
+| `entity()` by | a target's Ensembl gene, a disease's EFO, Mondo, HPO or Orphanet id (`MONDO_0011382`, `MONDO:0011382`), a drug's ChEMBL id | a VariationID (`15333`) or VCV accession; an rs id is refused (a site, several variations) | a study (`GCST000854`), a variant (`rs334`), a trait (EFO, Mondo, HPO) |
+| `search()` | Open Targets' search over targets, diseases and drugs, paged | ClinVar's query language (`HBB[gene] AND pathogenic[clinsig]`), paged | the catalogue's traits by name, paged |
+| Outside the contract | `associations()`: a target's diseases or a disease's targets, paged (`Association`: score by data type) | - | `associations()`: a study's, a variant's or a trait's, the smallest p-value first (`Association`: risk allele, p-value as mantissa and exponent, OR or beta, interval) |
+| Units | - | - | - |
+| Cross-references | a target's Swiss-Prot and HGNC ids; a disease's former ids, OMIM, Orphanet, EFO, Mondo, HPO ids (MeSH, ICD-10, UMLS, NCIt... as properties) | its dbSNP id | none |
+| Related | a target's `disease`, `drug`, `domain` (InterPro), `pathway` (Reactome), `organism`; a disease's `target`, `drug`, `parent`, `therapeutic_area`; a drug's `target`, `indication`, `parent` | `gene` (NCBI Gene), `condition` (Mondo, OMIM, Orphanet, HPO) | a study's `trait`, `background_trait`, `variant`; a variant's `study`, `associated_trait`; a trait's `study` |
+| Collector path | HGNC, Ensembl, NCBI Gene -> Open Targets (the Ensembl gene); ChEMBL -> Open Targets | ClinVar -> GWAS Catalog (rs id) | ClinVar -> GWAS Catalog |
+| Terms | CC0 | attribution, cite ClinVar | EMBL-EBI's terms of use |
+
 Their limits and politeness are in each package's `docs/index.md`.
 
 ## Errors
@@ -263,6 +286,28 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
   licence, all rights reserved when none.
 - **KEGG**: its API is "made available only for academic use by academic users"; non-academic use needs a licence (Pathway Solutions), so omnilab/kegg is not tested live; three calls a second at most, or the caller is blocked; flat files, not JSON; `find` does not page (the source cuts its lines into pages); KEGG's PubChem link is a substance (SID), not a compound.
 - **Rhea**: no rate published; a reaction costs one SPARQL query (about 3 s; `DISTINCT` or `LIMIT` in its sub-query take over a minute) and one UniProt search for its reviewed proteins (`enzymes: 0` leaves it); Rhea's search gives no total (its `count` is the page's); its pages answer a browser check to a program.
+- **STRING**: one call a second (its request), and `caller_identity` on every call; two calls an
+  entity (the mapping, the partners); `get_string_ids` maps a name to its best protein but does not
+  rank texts (no `search()`); a long annotation is cut by STRING (`[...]`); its pages answer a
+  browser check to a program.
+- **InterPro**: no rate published; "nothing found" is a 204 that carries a `Content-Length`, which
+  curl refuses over HTTP/2 - the source speaks HTTP/1.1; its text search is not ranked (by
+  accession); a protein's entries are one page of 200.
+- **QuickGO**: no rate published; a term's full record (`/complete`) is mostly its history (198 kB
+  for the cytosol): the source asks the term and its paths to its aspect's root (its direct parents
+  are their first steps); a protein's annotations come 200 a page, five pages at most by default.
+- **HGNC**: ten calls a second (the source waits 0.1 s); JSON only when asked by `Accept`; human
+  genes only; a symbol two genes share (an alias) names neither; its search answers every match at
+  once.
+- **Open Targets**: no rate published; one GraphQL call an entity; a malformed query is a 400 with
+  its messages; a drug's stage for a target is that pair's (voxelotor: withdrawal for HBB, approval
+  as a drug); its PDB and DrugBank cross-references are left out.
+- **ClinVar**: the E-utilities' rules - `tool` and `email` on every call, three calls a second
+  without a key, ten with one (per address: a 429 came once on 2026-10-15 while other clients
+  shared it); an rs id names a site (rs334: two alleles and eight haplotypes), not a variation.
+- **GWAS Catalog**: the v1 API is retired (410); v2 has no rate published; a p-value is kept as
+  its mantissa and exponent (`1e-323`: a float underflows past about 1e-308); `studies?disease_trait=`
+  matched nothing for "sickle" on 2026-10-15: the search goes through the traits.
 
 ## Throttling and politeness
 
@@ -288,6 +333,13 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
 | inaturalist | 1 s (iNaturalist's 60 a minute) | `mailto` in the User-Agent |
 | kegg | 0.34 s (KEGG's three a second) | `mailto` in the User-Agent |
 | rhea | none (no rate published) | `mailto` in the User-Agent, as Rhea asks |
+| string | 1 s (STRING's one a second) | `caller_identity` on every call; `mailto` in the User-Agent |
+| interpro | none (no rate published) | `mailto` in the User-Agent |
+| quickgo | none (no rate published) | `mailto` in the User-Agent |
+| hgnc | 0.1 s (HGNC's ten a second) | `mailto` in the User-Agent |
+| opentargets | none (no rate published) | `mailto` in the User-Agent |
+| clinvar | 0.34 s without a key, 0.1 s with one (`auto`) | `tool` and `email` (from `mailto`) on every call; `api_key` |
+| gwas | none (no rate published) | `mailto` in the User-Agent |
 
 Every factory takes `mailto`, `user_agent`, `throttle` (seconds between two calls of one source
 instance) and `base_uri`.

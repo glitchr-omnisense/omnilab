@@ -36,4 +36,11 @@ return [
     'inaturalist' => ['factory' => 'inaturalist', 'needs' => [], 'options' => ['mailto' => $mailto, 'locale' => $env('INATURALIST_LOCALE')]],
     'kegg' => ['factory' => 'kegg', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'rhea' => ['factory' => 'rhea', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'string' => ['factory' => 'string', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'interpro' => ['factory' => 'interpro', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'quickgo' => ['factory' => 'quickgo', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'hgnc' => ['factory' => 'hgnc', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'opentargets' => ['factory' => 'opentargets', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'clinvar' => ['factory' => 'clinvar', 'needs' => [], 'options' => ['mailto' => $mailto, 'api_key' => $env('NCBI_API_KEY')]],
+    'gwas' => ['factory' => 'gwas', 'needs' => [], 'options' => ['mailto' => $mailto]],
 ];
