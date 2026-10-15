@@ -62,4 +62,10 @@ return [
     'pbdb' => ['factory' => 'pbdb', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'ebird' => ['factory' => 'ebird', 'needs' => [], 'options' => ['mailto' => $mailto, 'key' => $env('EBIRD_API_KEY')]],
     'iucn' => ['factory' => 'iucn', 'needs' => ['IUCN_API_KEY'], 'options' => ['mailto' => $mailto, 'key' => $env('IUCN_API_KEY')]],
+    'horizons' => ['factory' => 'horizons', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'mpc' => ['factory' => 'mpc', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'ned' => ['factory' => 'ned', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'vizier' => ['factory' => 'vizier', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'donki' => ['factory' => 'donki', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'launches' => ['factory' => 'launches', 'needs' => [], 'options' => ['mailto' => $mailto, 'api_key' => $env('LL2_API_KEY')]],
 ];

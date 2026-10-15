@@ -55,4 +55,10 @@ return [
     'pbdb' => ['Omnilab\\Pbdb\\Tests\\', 'Omnilab\\Pbdb\\PbdbSourceFactory'],
     'ebird' => ['Omnilab\\Ebird\\Tests\\', 'Omnilab\\Ebird\\EbirdSourceFactory'],
     'iucn' => ['Omnilab\\Iucn\\Tests\\', 'Omnilab\\Iucn\\IucnSourceFactory'],
+    'horizons' => ['Omnilab\\Horizons\\Tests\\', 'Omnilab\\Horizons\\HorizonsSourceFactory'],
+    'mpc' => ['Omnilab\\Mpc\\Tests\\', 'Omnilab\\Mpc\\MpcSourceFactory'],
+    'ned' => ['Omnilab\\Ned\\Tests\\', 'Omnilab\\Ned\\NedSourceFactory'],
+    'vizier' => ['Omnilab\\Vizier\\Tests\\', 'Omnilab\\Vizier\\VizierSourceFactory'],
+    'donki' => ['Omnilab\\Donki\\Tests\\', 'Omnilab\\Donki\\DonkiSourceFactory'],
+    'launches' => ['Omnilab\\Launches\\Tests\\', 'Omnilab\\Launches\\LaunchesSourceFactory'],
 ];

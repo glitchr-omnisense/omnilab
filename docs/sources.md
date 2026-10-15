@@ -136,6 +136,21 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | Related | - | `host`: the star by each designation (name, HD, HIP, TIC, Gaia DR3, the last in the `gaia` scheme too) |
 | Collector path | SIMBAD -> Gaia (the designation), Wikidata -> Gaia (P13228) | Wikidata -> SIMBAD + the archive (P3083, P5667) |
 
+| | mpc | horizons | ned | vizier | donki | launches |
+|---|---|---|---|---|---|---|
+| Shape | entity, search | series | entity | datasets | entity | entity, search, occurrences |
+| `entity()` by | a number, designation (packed or not) or name; `mpc:` or `jpl.sbdb:` | - | any name NED resolves; `ned:` or `simbad:` | - | an activity id (`2026-10-08T15:29:00-FLR-001`) | a launch's UUID (`launch:`) |
+| `search()` | the names that hold the text, the closest first | - | - | - | - | LL2's search, by offset |
+| `series()` | - | a body seen from a `Point`: each variable `<body>:<quantity>` (`499:ra`, `jpl.sbdb:99942:distance`); steps from minutes to years; no aggregation | - | - | - | - |
+| `occurrences()` | - | - | - | - | - | the launches of a period, each at its pad; `provider`, `rocket`, `location`, `crewed`, `status`, `orbit`; `newest`, `oldest`; no place (LL2 filters by none) |
+| `datasets()` | - | - | - | the tables whose description holds the text, the largest first, one page | - | - |
+| Outside the contract | `observations()`: the latest optical observations | - | `cone()`: the objects of a cone on the sky | `rows()`, `rowsOf()`: a table's rows around a point of the sky or an entity | `events()`: every event of some kinds in a period (no place on the Earth) | - |
+| Units | au, deg, d, mag | deg, au, km/s, mag, %, arcsec | deg | each column's | km/s, deg | % |
+| Cross-references | `jpl.sbdb` (the same designation), its primary designation | - | none | - | none | none |
+| Related | - | - | - | - | `linked`: the events DONKI links it to | - |
+| Collector path | MPC <-> JPL by the designation | - | SIMBAD -> NED by SIMBAD's name; Wikidata -> SIMBAD -> NED | - | - | - |
+| Tested live | yes | yes | yes | yes | yes (at ccmc.gsfc.nasa.gov/DONKI-API: api.nasa.gov/DONKI answers 301 since 30 September 2026) | yes, within 15 calls an hour |
+
 | | reactome |
 |---|---|
 | Shape | entity |
@@ -386,6 +401,12 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
 - **PBDB**: no rate published; its `max_ma`/`min_ma` orders answered 400 on 2026-10-16 though listed, and its wildcard name list left *Tyrannosaurus* out of "Tyranno%": the source searches through the autocompletion.
 - **eBird**: a key for everything but the taxonomy (403 without one, met on 2026-10-16); recent observations within 50 km and 30 days, the latest of each species at each location; times in local time without an offset; omnilab/ebird is not tested live beyond the taxonomy.
 - **IUCN Red List**: a token for every call (403 without one, met on 2026-10-16); half a second between calls asked; non-commercial use under its terms of use; omnilab/iucn is not tested live.
+- **Minor Planet Center**: no rate published; its APIs take a JSON body on a GET (a POST answers 405: `HttpSource::getForJson()`); two calls an entity; a name two bodies share (Halley) names neither; every observation of a body comes at once (Eros: 18,679 in 1.7 MB, 5 to 15 s).
+- **JPL Horizons**: one request at a time, as JPL asks (0.2 s apart); its errors come with a 200 in an `error` field; a table holds 90,024 lines at most; a plain name is Horizons' text search over the major bodies (`Eros` gave Kerberos): name a small body in the `jpl.sbdb` scheme.
+- **NED**: no rate published; its directory's name column is not indexed (a query by name ran past a minute), so a row is read by a cone of an arcsecond; no `OFFSET` in its ADQL (a cone is one page); the distances themselves are web pages only, not read.
+- **VizieR**: no rate published for TAP; no `OFFSET`, `ILIKE` nor `LOWER()` in its ADQL (a search is one page, each word asked in four cases); a table's positions are at its own epoch.
+- **DONKI**: no key and no rate published since its move to ccmc.gsfc.nasa.gov/DONKI-API on 30 September 2026 (the old address and api.nasa.gov/DONKI answer 301); one call per kind of event; no paging.
+- **Launch Library 2**: 15 calls an hour without a key (429 beyond), a supporter's key for more; `lldev.thespacedevs.com` (stale data, no limit) for development; no geographic filter.
 - **OQMD**: no rate published; down on 2026-10-15 (502, then time-outs), so omnilab/oqmd is not tested live; one entry is asked by `filter=entry_id=...`, which its documentation does not list among the filter's keywords.
 
 ## Throttling and politeness
@@ -438,6 +459,12 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
 | pbdb | none (no rate published) | `mailto` in the User-Agent |
 | ebird | none | the user's key as `X-eBirdApiToken`; `mailto` in the User-Agent |
 | iucn | 0.5 s (the IUCN's half second) | the user's token in `Authorization`; `mailto` in the User-Agent |
+| mpc | none (no rate published) | `mailto` in the User-Agent |
+| horizons | 0.2 s (one request at a time, as JPL asks) | `mailto` in the User-Agent, as JPL asks |
+| ned | none (no rate published) | `mailto` in the User-Agent |
+| vizier | none (no rate published) | `mailto` in the User-Agent |
+| donki | none (no rate published) | `mailto` in the User-Agent |
+| launches | none (15 calls an hour without a key: the limit is the caller's to keep) | `api_key` as `Authorization: Token`; `mailto` in the User-Agent |
 
 Every factory takes `mailto`, `user_agent`, `throttle` (seconds between two calls of one source
 instance) and `base_uri`.

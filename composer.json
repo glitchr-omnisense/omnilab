@@ -92,6 +92,12 @@
         "omnilab/pbdb": "Paleobiology Database: fossil and living taxa with their first and last appearances in Ma; fossil occurrences by place and age (outside the contract)",
         "omnilab/ebird": "eBird API 2.0: bird taxa by species code; with the user's key, names, search, checklists and recent observations (not tested live)",
         "omnilab/iucn": "IUCN Red List API v4: taxa with their latest global assessment, with the user's token (not tested live)",
+        "omnilab/horizons": "NASA/JPL Horizons: the ephemeris of a planet, moon, asteroid, comet or spacecraft seen from a place on the Earth as series (RA, Dec, azimuth, elevation, magnitude, distances, elongation)",
+        "omnilab/mpc": "IAU Minor Planet Center: minor planets and comets by number, designation or name; designations, orbit, absolute magnitude, observation arc; their latest observations (outside the contract)",
+        "omnilab/ned": "NASA/IPAC Extragalactic Database: galaxies, quasars and clusters by any name; type, position, redshift, NED's data counts; the objects of a cone on the sky (outside the contract)",
+        "omnilab/vizier": "CDS VizieR: astronomical catalogues' tables by text as datasets; the rows of a table around a point of the sky or an object (outside the contract)",
+        "omnilab/donki": "NASA DONKI: space weather events (solar flares, CMEs, geomagnetic storms, shocks, SEP events) by activity id, or by period (outside the contract)",
+        "omnilab/launches": "The Space Devs' Launch Library 2: orbital launches by id, text or period, as occurrences at their pads (15 calls an hour without a key)",
         "symfony/config": "In a Symfony application: the configuration of Omnilab\\Bridge\\Symfony\\OmnilabBundle",
         "symfony/dependency-injection": "In a Symfony application: the services of Omnilab\\Bridge\\Symfony\\OmnilabBundle",
         "symfony/http-kernel": "In a Symfony application: Omnilab\\Bridge\\Symfony\\OmnilabBundle itself"

@@ -7,6 +7,9 @@ composer require omnilab/uniprot omnilab/ncbi omnilab/gbif   # proteins, genes a
 composer require omnilab/chembl                              # bioactive molecules, their targets
 composer require omnilab/simbad omnilab/jpl                  # stars and galaxies; asteroids and comets
 composer require omnilab/gaia omnilab/exoplanets             # Gaia DR3's sources; the confirmed exoplanets
+composer require omnilab/ned omnilab/vizier                # galaxies and quasars (NED); the CDS's catalogues (VizieR)
+composer require omnilab/mpc omnilab/horizons               # minor planets and comets (MPC); ephemerides seen from a place (JPL Horizons)
+composer require omnilab/donki omnilab/launches             # space weather events (NASA DONKI); orbital launches (Launch Library 2)
 composer require omnilab/usgs omnilab/emsc                   # earthquakes: the USGS's catalogue, the EMSC's
 composer require omnilab/ensembl omnilab/pdb                 # genomes; protein structures
 composer require omnilab/reactome                            # pathways and reactions

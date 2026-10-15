@@ -69,6 +69,15 @@ docker compose run --rm omnilab entity iucn 134817215              # needs IUCN_
 docker compose run --rm omnilab entity chembl CHEMBL113
 docker compose run --rm omnilab entity simbad Betelgeuse
 docker compose run --rm omnilab entity jpl 433
+docker compose run --rm omnilab entity mpc 433                       # Eros at the Minor Planet Center
+docker compose run --rm omnilab collect mpc 433                      # then JPL's SBDB (the same designation), two orbits merged
+docker compose run --rm omnilab series horizons 48.5734,7.7521 499:elevation 499:magnitude --from 2026-10-16 --to 2026-10-16   # Mars from Strasbourg
+docker compose run --rm omnilab entity ned M31                       # Messier 031: type, redshift, NED's counts
+docker compose run --rm omnilab collect simbad M87                   # then NED by SIMBAD's name
+docker compose run --rm omnilab datasets vizier hipparcos --limit 5  # VizieR's tables
+docker compose run --rm omnilab entity donki 2024-05-10T15:00:00-GST-001   # the Kp 9 storm of May 2024
+docker compose run --rm omnilab entity launches 18441371-8b2e-457c-afb5-1ec1b11ab630
+docker compose run --rm omnilab occurrences launches --from 2026-10-01 --to 2026-10-14 --max 10   # 15 calls an hour without LL2_API_KEY
 docker compose run --rm omnilab entity gaia "Gaia DR3 4472832130942575872"   # Barnard's star
 docker compose run --rm omnilab entity exoplanets "51 Peg b"
 docker compose run --rm omnilab collect wikidata Q242309          # 51 Peg b, then SIMBAD and the archive (P3083, P5667)

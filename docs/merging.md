@@ -320,6 +320,28 @@ one earthquake (the M 5.0 of central Turkey on 2026-10-04 at 11:43:23 UTC: `emsc
 mb; `usgs.event:us6000tzip`, mww) stay two entities: joining them by time and place would be a
 guess, which the `Merger` does not make.
 
+## The sky: small bodies and galaxies
+
+Walked against the real services on 2026-10-16. **The Minor Planet Center and JPL** name a small
+body by the same designation; an entity of either carries `jpl.sbdb` with it, which both read:
+
+```php
+$collector->collect('mpc', '433', 1, ['jpl']);     // (433) Eros: mpc, jpl - two calls at the MPC, one at JPL, 2.6 s
+$collector->collect('jpl', '99942', 1, ['mpc']);   // 99942 Apophis: jpl, mpc - 1.5 s
+```
+
+Each orbit is kept with its source: Eros's semi-major axis 1.4582437174 au [mpc] and
+1.4582437168 ± 0.0000000002 au [jpl], its absolute magnitude 10.395 [mpc] and 10.4 [jpl];
+identifiers `mpc:433`, `jpl.sbdb:433`, `mpc:A898 PA`, `jpl.sbdb:20000433`.
+
+**SIMBAD into NED**: NED resolves the names SIMBAD gives (omnilab/ned reads the `simbad`
+scheme). `collect('simbad', 'M87', 1, ['ned'])`: `M 87*` with `ned:Messier 087`, redshift 0.0042
+[simbad] and 0.004282963 ± 0.0000166782 [ned], 4.1 s; from Wikidata at depth 2,
+`collect('wikidata', 'Q14041', 2, ['simbad', 'ned'])` reaches both (3.0 s). NED gives no other
+base's id: nothing leads out of it. omnilab/horizons (series), omnilab/vizier (datasets),
+omnilab/donki and omnilab/launches carry no cross-references: the `Collector` neither enters
+nor leaves them.
+
 ## The Merger
 
 ```php
