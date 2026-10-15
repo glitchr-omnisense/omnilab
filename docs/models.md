@@ -15,9 +15,9 @@ give modified copies.
 | `description` | |
 | `properties` | `Property` list: `key`, `label`, `value` (a `Quantity`, a text, a number, a boolean), `source` |
 | `identifiers` | `Identifiers`: its own, then the cross-references to other bases - other names of the same thing; `identifiers()` adds `id` |
-| `related` | `array<string, Identifiers>`: other things it is tied to, by relation - a protein's `organism` (`ncbi.taxon:9606`), its `structure`s (`pdb:1A3N`), its `ligand`s and `cofactor`s (`chebi:60344`), a taxon's `parent`; `related($relation)` gives one relation's |
+| `related` | `array<string, Identifiers>`: other things it is tied to, by relation - a protein's `organism` (`ncbi.taxon:9606`), its `structure`s (`pdb:1A3N`), its `ligand`s and `cofactor`s (`chebi:60344`), a taxon's `parent`, an occurrence's `taxon`; `related($relation)` gives one relation's ([why a field of its own](decisions.md)) |
 | `url`, `image` | its page; its picture (a structure, where the source has `Capability::STRUCTURE`) |
-| `time`, `place` | for what happens somewhere at a moment (an earthquake) or sits somewhere (a station): a `Point` or a `BBox` |
+| `time`, `place` | for what happens somewhere at a moment (an earthquake, an occurrence of a species) or sits somewhere (a station): a `Point` or a `BBox`; every entity `occurrences()` answers has both ([occurrences](occurrences.md)) |
 | `source`, `sources` | the source of the record; after a merge, every source merged |
 
 Identifiers name the thing itself: the `Collector` follows them into the other sources, and the
@@ -65,7 +65,17 @@ A series iterates over its points (`foreach ($series as [$time, $value])`) and c
 
 `SeriesQuery(variables, place, from, to, step, aggregation, timezone)`: both ends of the period
 included, a date without a time standing for its whole day; the time zone the times and the days
-are given in (`auto` is the point's own, at Open-Meteo).
+are given in (`auto` is the point's own, at Open-Meteo). The variables are the source's names: the
+weather's `temperature_2m`, the air's `pm2_5`, `nitrogen_dioxide`, `european_aqi` (Open-Meteo), the
+earthquakes' `count` (the USGS).
+
+## Occurrences
+
+No model of their own: `occurrences(OccurrenceQuery)` answers a `Page` of `Entity`, each with its
+`time` and its `place`. `OccurrenceQuery(place, from, to, filters, radius, limit, cursor, sort)`:
+a `BBox`, or a `Point` and a radius in kilometres; the period; the filters of a domain by key
+(`OccurrenceQuery::TAXON`, `COUNTRY`, `KIND`, `MIN_MAGNITUDE`, `MAX_MAGNITUDE`, or a source's own);
+`filter($key)` reads one. See [occurrences](occurrences.md).
 
 ## Product
 
@@ -113,6 +123,7 @@ Identifier::tryOf('cas', '58-08-3');                                 // null: wr
 | `unii`, `dsstox`, `kegg` | chemistry | `3G6A5W338E` (`UNII-` read), `DTXSID...`, `C00001` / `D00528` |
 | `uniprot`, `ncbi.gene`, `ensembl`, `pdb` | biology | upper case; Ensembl without its version |
 | `ncbi.taxon`, `inaturalist` | taxonomy | the number (`txid` read for NCBI) |
+| `gbif.occurrence` | taxonomy | the number of a GBIF occurrence (`5007681734`), its page `gbif.org/occurrence/` read |
 | `gbif` | taxonomy | the key of the Catalogue of Life eXtended Release, GBIF's taxonomy since June 2026, upper case (`4CGXP`: one to six of the digits 2 to 9 and the consonants, Wikidata's P14607); or the number of the legacy GBIF Backbone (`5219404`, P846). A key of digits alone is read as a legacy number |
 | `simbad`, `jpl.sbdb` | astronomy | the name, spaces collapsed: `M 31`, `433`, `1P/Halley` |
 | `usgs.event` | earth | lower case, a network's code then the event's: `us6000u24c`, `official20110311054624120_30` (the catalogues ComCat keeps, as Wikidata's P3196 names some) |

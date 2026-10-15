@@ -8,6 +8,7 @@ use Omnilab\Model\Entity;
 use Omnilab\Model\Identifier;
 use Omnilab\Model\Scheme;
 use Omnilab\Source\Capability;
+use Omnilab\Source\OccurrenceQuery;
 use Omnilab\Source\Page;
 use Omnilab\Source\ProductQuery;
 use Omnilab\Source\Query;
@@ -83,5 +84,10 @@ final class StubSource implements SourceInterface
     public function products(ProductQuery $query): Page
     {
         throw NotSupportedException::operation($this->name, 'list products');
+    }
+
+    public function occurrences(OccurrenceQuery $query): Page
+    {
+        throw NotSupportedException::operation($this->name, 'list occurrences');
     }
 }

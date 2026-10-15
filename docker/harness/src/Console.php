@@ -15,6 +15,7 @@ use Omnilab\Model\Product;
 use Omnilab\Model\Property;
 use Omnilab\Registry;
 use Omnilab\Source\Capability;
+use Omnilab\Source\OccurrenceQuery;
 use Omnilab\Source\ProductQuery;
 use Omnilab\Source\Query;
 use Omnilab\Source\SeriesQuery;
@@ -31,8 +32,8 @@ use Symfony\Component\HttpClient\HttpClient;
 
 /**
  * The console that asks every source, for real: sources, entity, search,
- * collect, series, products. A source that cannot be reached is skipped,
- * and said so on stderr.
+ * collect, series, products, occurrences. A source that cannot be reached
+ * is skipped, and said so on stderr.
  */
 final class Console
 {
@@ -61,7 +62,7 @@ final class Console
     public static function create(): Application
     {
         $self = new self();
-        $source = new InputArgument('source', InputArgument::REQUIRED, 'A configured source: pubchem, chebi, wikidata, open-meteo, copernicus');
+        $source = new InputArgument('source', InputArgument::REQUIRED, 'A configured source: pubchem, chebi, wikidata, open-meteo, copernicus, gbif, usgs...');
         $period = [
             new InputOption('from', null, InputOption::VALUE_REQUIRED, 'From then: a date, a time, "tomorrow", "-10days"'),
             new InputOption('to', null, InputOption::VALUE_REQUIRED, 'Up to then'),
@@ -91,6 +92,17 @@ final class Console
             new InputOption('max', 'm', InputOption::VALUE_REQUIRED, 'The most products read', '50'),
             new InputOption('json', null, InputOption::VALUE_NONE, 'JSON instead of a table'),
         ], fn ($in, $out) => $self->products($in, $out)));
+        $app->addCommand($self->command('occurrences', 'What was found or happened at a place in a period, every page up to --max', [
+            $source,
+            new InputOption('point', null, InputOption::VALUE_REQUIRED, 'latitude,longitude'),
+            new InputOption('radius', 'r', InputOption::VALUE_REQUIRED, 'Kilometres around the point (the source\'s default otherwise)'),
+            new InputOption('bbox', null, InputOption::VALUE_REQUIRED, 'west,south,east,north'),
+            ...$period,
+            new InputOption('filter', 'f', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'key=value: taxon=4CGXP, country=ZA, kind=preserved_specimen, min_magnitude=4...; a key twice makes a list'),
+            new InputOption('sort', null, InputOption::VALUE_REQUIRED, 'newest, oldest, or the source\'s own (magnitude)'),
+            new InputOption('max', 'm', InputOption::VALUE_REQUIRED, 'The most occurrences read', '50'),
+            new InputOption('json', null, InputOption::VALUE_NONE, 'JSON instead of a table'),
+        ], fn ($in, $out) => $self->occurrences($in, $out)));
 
         return $app;
     }
@@ -237,6 +249,48 @@ final class Console
         }
         $table->render();
         $this->stderr($out)->writeln(\sprintf('<info>%d products.</info>', \count($products)));
+    }
+
+    private function occurrences(InputInterface $in, OutputInterface $out): void
+    {
+        $filters = [];
+        foreach ((array) $in->getOption('filter') as $pair) {
+            [$key, $value] = array_pad(explode('=', (string) $pair, 2), 2, '');
+            $filters[$key] = \array_key_exists($key, $filters) ? [...(array) $filters[$key], $value] : $value;
+        }
+        $point = $in->getOption('point');
+        $bbox = $in->getOption('bbox');
+        $radius = $in->getOption('radius');
+        $max = max(1, (int) $in->getOption('max'));
+        $query = new OccurrenceQuery(
+            null !== $bbox ? BBox::parse((string) $bbox) : (null !== $point ? Point::parse((string) $point) : null),
+            self::time($in->getOption('from')),
+            self::time($in->getOption('to')),
+            $filters,
+            null === $radius ? null : (float) $radius,
+            min(300, $max),
+            sort: $in->getOption('sort'),
+        );
+        $source = $this->registry->get((string) $in->getArgument('source'));
+        $occurrences = [];
+        do {
+            $page = $source->occurrences($query);
+            array_push($occurrences, ...$page->items);
+            $query = $query->with(['cursor' => $page->next]);
+        } while (null !== $page->next && \count($occurrences) < $max);
+        $occurrences = \array_slice($occurrences, 0, $max);
+        if ($in->getOption('json')) {
+            $out->writeln(self::json($occurrences));
+
+            return;
+        }
+        $table = new Table($out);
+        $table->setHeaders(['Time (UTC)', 'Place', 'Id', 'Label', 'Kind']);
+        foreach ($occurrences as $occurrence) {
+            $table->addRow([$occurrence->time?->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i'), (string) $occurrence->place, $occurrence->id->key(), self::cut($occurrence->label, 60), $occurrence->kind]);
+        }
+        $table->render();
+        $this->stderr($out)->writeln(\sprintf('<info>%d of %s.</info>', \count($occurrences), $page->total ?? '?'));
     }
 
     private static function place(string $text): Point|BBox

@@ -8,6 +8,7 @@ use Omnilab\Copernicus\CopernicusSourceFactory;
 use Omnilab\OpenMeteo\OpenMeteoSourceFactory;
 use Omnilab\PubChem\PubChemSourceFactory;
 use Omnilab\Registry;
+use Omnilab\Usgs\UsgsSourceFactory;
 use Omnilab\Wikidata\WikidataSourceFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
@@ -16,7 +17,8 @@ use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
  * Omnilab outside Symfony: the harness's bare script (docker/harness/bin/bare)
  * run in a PHP process of its own - this one has loaded the bundle's tests -
  * builds the registry by hand, asks PubChem for an entity, Open-Meteo for a
- * series and the Copernicus Data Space for products, has the Collector
+ * series, the Copernicus Data Space for products and the USGS for
+ * occurrences, has the Collector
  * follow the entity into ChEBI and Wikidata, from recorded answers,
  * and reports every class and file PHP loaded on the way. None may be a
  * framework's.
@@ -84,6 +86,21 @@ final class BareTest extends TestCase
         self::assertSame(['purine alkaloid [chebi]', 'trimethylxanthine [chebi]'], $report['collected']['properties']['is_a']);
         self::assertSame(['234 °C [wikidata]', '235 °C [wikidata]'], $report['collected']['properties']['melting_point']);
         self::assertSame(['C8H10N4O2 [pubchem]', 'C8H10N4O2 [chebi]', 'C8H10N4O2 [wikidata]'], $report['collected']['properties']['molecular_formula']);
+        self::assertSame([], self::framework($report), 'no class nor file of a framework');
+    }
+
+    public function testTheFourthShapeOccurrencesFromARecordedAnswerWithNoClassOfAFrameworkLoaded(): void
+    {
+        if (!class_exists(UsgsSourceFactory::class)) {
+            self::markTestSkipped('omnilab/usgs is not installed.');
+        }
+        [$status, $report] = self::php([__DIR__.'/../docker/harness/bin/bare', '--recorded', '--json']);
+
+        self::assertSame(0, $status);
+        self::assertContains('occurrences', $report['sources']['usgs']);
+        self::assertSame(['usgs.event:us6000tzip', 'usgs.event:us6000tzif', 'usgs.event:us6000tzil', 'usgs.event:us6000tzpq', 'usgs.event:us6000tz1r'], array_column($report['occurrences'], 'id'));
+        self::assertSame(['2026-10-04 11:43:23', '37.7292,36.1272', 'M 5.0 - 21 km ESE of Feke, Turkey'], [$report['occurrences'][0]['time'], $report['occurrences'][0]['place'], $report['occurrences'][0]['label']]);
+        self::assertEquals(5.0, $report['occurrences'][0]['magnitude'], 'JSON writes 5.0 as 5');
         self::assertSame([], self::framework($report), 'no class nor file of a framework');
     }
 

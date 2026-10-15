@@ -54,6 +54,8 @@ final class IdentifierTest extends TestCase
         yield 'a legacy GBIF key' => ['gbif:5219404', 'gbif:5219404'];
         yield 'not a GBIF key: a vowel' => ['gbif:4CGXA', null];
         yield 'nor: seven characters' => ['gbif:4CGXPBB', null];
+        yield 'a GBIF occurrence' => ['gbif.occurrence:5938104699', 'gbif.occurrence:5938104699'];
+        yield 'its page' => ['https://www.gbif.org/occurrence/5938104699', 'gbif.occurrence:5938104699'];
         yield 'an iNaturalist taxon' => ['https://www.inaturalist.org/taxa/42007-Puma-concolor', 'inaturalist:42007'];
         yield 'a USGS event page' => ['https://earthquake.usgs.gov/earthquakes/eventpage/us6000u24c/executive', 'usgs.event:us6000u24c'];
         yield 'the page of a long one' => ['https://earthquake.usgs.gov/earthquakes/eventpage/iscgemsup16957911', 'usgs.event:iscgemsup16957911'];
@@ -76,6 +78,8 @@ final class IdentifierTest extends TestCase
         self::assertSame(Domain::CHEMISTRY, Scheme::INCHIKEY->domain());
         self::assertSame(Domain::BIOLOGY, Scheme::UNIPROT->domain());
         self::assertSame(Domain::TAXONOMY, Scheme::GBIF->domain());
+        self::assertSame(Domain::TAXONOMY, Scheme::GBIF_OCCURRENCE->domain());
+        self::assertSame('https://www.gbif.org/occurrence/5938104699', Identifier::of(Scheme::GBIF_OCCURRENCE, '5938104699')->url());
         self::assertSame(Domain::ASTRONOMY, Scheme::SIMBAD->domain());
         self::assertSame(Domain::EARTH, Scheme::USGS_EVENT->domain());
         self::assertNull(Scheme::WIKIDATA->domain());

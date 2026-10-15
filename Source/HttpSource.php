@@ -57,6 +57,28 @@ abstract class HttpSource implements SourceInterface
         throw NotSupportedException::operation($this->getName(), 'list products');
     }
 
+    public function occurrences(OccurrenceQuery $query): Page
+    {
+        throw NotSupportedException::operation($this->getName(), 'list occurrences');
+    }
+
+    /**
+     * The filters of an occurrence query, when the source reads every one
+     * (an empty value left out); a key it does not read is refused before
+     * any call, rather than answered unfiltered.
+     *
+     * @return array<string, mixed>
+     */
+    protected function filters(OccurrenceQuery $query, string ...$known): array
+    {
+        $unknown = array_diff(array_keys($query->filters), $known);
+        if ($unknown) {
+            throw NotSupportedException::operation($this->getName(), \sprintf('filter occurrences by "%s" (it reads %s)', implode('", "', $unknown), $known ? '"'.implode('", "', $known).'"' : 'none'));
+        }
+
+        return array_filter($query->filters, static fn (mixed $value) => null !== $value && '' !== $value && [] !== $value);
+    }
+
     /**
      * GETs JSON. Null when the service answers 404 / 410.
      *

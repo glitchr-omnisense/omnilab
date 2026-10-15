@@ -3,9 +3,9 @@
 namespace Omnilab\Source;
 
 /**
- * One page of entities (search()) or of products (products()). $next is
- * the cursor of the following page (pass it as the query's cursor), null
- * on the last one.
+ * One page of entities (search(), occurrences()) or of products
+ * (products()). $next is the cursor of the following page (pass it as the
+ * query's cursor), null on the last one.
  *
  * @template T of \Omnilab\Model\Entity|\Omnilab\Model\Product
  *

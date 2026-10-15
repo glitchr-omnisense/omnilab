@@ -13,13 +13,16 @@ use Omnilab\Model\Series;
 /**
  * A service that publishes what science knows or measures: PubChem,
  * Open-Meteo, the Copernicus Data Space... whatever its domain. Its answers
- * take one of three shapes:
+ * take one of four shapes:
  *
  * - an Entity: one thing, named and identified, with its properties and its
  *   identifiers in other bases (entity(), search());
  * - a Series: one variable at a place over a time (series());
  * - a Product: a catalogued scene or file, its footprint and its assets
- *   (products()).
+ *   (products());
+ * - occurrences: the entities found or happened at a place in a period,
+ *   each with its time and its place - the observations of a species, the
+ *   earthquakes of a region (occurrences()).
  *
  * A source answers what it can, says what that is (capabilities()), and
  * throws NotSupportedException for the rest: an operation it does not do,
@@ -71,4 +74,15 @@ interface SourceInterface
      * @return Page<Product>
      */
     public function products(ProductQuery $query): Page;
+
+    /**
+     * The things found or happened at the place in the period, one page at a
+     * time, each an Entity with its time and its place (a Point); in the
+     * source's order unless the query sorts. An entity of a page may hold
+     * less than entity() gives for it (its README says what): entity($it->id)
+     * reads it whole.
+     *
+     * @return Page<Entity>
+     */
+    public function occurrences(OccurrenceQuery $query): Page;
 }

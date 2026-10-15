@@ -8,8 +8,10 @@
  * needed: caffeine of PubChem (an entity), tomorrow's hourly temperature in
  * Strasbourg of Open-Meteo (a series), the Sentinel-2 L2A scenes over
  * Strasbourg in the last ten days under 30 % cloud of the Copernicus Data
- * Space (products), caffeine followed from PubChem into ChEBI and Wikidata
- * by the Collector - and the script lists what PHP loaded on the way.
+ * Space (products), the largest earthquakes (five at most) of magnitude 4
+ * or more over Europe in a week of the USGS (occurrences), caffeine followed from
+ * PubChem into ChEBI and Wikidata by the Collector - and the script lists
+ * what PHP loaded on the way.
  *
  *   docker compose run --rm omnilab bare              # exits 1 when a class of a framework was loaded
  *   docker compose run --rm omnilab bare --recorded   # the answers recorded on 2026-10-15 (cut down) instead of calls
@@ -19,11 +21,14 @@
  */
 
 use Omnilab\Collector;
+use Omnilab\Model\BBox;
+use Omnilab\Model\Entity;
 use Omnilab\Model\Point;
 use Omnilab\Model\Product;
 use Omnilab\Model\Property;
 use Omnilab\Registry;
 use Omnilab\Source\Capability;
+use Omnilab\Source\OccurrenceQuery;
 use Omnilab\Source\ProductQuery;
 use Omnilab\Source\SeriesQuery;
 use Symfony\Component\HttpClient\HttpClient;
@@ -47,6 +52,7 @@ $http = !$recorded ? null : new MockHttpClient(static function (string $method, 
         str_contains($url, 'wikidata.org/w/api.php') && str_contains($url, 'srsearch=haswbstatement:P662=2519') => 'wikidata-statement-P662-2519.json',
         str_contains($url, 'wikidata.org/w/api.php') && str_contains($url, 'ids=Q60235&') => 'wikidata-entities-Q60235.json',
         str_contains($url, 'wikidata.org/w/api.php') && str_contains($url, 'ids=Q113145171&') => 'wikidata-labels-Q113145171.json',
+        str_contains($url, 'earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=magnitude&starttime=2026-10-01T00:00:00&endtime=2026-10-08T00:00:00') => 'usgs-europe-m4-2026-10-01.json',
         default => null,
     };
 
@@ -70,7 +76,7 @@ $now = $recorded ? new DateTimeImmutable('2026-10-15T00:00:00Z') : new DateTimeI
 $tomorrow = $recorded ? new DateTimeImmutable('2026-10-16', $paris) : new DateTimeImmutable('tomorrow', $paris);
 $strasbourg = new Point(48.5734, 7.7521);
 
-$report = ['recorded' => $recorded, 'sources' => [], 'entity' => null, 'collected' => null, 'series' => null, 'products' => null];
+$report = ['recorded' => $recorded, 'sources' => [], 'entity' => null, 'collected' => null, 'series' => null, 'products' => null, 'occurrences' => null];
 foreach ($registry->all() as $name => $source) {
     $report['sources'][$name] = array_map(static fn (Capability $capability) => $capability->value, $source->capabilities());
 }
@@ -102,6 +108,14 @@ if ($registry->has('copernicus')) {
     $query = new ProductQuery(['sentinel-2-l2a'], $strasbourg, $now->modify('-10 days'), $recorded ? $now : null, maxCloudCover: 30, limit: 100);
     $page = $registry->get('copernicus')->products($query);
     $report['products'] = array_map(static fn (Product $p) => ['id' => $p->id, 'datetime' => $p->datetime?->format('Y-m-d H:i'), 'cloud' => $p->cloudCover(), 'tile' => $p->properties['grid:code'] ?? null, 'preview' => $p->preview], $page->items);
+}
+if ($registry->has('usgs')) {
+    // Recorded: the first week of October 2026; live: the last seven days.
+    $europe = new BBox(-25, 35, 45, 72);
+    $weekFrom = $recorded ? new DateTimeImmutable('2026-10-01') : new DateTimeImmutable('-7 days', new DateTimeZone('UTC'));
+    $weekTo = $recorded ? new DateTimeImmutable('2026-10-07') : new DateTimeImmutable('now', new DateTimeZone('UTC'));
+    $page = $registry->get('usgs')->occurrences(new OccurrenceQuery($europe, $weekFrom, $weekTo, [OccurrenceQuery::MIN_MAGNITUDE => 4], limit: 5, sort: 'magnitude'));
+    $report['occurrences'] = array_map(static fn (Entity $e) => ['id' => $e->id->key(), 'time' => $e->time?->format('Y-m-d H:i:s'), 'place' => (string) $e->place, 'magnitude' => $e->value('magnitude'), 'label' => $e->label], $page->items);
 }
 
 // What PHP loaded to get there: the proof that no framework was needed.
@@ -149,6 +163,15 @@ if (null !== $report['products']) {
         printf("  %s UTC  %5.2f %%  %s  %s\n", $product['datetime'], $product['cloud'], $product['tile'], $product['id']);
     }
     if (!$report['products']) {
+        echo "  none\n";
+    }
+}
+if (null !== $report['occurrences']) {
+    echo "\nUSGS, the largest earthquakes (five at most) of magnitude 4 or more over Europe ", $recorded ? 'from 2026-10-01 to 10-07' : 'in the last seven days', $from ?: ', asked of earthquake.usgs.gov', ":\n";
+    foreach ($report['occurrences'] as $quake) {
+        printf("  %s UTC  %-20s %s\n", $quake['time'], $quake['place'], $quake['label']);
+    }
+    if (!$report['occurrences']) {
         echo "  none\n";
     }
 }

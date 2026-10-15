@@ -12,6 +12,7 @@ $mailto = $env('OMNILAB_MAILTO');
 return [
     'pubchem' => ['factory' => 'pubchem', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'open-meteo' => ['factory' => 'open-meteo', 'needs' => [], 'options' => ['mailto' => $mailto, 'api_key' => $env('OPEN_METEO_API_KEY'), 'base_uri' => $env('OPEN_METEO_BASE_URI')]],
+    'air-quality' => ['factory' => 'open-meteo', 'needs' => [], 'options' => ['mailto' => $mailto, 'api' => 'air_quality', 'api_key' => $env('OPEN_METEO_API_KEY')]],
     'copernicus' => ['factory' => 'copernicus', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'chebi' => ['factory' => 'chebi', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'wikidata' => ['factory' => 'wikidata', 'needs' => [], 'options' => ['mailto' => $mailto, 'language' => $env('WIKIDATA_LANGUAGE')]],

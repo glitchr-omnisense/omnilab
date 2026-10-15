@@ -2,6 +2,7 @@
 
 namespace Omnilab\Tests;
 
+use Omnilab\Exception\NotSupportedException;
 use Omnilab\Model\Asset;
 use Omnilab\Model\BBox;
 use Omnilab\Model\Point;
@@ -9,11 +10,15 @@ use Omnilab\Model\Product;
 use Omnilab\Model\Property;
 use Omnilab\Model\Quantity;
 use Omnilab\Model\Series;
+use Omnilab\Source\Capability;
+use Omnilab\Source\HttpSource;
+use Omnilab\Source\OccurrenceQuery;
 use Omnilab\Source\Page;
 use Omnilab\Source\ProductQuery;
 use Omnilab\Source\Query;
 use Omnilab\Source\SeriesQuery;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\MockHttpClient;
 
 final class ModelsTest extends TestCase
 {
@@ -92,5 +97,62 @@ final class ModelsTest extends TestCase
         }
         $this->expectException(\InvalidArgumentException::class);
         new ProductQuery(from: new \DateTimeImmutable('2026-10-15'), to: new \DateTimeImmutable('2026-10-05'));
+    }
+
+    public function testAnOccurrenceQuery(): void
+    {
+        $skukuza = new Point(-24.99, 31.59);
+        $query = new OccurrenceQuery($skukuza, new \DateTimeImmutable('2025-01-01'), new \DateTimeImmutable('2025-12-31'), [OccurrenceQuery::TAXON => '4CGXP'], radius: 100);
+
+        self::assertSame('4CGXP', $query->filter(OccurrenceQuery::TAXON));
+        self::assertNull($query->filter(OccurrenceQuery::COUNTRY));
+        self::assertSame('300', $query->with(['cursor' => '300'])->cursor);
+        self::assertSame(25, $query->limit);
+        self::assertNull($query->sort, 'the source\'s own order');
+        self::assertNull((new OccurrenceQuery())->place, 'anywhere');
+        foreach ([
+            'a radius around a box' => static fn () => new OccurrenceQuery(new BBox(-25, 35, 45, 72), radius: 10),
+            'a radius without a place' => static fn () => new OccurrenceQuery(radius: 10),
+            'a radius of nothing' => static fn () => new OccurrenceQuery($skukuza, radius: 0),
+            'a period backwards' => static fn () => new OccurrenceQuery(from: new \DateTimeImmutable('2026-10-15'), to: new \DateTimeImmutable('2026-10-05')),
+        ] as $what => $query) {
+            try {
+                $query();
+                self::fail($what);
+            } catch (\InvalidArgumentException) {
+            }
+        }
+    }
+
+    public function testASourceRefusesTheOccurrencesOrTheFiltersItDoesNotRead(): void
+    {
+        $source = new class(new MockHttpClient(), 'https://example.org/') extends HttpSource {
+            public function getName(): string
+            {
+                return 'example';
+            }
+
+            public function capabilities(): array
+            {
+                return [];
+            }
+
+            /** @return array<string, mixed> */
+            public function read(OccurrenceQuery $query): array
+            {
+                return $this->filters($query, OccurrenceQuery::TAXON, OccurrenceQuery::COUNTRY);
+            }
+        };
+        self::assertNotContains(Capability::OCCURRENCES, $source->capabilities());
+        self::assertSame(['taxon' => '4CGXP'], $source->read(new OccurrenceQuery(filters: ['taxon' => '4CGXP', 'country' => []])), 'an empty value is no filter');
+        try {
+            $source->read(new OccurrenceQuery(filters: ['taxon' => '4CGXP', 'min_magnitude' => 4]));
+            self::fail('a filter it does not read');
+        } catch (NotSupportedException $e) {
+            self::assertSame('The "example" source does not filter occurrences by "min_magnitude" (it reads "taxon", "country").', $e->getMessage());
+        }
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('The "example" source does not list occurrences.');
+        $source->occurrences(new OccurrenceQuery());
     }
 }

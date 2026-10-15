@@ -13,7 +13,7 @@ enum Domain: string
     case CHEMISTRY = 'chemistry';
     /** Genes, proteins, structures, pathways. */
     case BIOLOGY = 'biology';
-    /** Species and the other ranks of the tree of life. */
+    /** Species and the other ranks of the tree of life, and where they were found (occurrences). */
     case TAXONOMY = 'taxonomy';
     /** Stars, galaxies, planets, small bodies. */
     case ASTRONOMY = 'astronomy';

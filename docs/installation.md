@@ -9,6 +9,9 @@ composer require omnilab/simbad omnilab/jpl                  # stars and galaxie
 composer require omnilab/usgs                                # earthquakes
 ```
 
+The weather and the air are both `omnilab/open-meteo` (`api: air_quality` for the air); the
+occurrences of a species are `omnilab/gbif`'s, those of earthquakes `omnilab/usgs`'s.
+
 PHP 8.2 or later.
 
 Omnilab needs no framework. The core requires nothing but `symfony/http-client-contracts`, each
@@ -142,6 +145,60 @@ foreach ($page as $scene) {
     echo $scene->datetime->format(\DATE_ATOM), ' ', $scene->platform(), ' ', $scene->asset('Product')?->href, "\n";
 }
 ```
+
+## Air quality
+
+```php
+$air = (new OpenMeteoSourceFactory($http))->create(['api' => 'air_quality']);
+$day = new \DateTimeImmutable('2026-10-14');
+foreach ($air->series(new SeriesQuery(['pm2_5', 'pm10', 'nitrogen_dioxide', 'ozone', 'european_aqi', 'us_aqi'], $strasbourg, $day, $day)) as $series) {
+    printf("%-17s %-6s from %s to %s\n", $series->variable, $series->unit, $series->min(), $series->max());
+}
+```
+
+```
+pm2_5             μg/m³ from 5.8 to 19
+pm10              μg/m³ from 7.7 to 24.9
+nitrogen_dioxide  μg/m³ from 7 to 41.4
+ozone             μg/m³ from 16 to 73
+european_aqi      EAQI   from 22 to 49
+us_aqi            USAQI  from 41 to 51
+```
+
+(Strasbourg, 2026-10-14, as answered on 2026-10-15)
+
+## Occurrences
+
+What was found or happened at a place in a period - the fourth shape
+([occurrences](occurrences.md)):
+
+```php
+use Omnilab\Gbif\GbifSourceFactory;
+use Omnilab\Source\OccurrenceQuery;
+use Omnilab\Usgs\UsgsSourceFactory;
+
+$gbif = (new GbifSourceFactory($http))->create(['mailto' => 'you@example.org']);
+$lions = $gbif->occurrences(new OccurrenceQuery(new Point(-24.99, 31.59), new \DateTimeImmutable('2025-01-01'),
+    new \DateTimeImmutable('2025-12-31'), [OccurrenceQuery::TAXON => '4CGXP'], radius: 100, limit: 300));
+echo $lions->total, " lions within 100 km of Skukuza in 2025\n";
+
+$usgs = (new UsgsSourceFactory($http))->create(['mailto' => 'you@example.org']);
+$quakes = $usgs->occurrences(new OccurrenceQuery(new BBox(-25, 35, 45, 72), new \DateTimeImmutable('2026-10-01'),
+    new \DateTimeImmutable('2026-10-07'), [OccurrenceQuery::MIN_MAGNITUDE => 4], limit: 3, sort: 'magnitude'));
+foreach ($quakes as $quake) {
+    echo $quake->time->format('Y-m-d H:i:s'), ' UTC  ', $quake->place, '  ', $quake->label, "\n";
+}
+```
+
+```
+412 lions within 100 km of Skukuza in 2025
+2026-10-04 11:43:23 UTC  37.7292,36.1272  M 5.0 - 21 km ESE of Feke, Turkey
+2026-10-04 11:36:26 UTC  37.7757,36.1685  M 4.7 - 22 km E of Feke, Turkey
+2026-10-04 11:19:26 UTC  37.8028,36.1749  M 4.7 - 21 km SSE of Saimbeyli, Turkey
+```
+
+(as answered on 2026-10-15; `printf` pads `μg/m³` by its bytes; two earthquakes of one magnitude
+come in either order)
 
 ## Several sources
 
