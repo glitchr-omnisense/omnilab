@@ -63,11 +63,42 @@ the factor. `(string) new Quantity(194.19, 'g/mol')` is `194.19 g/mol`.
 A series iterates over its points (`foreach ($series as [$time, $value])`) and counts them;
 `values()`, `times()`, `at($time)`, `min()`, `max()`, `mean()`, `between($from, $to)`.
 
-`SeriesQuery(variables, place, from, to, step, aggregation, timezone)`: both ends of the period
+`SeriesQuery(variables, place, from, to, step, aggregation, timezone)`: the place a `Point`, a
+`BBox` (`Capability::AREA`) or a station's `Identifier` (`Capability::STATION`, below); both ends of the period
 included, a date without a time standing for its whole day; the time zone the times and the days
 are given in (`auto` is the point's own, at Open-Meteo). The variables are the source's names: the
 weather's `temperature_2m`, the air's `pm2_5`, `nitrogen_dioxide`, `european_aqi` (Open-Meteo), the
 earthquakes' `count` (the USGS).
+
+## Stations
+
+A station's records are a series of their own: the station that measured them, not the nearest
+grid point nor whichever station a source picks. `SeriesQuery::$place` takes a station's
+`Identifier` in place of a `Point` - a source with `Capability::STATION` reads the stations of
+its schemes, any other refuses a station before any call -, and the series answered carry the
+station's `Point` (its elevation too):
+
+| Scheme | A station of | Normalised as |
+|---|---|---|
+| `ghcn` | the Global Historical Climatology Network (NCEI's GHCN-Daily and its monthly and yearly summaries, the whole world) | eleven characters, upper case: the country (FIPS), the network, the station's own (`USW00094728`, Central Park; `FR000007190`, Strasbourg-Entzheim; `BR00A6-0010`) |
+| `wigos` | the WMO's register (OSCAR/Surface): any observing station | its WIGOS id, `0-20000-0-07190`; a WMO index of five digits, written `wmo:07190`, is read as its WIGOS id (Wikidata's P4136) |
+| `nws.station` | the U.S. National Weather Service's observation stations | upper case: an ICAO airport (`KNYC`), a buoy (`44069`), a network's (`A4080`) |
+
+Only the WIGOS id is told by its shape alone; a GHCN or an NWS station needs its scheme
+(`ghcn:USW00094728`, `nws.station:KNYC`) or its page, as its shape is any code's.
+
+```php
+$series = $noaa->series(new SeriesQuery(['TMAX', 'PRCP'], Identifier::of(Scheme::GHCN, 'USW00094728'), new \DateTimeImmutable('2026-10-01'), new \DateTimeImmutable('2026-10-07'), SeriesQuery::DAILY));
+$series[0]->place;   // 40.77898,-73.96925 (42.7 m)
+$series[0]->label;   // NY CITY CENTRAL PARK, NY US (daily-summaries:USW00094728)
+
+$station = $noaa->entity('ghcn:USW00094728'); // the station itself, an Entity of kind "station"
+$station->place;                         // its Point and elevation
+$station->value('period_start');         // the first day it has records of
+$station->properties('variable');        // each element and the period it covers: "TMAX: 1869-01-01/2026-10-10"
+```
+
+(see [omnilab/noaa](https://github.com/glitchr-studio/omnilab-noaa) for what each API answers)
 
 ## Occurrences
 
@@ -128,12 +159,13 @@ Identifier::tryOf('cas', '58-08-3');                                 // null: wr
 | `gbif` | taxonomy | the key of the Catalogue of Life eXtended Release, GBIF's taxonomy since June 2026, upper case (`4CGXP`: one to six of the digits 2 to 9 and the consonants, Wikidata's P14607); or the number of the legacy GBIF Backbone (`5219404`, P846). A key of digits alone is read as a legacy number |
 | `simbad`, `jpl.sbdb` | astronomy | the name, spaces collapsed: `M 31`, `433`, `1P/Halley` |
 | `usgs.event` | earth | lower case, a network's code then the event's: `us6000u24c`, `official20110311054624120_30` (the catalogues ComCat keeps, as Wikidata's P3196 names some) |
+| `ghcn`, `wigos`, `nws.station` | earth | stations ([above](#stations)): `USW00094728`; `0-20000-0-07190` (`wmo:07190` read); `KNYC` |
 | `wikidata` | any | `Q60235` |
 
 `parse()` reads `scheme:value` (the schemes' names, identifiers.org's prefixes, `CHEBI:`), the
 pages of each base and identifiers.org's links, and the values whose shape tells their scheme
 (an InChIKey, a CAS number, `CHEMBL...`, `DTXSID...`, `UNII-...`, an Ensembl id, a Wikidata
-Q-number). A bare number, a UniProt accession or a PDB code needs its scheme: other values share
+Q-number, a WIGOS id). A bare number, a UniProt accession or a PDB code needs its scheme: other values share
 their shapes. An entity may carry two identifiers of one scheme (GBIF's new key and its legacy
 number, a secondary accession): the `Merger` knows it by either. `Identifiers` keeps each identifier once: `get()`, `value()`, `values()`, `has()`,
 `with()`, `merge()`, `toArray()` / `fromArray()` for storage.

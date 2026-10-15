@@ -14,6 +14,7 @@ namespace Omnilab\Model;
  *   Identifier::parse('https://identifiers.org/uniprot:P69905');        // uniprot:P69905
  *   Identifier::of(Scheme::PUBCHEM_CID, '2519')->url();                 // https://pubchem.ncbi.nlm.nih.gov/compound/2519
  *   Identifier::tryOf('cas', '58-08-3');                                // null: wrong check digit
+ *   Identifier::of('wmo', '07190');                                     // wigos:0-20000-0-07190
  */
 final readonly class Identifier implements \Stringable
 {
@@ -21,6 +22,8 @@ final readonly class Identifier implements \Stringable
     private const CAS = '~^(\d{2,7})-(\d{2})-(\d)$~';
     private const UNIPROT = '~^(?:[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9](?:[A-Z][A-Z0-9]{2}[0-9]){1,2})(?:-\d+)?$~';
     private const ENSEMBL = '~^(ENS[A-Z]*[EFGPRT]\d{11})(?:\.\d+)?$~';
+    /** A WIGOS station id: its series, issuer, issue number and local id (the WMO's own pattern, as Wikidata's P4136 writes it). */
+    private const WIGOS = '~^(?:\d|1[0-4])(?:-(?:\d|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-4])){2}-[0-9A-Za-z]{1,16}$~';
 
     /** The other names a "prefix:value" may give a scheme: identifiers.org's prefixes, the bases' own. */
     private const PREFIXES = [
@@ -35,6 +38,8 @@ final readonly class Identifier implements \Stringable
         'inaturalist.taxon' => Scheme::INATURALIST,
         'sbdb' => Scheme::JPL_SBDB, 'jpl' => Scheme::JPL_SBDB,
         'usgs' => Scheme::USGS_EVENT,
+        'ghcnd' => Scheme::GHCN,
+        'wmo' => Scheme::WIGOS,
         'wd' => Scheme::WIKIDATA,
     ];
 
@@ -86,6 +91,11 @@ final readonly class Identifier implements \Stringable
             Scheme::SIMBAD, Scheme::JPL_SBDB => self::name($value),
             // A network's code then the event's own (ComCat keeps the catalogues' long ones: official20110311054624120_30, iscgemsup16957911).
             Scheme::USGS_EVENT => preg_match('~^[a-z]{2,10}[a-z0-9_]{6,24}$~', $v = strtolower($value)) ? $v : null,
+            // The country (FIPS), the network, the station's own: USW00094728, BR00A6-0010.
+            Scheme::GHCN => preg_match('~^(?:GHCND:)?([A-Z]{2}[0-9A-Z][0-9A-Z-]{8})$~', $upper, $m) ? $m[1] : null,
+            // A WMO index of five digits is the WIGOS id 0-20000-0-<index>.
+            Scheme::WIGOS => preg_match('~^\d{5}$~', $value) ? '0-20000-0-'.$value : (preg_match(self::WIGOS, $value) ? $value : null),
+            Scheme::NWS_STATION => preg_match('~^[A-Z0-9]{3,10}$~', $upper) ? $upper : null,
             Scheme::WIKIDATA => preg_match('~^(?:WD:)?(Q[1-9]\d*)$~', $upper, $m) ? $m[1] : null,
         };
 
@@ -126,6 +136,7 @@ final readonly class Identifier implements \Stringable
             (bool) preg_match('~^UNII-[A-Z0-9]{10}$~', $upper) => self::tryOf(Scheme::UNII, $upper),
             (bool) preg_match(self::ENSEMBL, $upper) => self::tryOf(Scheme::ENSEMBL, $upper),
             (bool) preg_match('~^Q[1-9]\d*$~', $upper) => self::tryOf(Scheme::WIKIDATA, $upper),
+            (bool) preg_match(self::WIGOS, $input) => self::tryOf(Scheme::WIGOS, $input),
             default => null,
         };
     }
@@ -210,6 +221,9 @@ final readonly class Identifier implements \Stringable
             Scheme::SIMBAD => 'https://simbad.cds.unistra.fr/simbad/sim-id?Ident='.$v,
             Scheme::JPL_SBDB => 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr='.$v,
             Scheme::USGS_EVENT => 'https://earthquake.usgs.gov/earthquakes/eventpage/'.$v,
+            Scheme::GHCN => 'https://www.ncei.noaa.gov/cdo-web/datasets/GHCND/stations/GHCND:'.$v.'/detail',
+            Scheme::WIGOS => 'https://oscar.wmo.int/surface/#/search/station/stationReportDetails/'.$v,
+            Scheme::NWS_STATION => 'https://www.weather.gov/wrh/timeseries?site='.$v,
             Scheme::WIKIDATA => 'https://www.wikidata.org/wiki/'.$v,
         };
     }
@@ -249,6 +263,10 @@ final readonly class Identifier implements \Stringable
             'precision.fda.gov' === $host => self::tryOf(Scheme::UNII, $last),
             str_ends_with($host, 'kegg.jp') || str_ends_with($host, 'genome.jp') => $found('~\b([CD]\d{5})\b~', Scheme::KEGG),
             str_contains($host, 'simbad') => self::tryOf(Scheme::SIMBAD, (string) ($query['Ident'] ?? $query['ident'] ?? '')),
+            'www.ncei.noaa.gov' === $host => $found('~GHCND:([A-Z0-9-]{11})~i', Scheme::GHCN),
+            'oscar.wmo.int' === $host => preg_match('~stationReportDetails/([0-9A-Za-z-]+)~', $fragment, $m) ? self::tryOf(Scheme::WIGOS, $m[1]) : self::tryOf(Scheme::WIGOS, (string) ($query['wigosId'] ?? '')),
+            'api.weather.gov' === $host => preg_match('~^stations/([A-Z0-9]+)$~i', $path, $m) ? self::tryOf(Scheme::NWS_STATION, $m[1]) : null,
+            'www.weather.gov' === $host => self::tryOf(Scheme::NWS_STATION, (string) ($query['site'] ?? '')),
             'ssd.jpl.nasa.gov' === $host => preg_match('~sstr=([^&]+)~', $fragment.'&'.http_build_query($query), $m) ? self::tryOf(Scheme::JPL_SBDB, $m[1]) : null,
             default => null,
         };

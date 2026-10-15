@@ -64,6 +64,24 @@ abstract class HttpSource implements SourceInterface
     }
 
     /**
+     * The station a series query names in place of a Point or a BBox, when
+     * it is of one of the schemes the source reads; null when the query
+     * names a place. A station of any other scheme is refused before any
+     * call (a source that reads none calls it without a scheme).
+     */
+    protected function station(SeriesQuery $query, Scheme ...$schemes): ?Identifier
+    {
+        if (!$query->place instanceof Identifier) {
+            return null;
+        }
+        if (!\in_array($query->place->scheme, $schemes, true)) {
+            throw NotSupportedException::operation($this->getName(), \sprintf('serve the records of a station of %s (%s)', $query->place->scheme->label(), $schemes ? 'it reads '.implode(', ', array_map(static fn (Scheme $s) => $s->label(), $schemes)) : 'a place: a Point'));
+        }
+
+        return $query->place;
+    }
+
+    /**
      * The filters of an occurrence query, when the source reads every one
      * (an empty value left out); a key it does not read is refused before
      * any call, rather than answered unfiltered.

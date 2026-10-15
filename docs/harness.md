@@ -18,7 +18,7 @@ air_quality`).
 | `entity <source> <id>` | one entity, by an identifier or a name (JSON) |
 | `search <source> <text>` | `--domain`, `--limit` |
 | `collect <source> <id>` | one entity, its cross-references followed into the other sources, merged (JSON); `--depth` |
-| `series <source> <place> <variable>...` | `--from`, `--to`, `--daily mean\|max\|min\|sum`, `--step PT15M`, `--timezone` |
+| `series <source> <place> <variable>...` (a place `lat,lon`, a box, or a station: `ghcn:USW00094728`, `nws.station:KNYC`) | `--from`, `--to`, `--daily mean\|max\|min\|sum`, `--step PT15M`, `--timezone` |
 | `products <source>` | `--point` or `--bbox`, `--collection` (repeatable), `--from`, `--to`, `--cloud`, `--oldest`, `--max`, `--json` |
 | `occurrences <source>` | `--point` and `--radius` (km), or `--bbox`; `--from`, `--to`; `--filter key=value` (repeatable, a key twice makes a list: `-f taxon=4CGXP -f country=ZA`, `-f min_magnitude=4`); `--sort`; `--max`, `--json` |
 | `bare` | plain PHP: the registry built by hand, each shape asked of its service, what PHP loaded |
@@ -52,6 +52,8 @@ docker compose run --rm omnilab entity jpl 433
 docker compose run --rm omnilab entity usgs us7000pn9s
 docker compose run --rm omnilab collect wikidata Q133574091         # the 2025 Myanmar earthquake, then the USGS by P3196
 docker compose run --rm omnilab series usgs 35.6812,139.7671 count magnitude --daily max --from 2026-10-01 --to 2026-10-07
+docker compose run --rm omnilab series noaa ghcn:USW00094728 TMAX PRCP --step P1D --from 2026-10-01 --to 2026-10-07   # a station's own records
+docker compose run --rm omnilab entity noaa ghcn:FR000007190                                                    # the station itself
 docker compose run --rm omnilab series open-meteo 48.5734,7.7521 temperature_2m --from tomorrow --to tomorrow
 docker compose run --rm omnilab series open-meteo 48.5734,7.7521 temperature_2m precipitation_sum --daily max --from 2026-09-01 --to 2026-09-07
 docker compose run --rm omnilab series air-quality 48.5734,7.7521 pm2_5 nitrogen_dioxide european_aqi --from 2026-10-14 --to 2026-10-14

@@ -6,10 +6,12 @@ use Omnilab\Exception\NotSupportedException;
 use Omnilab\Exception\ProviderException;
 use Omnilab\Model\Asset;
 use Omnilab\Model\BBox;
+use Omnilab\Model\Identifier;
 use Omnilab\Model\Point;
 use Omnilab\Model\Product;
 use Omnilab\Model\Property;
 use Omnilab\Model\Quantity;
+use Omnilab\Model\Scheme;
 use Omnilab\Model\Series;
 use Omnilab\Source\Capability;
 use Omnilab\Source\HttpSource;
@@ -99,6 +101,43 @@ final class ModelsTest extends TestCase
         }
         $this->expectException(\InvalidArgumentException::class);
         new ProductQuery(from: new \DateTimeImmutable('2026-10-15'), to: new \DateTimeImmutable('2026-10-05'));
+    }
+
+    public function testASeriesAtAStation(): void
+    {
+        $central = Identifier::of(Scheme::GHCN, 'USW00094728');
+        $query = new SeriesQuery(['TMAX'], $central, step: SeriesQuery::DAILY);
+        self::assertSame($central, $query->place);
+        self::assertSame('nws.station:KNYC', (string) $query->with(['place' => Identifier::of(Scheme::NWS_STATION, 'KNYC')])->place);
+
+        $source = new class(new MockHttpClient(), 'https://example.org/') extends HttpSource {
+            public function getName(): string
+            {
+                return 'example';
+            }
+
+            public function capabilities(): array
+            {
+                return [Capability::SERIES, Capability::STATION];
+            }
+
+            public function read(SeriesQuery $query, Scheme ...$schemes): ?Identifier
+            {
+                return $this->station($query, ...$schemes);
+            }
+        };
+        self::assertSame($central, $source->read($query, Scheme::GHCN));
+        self::assertNull($source->read(new SeriesQuery(['t'], new Point(0, 0)), Scheme::GHCN), 'a place');
+        foreach ([[Scheme::NWS_STATION], []] as $schemes) {
+            try {
+                $source->read($query, ...$schemes);
+                self::fail('a station of a scheme it does not read');
+            } catch (NotSupportedException $e) {
+                self::assertStringStartsWith('The "example" source does not serve the records of a station of GHCN station', $e->getMessage());
+            }
+        }
+        $this->expectException(\InvalidArgumentException::class);
+        new SeriesQuery(['t'], Identifier::of(Scheme::PUBCHEM_CID, '2519'));
     }
 
     public function testAnOccurrenceQuery(): void

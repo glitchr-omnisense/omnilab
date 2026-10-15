@@ -35,6 +35,34 @@ and keeps among a gene's identifiers its NCBI Gene record and its Swiss-Prot ent
 UniProt already joined a gene and its protein. A GBIF occurrence published by iNaturalist carries
 the observation's number among its identifiers: it is that very record (`inaturalist.observation`).
 
+## A station in place of a point (2026-10-15)
+
+`SeriesQuery::$place` is a `Point`, a `BBox` or an `Identifier`: a station's (`ghcn`, `wigos`,
+`nws.station`), `Capability::STATION` saying that a source reads them. A station is an `Entity`
+too (kind `station`, its place and elevation, the period its records cover), which `entity()`
+answers.
+
+**Why**: a series at a point is the source's choice of where - Open-Meteo's grid point, NCEI's
+nearest station that has the variables (around Strasbourg, Entzheim rather than Kehl, nearer but
+without TMAX since 2003). A climatologist asks for a station's records by its id, and omnilab/noaa
+did it by a method of its own, `seriesAt()`, outside the contract. A station is a place with an
+identity: what an `Identifier` is for, not a field of its own.
+
+**Why these schemes**: each base's own id, as everywhere in the contract - GHCN's (NCEI's stations
+of the whole world, 133,039 on 2026-10-15), the WMO's WIGOS id (the register every national
+service reports to, the one Wikidata keeps, P4136; the five-digit index of old is its
+`0-20000-0-` form) and the NWS's (an ICAO airport, a buoy, a network's code: its own list).
+GHCN's and the NWS's shapes are any code's - eleven or four characters -, so a bare value is not
+read as one: a name such as "CAFFEINATED" would have been a station.
+
+**Why not a field `station`**: a query that named a point and a station would say two places;
+`place` says one, of three kinds, and a source refuses the kinds it does not read before any call,
+as it refuses a box without `Capability::AREA`.
+
+**Applied**: omnilab/noaa reads `ghcn` stations through NCEI and `nws.station` through the NWS,
+and answers their records; `seriesAt()` stays, deprecated, through `series()`. Open-Meteo and the
+USGS refuse a station.
+
 ## A fourth shape: occurrences (2026-10-15)
 
 `SourceInterface::occurrences(OccurrenceQuery): Page<Entity>`, `Capability::OCCURRENCES` - the

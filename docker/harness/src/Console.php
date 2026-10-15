@@ -293,8 +293,13 @@ final class Console
         $this->stderr($out)->writeln(\sprintf('<info>%d of %s.</info>', \count($occurrences), $page->total ?? '?'));
     }
 
-    private static function place(string $text): Point|BBox
+    /** "lat,lon", "west,south,east,north", or a station: ghcn:USW00094728, nws.station:KNYC, 0-20000-0-07190. */
+    private static function place(string $text): Point|BBox|Identifier
     {
+        if (null !== ($station = Identifier::parse($text)) && \in_array($station->scheme, SeriesQuery::STATIONS, true)) {
+            return $station;
+        }
+
         return 4 === \count(explode(',', $text)) ? BBox::parse($text) : Point::parse($text);
     }
 

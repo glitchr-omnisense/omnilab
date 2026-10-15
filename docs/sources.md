@@ -29,6 +29,7 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | `forecast` | `series()` answers ahead of now |
 | `historical` | `series()` answers for the past: observations, an archive, a reanalysis |
 | `area` | `series()`, `products()` or `occurrences()` take a `BBox`; without it, a box is refused rather than answered for its centre |
+| `station` | `series()` takes a station's `Identifier` (`ghcn`, `wigos`, `nws.station`) in place of a `Point`, and answers its own records; without it, a station is refused ([stations](models.md#stations)) |
 | `cloud_cover` | `products()` applies `ProductQuery::$maxCloudCover`; without it, the query is refused rather than answered unfiltered |
 
 ## What each one does

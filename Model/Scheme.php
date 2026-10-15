@@ -55,6 +55,12 @@ enum Scheme: string
     case JPL_SBDB = 'jpl.sbdb';
     /** A USGS earthquake event (ComCat): us6000u24c, official20110311054624120_30. */
     case USGS_EVENT = 'usgs.event';
+    /** A station of the Global Historical Climatology Network (NCEI): USW00094728, New York's Central Park. */
+    case GHCN = 'ghcn';
+    /** A station of the WMO's register by its WIGOS id: 0-20000-0-07190, Strasbourg-Entzheim (a WMO index, 07190, read as such). */
+    case WIGOS = 'wigos';
+    /** An observation station of the U.S. National Weather Service: KNYC. */
+    case NWS_STATION = 'nws.station';
     /** A Wikidata item, whatever its domain: Q60235. */
     case WIKIDATA = 'wikidata';
 
@@ -82,6 +88,9 @@ enum Scheme: string
             self::SIMBAD => 'SIMBAD',
             self::JPL_SBDB => 'JPL SBDB',
             self::USGS_EVENT => 'USGS event',
+            self::GHCN => 'GHCN station',
+            self::WIGOS => 'WIGOS station',
+            self::NWS_STATION => 'NWS station',
             self::WIKIDATA => 'Wikidata',
         };
     }
@@ -94,7 +103,7 @@ enum Scheme: string
             self::UNIPROT, self::NCBI_GENE, self::ENSEMBL, self::PDB => Domain::BIOLOGY,
             self::NCBI_TAXON, self::GBIF, self::GBIF_OCCURRENCE, self::INATURALIST, self::INATURALIST_OBSERVATION => Domain::TAXONOMY,
             self::SIMBAD, self::JPL_SBDB => Domain::ASTRONOMY,
-            self::USGS_EVENT => Domain::EARTH,
+            self::USGS_EVENT, self::GHCN, self::WIGOS, self::NWS_STATION => Domain::EARTH,
             self::WIKIDATA => null,
         };
     }

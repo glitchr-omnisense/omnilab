@@ -25,6 +25,8 @@ enum Capability: string
     case HISTORICAL = 'historical';
     /** series(), products() or occurrences() take a BBox, not only a Point; a source without it refuses a box rather than answer for its centre. */
     case AREA = 'area';
+    /** series() takes a station's Identifier (ghcn, wigos, nws.station) in place of a Point, and answers that station's records; a source without it refuses a station. */
+    case STATION = 'station';
     /** products() applies ProductQuery::$maxCloudCover; a source without it refuses the query rather than answer unfiltered. */
     case CLOUD_COVER = 'cloud_cover';
 }

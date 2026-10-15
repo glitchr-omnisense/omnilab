@@ -38,6 +38,19 @@ final class IdentifierTest extends TestCase
         yield 'a USGS event' => ['usgs:US6000U24C', 'usgs.event:us6000u24c'];
         yield 'one of the catalogues ComCat keeps, its code long' => ['usgs:official20110311054624120_30', 'usgs.event:official20110311054624120_30'];
         yield 'not a USGS event: no network' => ['usgs:20110311', null];
+        yield 'a GHCN station' => ['ghcn:usw00094728', 'ghcn:USW00094728'];
+        yield 'a GHCN station with a hyphen' => ['ghcn:BR00A6-0010', 'ghcn:BR00A6-0010'];
+        yield 'a GHCN station as CDO writes it' => ['ghcnd:GHCND:FR000007190', 'ghcn:FR000007190'];
+        yield 'a GHCN station needs its scheme' => ['USW00094728', null];
+        yield 'nor is a word of eleven letters one' => ['CAFFEINATED', null];
+        yield 'a WIGOS id' => ['0-20000-0-07190', 'wigos:0-20000-0-07190'];
+        yield 'a WMO index' => ['wmo:07190', 'wigos:0-20000-0-07190'];
+        yield 'an NWS station' => ['nws.station:knyc', 'nws.station:KNYC'];
+        yield 'an NWS buoy' => ['nws.station:44069', 'nws.station:44069'];
+        yield 'GHCN\'s page' => ['https://www.ncei.noaa.gov/cdo-web/datasets/GHCND/stations/GHCND:USW00094728/detail', 'ghcn:USW00094728'];
+        yield 'OSCAR\'s page' => ['https://oscar.wmo.int/surface/#/search/station/stationReportDetails/0-20000-0-07190', 'wigos:0-20000-0-07190'];
+        yield 'the NWS\'s station' => ['https://api.weather.gov/stations/KNYC', 'nws.station:KNYC'];
+        yield 'the NWS\'s page of a station' => ['https://www.weather.gov/wrh/timeseries?site=KNYC', 'nws.station:KNYC'];
         yield 'a bare number needs its scheme' => ['2519', null];
         yield 'a name is no identifier' => ['caffeine', null];
         yield 'nor a SMILES' => ['CN1C=NC2=C1C(=O)N(C(=O)N2C)C', null];
@@ -108,7 +121,7 @@ final class IdentifierTest extends TestCase
                 Scheme::INCHIKEY => 'RYYVLZVUVIJVGH-UHFFFAOYSA-N', Scheme::INCHI => 'InChI=1S/H2O/h1H2', Scheme::CAS => '7732-18-5',
                 Scheme::CHEMBL => 'CHEMBL1098659', Scheme::UNII => '059QF0KO0R', Scheme::DSSTOX => 'DTXSID6026296', Scheme::KEGG => 'C00001',
                 Scheme::UNIPROT => 'P69905', Scheme::ENSEMBL => 'ENSG00000141510', Scheme::PDB => '1A3N', Scheme::SIMBAD => 'M 31', Scheme::JPL_SBDB => '433',
-                Scheme::USGS_EVENT => 'us6000u24c', Scheme::WIKIDATA => 'Q283', default => '962',
+                Scheme::USGS_EVENT => 'us6000u24c', Scheme::WIKIDATA => 'Q283', Scheme::GHCN => 'USW00094728', Scheme::NWS_STATION => 'KNYC', default => '962',
             })?->url();
             self::assertTrue(null === $url || str_starts_with($url, 'https://'), $scheme->value);
         }
