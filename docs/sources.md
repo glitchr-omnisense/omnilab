@@ -81,6 +81,54 @@ of the sources over HTTP, throws it for every operation a source does not overri
 
 Their limits and politeness are in each package's `docs/index.md`.
 
+## Errors
+
+Unknown is null; anything else a service refuses is an exception, before or after a call:
+
+| Exception | When |
+|---|---|
+| `NotSupportedException` | the source does not do it (an operation, a scheme, a filter, a box), said before any call |
+| `RateLimitedException` | 429: slow down (`retryAfter` when the service says, in seconds) |
+| `UnavailableException` | 5xx, a timeout, a host that does not answer |
+| `ProviderException` | any other error answer (4xx), its `status` and what the service said |
+
+`HttpSource` maps a call's answer so for every source, and writes into the message what the
+service said - the services write it each its own way, all read:
+
+| The answer | Services | The message |
+|---|---|---|
+| `{"reason": ...}` | Open-Meteo | the reason |
+| `{"Fault": {"Message", "Details": [...]}}` | PubChem | the message (the details) |
+| `{"title", "detail", "parameterErrors": [...]}` (RFC 9457 problem details) | the CDS and the ADS, the NWS | title: detail (each parameter: its message) |
+| `{"detail": {"message"}}`, `{"detail": "..."}`, `{"code", "description"}` | the Copernicus Data Space's STAC | the message, the detail, the description |
+| `{"errorMessage", "errors": [{"field", "message"}]}` | NCEI | the message (each field: its message) |
+| `{"errors": ["..."]}`, `{"errors": [{"message"}]}` | NASA's CMR, iNaturalist's v2 | the errors |
+| `{"messages": ["..."]}` | UniProt | the messages |
+| `{"message"}`, `{"error_message"}` | NCBI Datasets, JPL, RCSB's search; ChEMBL | the message |
+| `{"error": "..."}`, `{"error": {"info"}}` | Ensembl, iNaturalist's v1; Wikidata | the error, its info |
+| an HTML page, a VOTable | GBIF's front (Varnish), the EBI's; SIMBAD's TAP | the page's title; the `QUERY_STATUS` error |
+| any other text | the USGS, GBIF | the text, white space collapsed, cut at 300 characters |
+
+```php
+use Omnilab\Cds\CdsSourceFactory;
+use Omnilab\Exception\ProviderException;
+use Symfony\Component\HttpClient\HttpClient;
+
+$cds = (new CdsSourceFactory(HttpClient::create()))->create(['key' => 'not-a-key']);
+try {
+    $cds->submit('reanalysis-era5-single-levels', ['variable' => ['2m_temperature']]);
+} catch (ProviderException $e) {
+    echo $e->status, ' ', $e->getMessage(), "\n";
+}
+```
+
+```
+401 [cds] the service answered 401: Authentication failed: operation not allowed
+```
+
+(as answered on 2026-10-15; NCEI's `{"errorCode":400,"errorMessage":"Bad Request","errors":[{"field":"dataset","message":"Unsupported dataset."}]}`
+reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo] is not a valid URL encoded bounding_box"]}` its error)
+
 ## What the services do not allow
 
 - **PubChem**: five calls a second and 400 a minute at most (the throttle leaves 0.2 s between

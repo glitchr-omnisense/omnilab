@@ -206,21 +206,78 @@ abstract class HttpSource implements SourceInterface
         }
     }
 
-    /** What an error answer says: its JSON message when it has one (reason, message, detail, PubChem's Fault), else its text, cut. */
+    /**
+     * What an error answer says: its JSON message in whichever form the
+     * service writes it (docs/sources.md#errors lists them), else an HTML
+     * page's title or a VOTable's error, else its text - white space
+     * collapsed, cut at 300 characters.
+     */
     private static function reason(string $body): string
     {
         $data = json_decode($body, true);
-        if (\is_array($data)) {
-            foreach ([$data['reason'] ?? null, $data['detail']['message'] ?? null, $data['detail'] ?? null, $data['Fault']['Message'] ?? null, $data['message'] ?? null, $data['error'] ?? null] as $message) {
-                if (\is_string($message) && '' !== $message) {
-                    $details = $data['Fault']['Details'] ?? [];
+        if (\is_array($data) && null !== ($message = self::message($data))) {
+            return $message;
+        }
+        $text = match (true) {
+            // SIMBAD's TAP: a VOTable whose QUERY_STATUS says the error.
+            (bool) preg_match('~<INFO[^>]*name="QUERY_STATUS"[^>]*value="ERROR"[^>]*>(.*?)</INFO>~is', $body, $m) => $m[1],
+            // An error page (GBIF's Varnish, the EBI's): its title.
+            (bool) preg_match('~<title[^>]*>(.*?)</title>~is', $body, $m) && '' !== trim(strip_tags($m[1])) => $m[1],
+            default => $body,
+        };
+        $text = trim((string) preg_replace('~\s+~u', ' ', html_entity_decode(strip_tags($text), \ENT_QUOTES | \ENT_HTML5, 'UTF-8')));
 
-                    return $message.(\is_array($details) && $details ? ' ('.implode('; ', array_filter($details, 'is_string')).')' : '');
+        return (string) preg_replace('~^(.{0,300}).*$~us', '$1', $text);
+    }
+
+    /**
+     * The message of a JSON error answer, its details in parentheses; null
+     * when it has none of the forms the services write.
+     *
+     * @param array<mixed> $data
+     */
+    private static function message(array $data): ?string
+    {
+        $text = static fn (mixed $value): ?string => \is_string($value) && '' !== trim($value) ? trim($value) : null;
+        // A list of strings (the CMR's errors, UniProt's messages) or of objects with a message and what it is about (NCEI's errors, the NWS's parameterErrors, iNaturalist's v2).
+        $list = static function (mixed $items) use ($text): array {
+            $messages = [];
+            foreach (\is_array($items) ? $items : [] as $item) {
+                if (null !== ($message = $text($item))) {
+                    $messages[] = $message;
+                } elseif (\is_array($item) && null !== ($message = $text($item['message'] ?? $item['reason'] ?? $item['info'] ?? null))) {
+                    $about = $text($item['field'] ?? $item['parameter'] ?? null);
+                    $messages[] = null === $about ? $message : $about.': '.$message;
                 }
             }
-        }
 
-        return (string) preg_replace('~^(.{0,300}).*$~us', '$1', trim(strip_tags($body)));
+            return $messages;
+        };
+        $title = $text($data['title'] ?? null);
+        $detail = $text($data['detail'] ?? null);
+        $error = $data['error'] ?? null;
+        $main = $text($data['reason'] ?? null)                                                       // Open-Meteo
+            ?? $text($data['Fault']['Message'] ?? null)                                              // PubChem
+            ?? (null !== $title && null !== $detail ? ($title === $detail ? $title : $title.': '.$detail) : null) // RFC 9457: the CDS, the NWS
+            ?? $text($data['detail']['message'] ?? null) ?? $detail ?? $title                        // the Copernicus STAC (FastAPI)
+            ?? $text($data['description'] ?? null)                                                   // the Copernicus STAC (stac-fastapi)
+            ?? $text($data['errorMessage'] ?? null)                                                  // NCEI
+            ?? $text($data['message'] ?? null)                                                       // NCBI Datasets, JPL, RCSB
+            ?? $text($data['error_message'] ?? null)                                                 // ChEMBL
+            ?? $text($error)                                                                         // Ensembl, iNaturalist
+            ?? (\is_array($error) ? $text($error['info'] ?? $error['message'] ?? null) : null);      // Wikidata
+        $details = array_values(array_unique([
+            ...$list($data['Fault']['Details'] ?? null),
+            ...$list($data['parameterErrors'] ?? null),
+            ...$list($data['errors'] ?? null),
+            ...$list($data['messages'] ?? null),
+        ]));
+        if (null === $main) {
+            return $details ? implode('; ', $details) : null;
+        }
+        $details = array_values(array_diff($details, [$main]));
+
+        return $main.($details ? ' ('.implode('; ', $details).')' : '');
     }
 
     /** Leaves the configured interval since the last call. */
