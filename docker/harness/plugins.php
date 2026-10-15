@@ -14,4 +14,7 @@ return [
     'uniprot' => ['Omnilab\\UniProt\\Tests\\', 'Omnilab\\UniProt\\UniProtSourceFactory'],
     'ncbi' => ['Omnilab\\Ncbi\\Tests\\', 'Omnilab\\Ncbi\\NcbiSourceFactory'],
     'gbif' => ['Omnilab\\Gbif\\Tests\\', 'Omnilab\\Gbif\\GbifSourceFactory'],
+    'simbad' => ['Omnilab\\Simbad\\Tests\\', 'Omnilab\\Simbad\\SimbadSourceFactory'],
+    'jpl' => ['Omnilab\\Jpl\\Tests\\', 'Omnilab\\Jpl\\JplSourceFactory'],
+    'usgs' => ['Omnilab\\Usgs\\Tests\\', 'Omnilab\\Usgs\\UsgsSourceFactory'],
 ];

@@ -54,6 +54,18 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | Paging (cursor) | UniProt's cursor | the search's offset | the search's offset |
 | Per page, at most | 500 | 100 | 1000 |
 
+| | chembl | simbad | jpl | usgs |
+|---|---|---|---|---|
+| Shape | entity | entity | entity | entity, series |
+| `entity()` by | ChEMBL id, InChIKey, name or synonym | any SIMBAD identifier or name (`M31`, `Betelgeuse`, `HD 39801`) | number, designation, name, SPK-ID | event id (ComCat or another network's) |
+| `search()` | ChEMBL's full-text search; an InChIKey or its first block | by identifier or name | the names that hold the text, the designation that is it | - (`events()`, outside the contract: the events of a place and a period) |
+| `series()` | - | - | - | per step: count, magnitude, depth, at a `BBox` or around a `Point` |
+| Cross-references | InChIKey, InChI; ChEBI, PubChem, UNII, DSSTox (UniChem) | its own id alone | its SPK-ID (a second `jpl.sbdb`) | the other networks' ids for the event |
+| Related | the targets of its mechanisms, their proteins (UniProt) | - | - | - |
+| Collector path | PubChem -> ChEMBL by the InChIKey | Wikidata -> SIMBAD (P3083) | Wikidata -> JPL (P716) | none yet: Wikidata's P3196 is not read |
+
+Their limits and politeness are in each package's `docs/index.md`.
+
 ## What the services do not allow
 
 - **PubChem**: five calls a second and 400 a minute at most (the throttle leaves 0.2 s between

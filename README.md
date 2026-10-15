@@ -50,6 +50,9 @@ source package `symfony/http-client`. Each source is a package of its own:
 | [`omnilab/uniprot`](https://github.com/glitchr-studio/omnilab-uniprot) | UniProtKB: proteins by accession or entry name; function, gene, organism, sequence, mass, cofactors, ligands; their genes in NCBI and Ensembl | entity | none |
 | [`omnilab/gbif`](https://github.com/glitchr-studio/omnilab-gbif) | GBIF's taxonomy (the Catalogue of Life eXtended Release since 2026): taxa by key, legacy Backbone number, NCBI id or scientific name; status, IUCN category, lineage; NCBI cross-reference | entity | none |
 | [`omnilab/ncbi`](https://github.com/glitchr-studio/omnilab-ncbi) | NCBI Gene and Taxonomy (Datasets v2, E-utilities): genes by GeneID, taxa by id or name; location, summary, lineage; UniProt, Ensembl and GBIF ids | entity | none (3 calls a second; 10 with an API key) |
+| [`omnilab/simbad`](https://github.com/glitchr-studio/omnilab-simbad) | SIMBAD (CDS, Strasbourg), through its TAP service: objects beyond the solar system by any identifier; type, coordinates, motion, parallax, velocity, redshift, spectral type, magnitudes | entity | none |
+| [`omnilab/jpl`](https://github.com/glitchr-studio/omnilab-jpl) | NASA/JPL's Small-Body Database: asteroids and comets by number, designation, name or SPK-ID; orbit, physical parameters, NEO and PHA flags, close approaches, Sentry's impact risk | entity | none |
+| [`omnilab/usgs`](https://github.com/glitchr-studio/omnilab-usgs) | USGS earthquake catalogue (ComCat, FDSN event service): an earthquake by its id, with its time and place; the earthquakes of a box or around a point as series | entity, series | none |
 
 A source answers what it can - `capabilities()` says what - and throws `NotSupportedException`
 for the rest, before any call. Unknown is `null`, an empty page or a series without points; a

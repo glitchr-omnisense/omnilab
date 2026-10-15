@@ -19,4 +19,7 @@ return [
     'uniprot' => ['factory' => 'uniprot', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'ncbi' => ['factory' => 'ncbi', 'needs' => [], 'options' => ['mailto' => $mailto, 'api_key' => $env('NCBI_API_KEY')]],
     'gbif' => ['factory' => 'gbif', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'simbad' => ['factory' => 'simbad', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'jpl' => ['factory' => 'jpl', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'usgs' => ['factory' => 'usgs', 'needs' => [], 'options' => ['mailto' => $mailto]],
 ];
