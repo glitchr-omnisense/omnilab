@@ -45,7 +45,7 @@ final class OmnilabBundleTest extends TestCase
 
         $registry = $container->get(Registry::class);
         self::assertSame(['pubchem', 'chebi'], $registry->names());
-        foreach (['pubchem', 'open-meteo', 'copernicus'] as $factory) {
+        foreach (['pubchem', 'open-meteo', 'copernicus', 'chebi', 'wikidata', 'chembl', 'uniprot', 'ncbi', 'gbif', 'simbad', 'jpl', 'usgs'] as $factory) {
             self::assertContains($factory, $registry->factories(), 'the packages installed are registered');
         }
         self::assertContains('stub', $registry->factories(), 'the application\'s own, autoconfigured');

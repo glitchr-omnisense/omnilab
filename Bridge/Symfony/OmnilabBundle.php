@@ -2,14 +2,23 @@
 
 namespace Omnilab\Bridge\Symfony;
 
+use Omnilab\Chebi\ChebiSourceFactory;
+use Omnilab\Chembl\ChemblSourceFactory;
 use Omnilab\Collector;
 use Omnilab\Copernicus\CopernicusSourceFactory;
+use Omnilab\Gbif\GbifSourceFactory;
+use Omnilab\Jpl\JplSourceFactory;
 use Omnilab\Merger;
+use Omnilab\Ncbi\NcbiSourceFactory;
 use Omnilab\OpenMeteo\OpenMeteoSourceFactory;
 use Omnilab\PubChem\PubChemSourceFactory;
 use Omnilab\Registry;
+use Omnilab\Simbad\SimbadSourceFactory;
 use Omnilab\Source\SourceFactoryInterface;
 use Omnilab\Source\SourceInterface;
+use Omnilab\UniProt\UniProtSourceFactory;
+use Omnilab\Usgs\UsgsSourceFactory;
+use Omnilab\Wikidata\WikidataSourceFactory;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -48,6 +57,15 @@ final class OmnilabBundle extends AbstractBundle
         PubChemSourceFactory::class,
         OpenMeteoSourceFactory::class,
         CopernicusSourceFactory::class,
+        ChebiSourceFactory::class,
+        WikidataSourceFactory::class,
+        ChemblSourceFactory::class,
+        UniProtSourceFactory::class,
+        NcbiSourceFactory::class,
+        GbifSourceFactory::class,
+        SimbadSourceFactory::class,
+        JplSourceFactory::class,
+        UsgsSourceFactory::class,
     ];
 
     public function configure(DefinitionConfigurator $definition): void
@@ -55,7 +73,7 @@ final class OmnilabBundle extends AbstractBundle
         $definition->rootNode()
             ->children()
                 ->arrayNode('sources')
-                    ->info('The sources, by name: a factory (pubchem, open-meteo, copernicus...) and its options.')
+                    ->info('The sources, by name: a factory (pubchem, chebi, wikidata, uniprot, gbif, simbad, usgs, open-meteo, copernicus...) and its options.')
                     ->useAttributeAsKey('name')
                     ->arrayPrototype()
                         ->children()

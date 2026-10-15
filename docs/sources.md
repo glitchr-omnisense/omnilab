@@ -4,7 +4,7 @@ Every source implements `Omnilab\Source\SourceInterface`:
 
 | Method | Answers |
 |---|---|
-| `getName()` | its factory's name: `pubchem`, `chebi`, `wikidata`, `open-meteo`, `copernicus`... |
+| `getName()` | its factory's name: `pubchem`, `chebi`, `wikidata`, `uniprot`, `simbad`, `usgs`, `open-meteo`, `copernicus`... |
 | `capabilities()` | a list of `Capability`: what it can be asked, what its answers hold |
 | `entity($id)` | an `Entity`, or null |
 | `search(Query)` | a `Page` of `Entity`, the best match first; `$page->next` is the next cursor |
@@ -105,6 +105,25 @@ Their limits and politeness are in each package's `docs/index.md`.
   checklist is still answered from the frozen Backbone - the source names it every time; three calls
   a taxon (match, record, the ENA usage that gives the NCBI id); no Wikidata nor iNaturalist id;
   occurrences are not read (no shape of the core holds them yet: see its docs).
+- **ChEMBL**: no rate published; a molecule costs up to four calls (the record, UniChem's
+  cross-references, the mechanisms, their targets); its record names no other base but the
+  InChI and its key - the others come from UniChem, which answers only POST, a call the
+  `throttle` does not space; a full-text search for an InChIKey answers unrelated molecules, so a
+  key is matched on the structures instead.
+- **SIMBAD**: blacklists a client beyond about five to ten queries a second (the source stays at
+  five); one ADQL query an object; no object of the solar system (see JPL); a search sorts the
+  matches itself, SIMBAD's `ORDER BY` over the join taking minutes; the measurement tables and the
+  bibliography are not read.
+- **JPL SBDB**: one request at a time, as JPL's fair use asks (0.2 s apart); one call a body, every
+  section asked at once and at full precision (without it every value is rounded to three
+  digits); a name two bodies share (`Halley`) names neither; the search's regular expression is
+  case-sensitive, so each letter is asked in both cases (4 to 7 s); close approaches and Sentry
+  are read per body, not as lists.
+- **USGS**: no rate published; one call an event, one for a series whatever its variables; at
+  most 20,000 events a query (the service's 400, said as such); no text search; the earthquakes of
+  a place and a period as entities are `events()`, outside the contract (the core has no query by
+  place and period that answers entities); no Wikidata item among an event's ids (Wikidata keeps
+  the USGS id in P3196, which omnilab/wikidata reads).
 
 ## Throttling and politeness
 
@@ -118,6 +137,10 @@ Their limits and politeness are in each package's `docs/index.md`.
 | uniprot | none (no rate published) | `mailto` in the User-Agent |
 | ncbi | 0.34 s without a key, 0.1 s with one (`auto`) | `tool` and `email` (from `mailto`) on E-utilities; `api_key` |
 | gbif | none (no rate published) | `mailto` in the User-Agent, as GBIF asks |
+| chembl | none (no rate published; UniChem's POST is not spaced) | `mailto` in the User-Agent |
+| simbad | 0.2 s (SIMBAD blacklists beyond five to ten a second) | `mailto` in the User-Agent |
+| jpl | 0.2 s (one request at a time, as JPL asks) | `mailto` in the User-Agent, as JPL asks |
+| usgs | none (no rate published) | `mailto` in the User-Agent |
 
 Every factory takes `mailto`, `user_agent`, `throttle` (seconds between two calls of one source
 instance) and `base_uri`.
