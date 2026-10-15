@@ -27,4 +27,6 @@ return [
     'exoplanets' => ['Omnilab\\Exoplanets\\Tests\\', 'Omnilab\\Exoplanets\\ExoplanetsSourceFactory'],
     'gaia' => ['Omnilab\\Gaia\\Tests\\', 'Omnilab\\Gaia\\GaiaSourceFactory'],
     'reactome' => ['Omnilab\\Reactome\\Tests\\', 'Omnilab\\Reactome\\ReactomeSourceFactory'],
+    'kegg' => ['Omnilab\\Kegg\\Tests\\', 'Omnilab\\Kegg\\KeggSourceFactory'],
+    'rhea' => ['Omnilab\\Rhea\\Tests\\', 'Omnilab\\Rhea\\RheaSourceFactory'],
 ];

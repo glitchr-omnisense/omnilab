@@ -109,6 +109,17 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | Related | `organism` (NCBI taxon), `event` (sub-pathways and reactions), `ortholog` (the same event in other species), `protein` (UniProt), `molecule` (ChEBI) |
 | Collector path | Wikidata -> Reactome (P3937); UniProt -> Reactome by `pathways()`, outside the Collector |
 
+| | kegg | rhea |
+|---|---|---|
+| Shape | entity | entity |
+| `entity()` by | a compound or drug (`C07481`, `D00528`), a reaction (`R00200`), a pathway (`map00010`, `hsa00010`), an enzyme (`2.7.1.40`), a KEGG page; a compound by its ChEBI id (KEGG's `conv`) | any of a reaction's four Rhea ids (`RHEA:18160` gives its master 18157), or its KEGG reaction (`kegg.reaction:R00200`) |
+| `search()` | `find` over the configured databases (compound by default), cut into pages | Rhea's text search, paged by offset |
+| Units | g/mol, Da | - |
+| Cross-references | CAS, ChEBI, ChEMBL, Rhea, the KEGG entry it is the same as | the three other ids of its quartet, its KEGG reaction |
+| Related | `reaction`, `pathway`, `enzyme` (EC), `compound`, `substrate`, `product`, `drug`, `go`, a drug's `organism` | `participant` (ChEBI), `enzyme` (EC), `go`, `event` (Reactome), `protein` (reviewed UniProt) |
+| Collector path | KEGG <-> Rhea (each names the other); ChEBI -> KEGG by `conv` | KEGG <-> Rhea |
+| Terms | academic use by academic users only: **not tested live** | CC BY 4.0 |
+
 Their limits and politeness are in each package's `docs/index.md`.
 
 ## Errors
@@ -250,6 +261,8 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
   chosen; paging by number stops 10,000 deep (the unsorted order pages by id instead, without a
   limit); no identifier of another base for a taxon; each observation and photo keeps its owner's
   licence, all rights reserved when none.
+- **KEGG**: its API is "made available only for academic use by academic users"; non-academic use needs a licence (Pathway Solutions), so omnilab/kegg is not tested live; three calls a second at most, or the caller is blocked; flat files, not JSON; `find` does not page (the source cuts its lines into pages); KEGG's PubChem link is a substance (SID), not a compound.
+- **Rhea**: no rate published; a reaction costs one SPARQL query (about 3 s; `DISTINCT` or `LIMIT` in its sub-query take over a minute) and one UniProt search for its reviewed proteins (`enzymes: 0` leaves it); Rhea's search gives no total (its `count` is the page's); its pages answer a browser check to a program.
 
 ## Throttling and politeness
 
@@ -273,6 +286,8 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
 | pdb | 0.25 s (RCSB's "a handful a second") | `mailto` in the User-Agent |
 | reactome | none (no rate published) | `mailto` in the User-Agent |
 | inaturalist | 1 s (iNaturalist's 60 a minute) | `mailto` in the User-Agent |
+| kegg | 0.34 s (KEGG's three a second) | `mailto` in the User-Agent |
+| rhea | none (no rate published) | `mailto` in the User-Agent, as Rhea asks |
 
 Every factory takes `mailto`, `user_agent`, `throttle` (seconds between two calls of one source
 instance) and `base_uri`.

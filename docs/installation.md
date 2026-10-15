@@ -13,6 +13,7 @@ composer require omnilab/reactome                            # pathways and reac
 composer require omnilab/inaturalist                         # taxa, and observations of species
 composer require omnilab/noaa                                # weather stations' records (NCEI), the NWS
 composer require omnilab/cds omnilab/cams omnilab/earthdata  # climate and atmosphere data stores; NASA's Earth observation
+composer require omnilab/rhea omnilab/kegg                  # biochemical reactions; KEGG (academic use only)
 ```
 
 The weather and the air are both `omnilab/open-meteo` (`api: air_quality` for the air); the

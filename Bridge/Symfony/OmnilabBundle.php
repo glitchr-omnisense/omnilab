@@ -15,6 +15,7 @@ use Omnilab\Ensembl\EnsemblSourceFactory;
 use Omnilab\Gbif\GbifSourceFactory;
 use Omnilab\INaturalist\INaturalistSourceFactory;
 use Omnilab\Jpl\JplSourceFactory;
+use Omnilab\Kegg\KeggSourceFactory;
 use Omnilab\Merger;
 use Omnilab\Ncbi\NcbiSourceFactory;
 use Omnilab\Noaa\NoaaSourceFactory;
@@ -23,6 +24,7 @@ use Omnilab\Pdb\PdbSourceFactory;
 use Omnilab\PubChem\PubChemSourceFactory;
 use Omnilab\Registry;
 use Omnilab\Reactome\ReactomeSourceFactory;
+use Omnilab\Rhea\RheaSourceFactory;
 use Omnilab\Simbad\SimbadSourceFactory;
 use Omnilab\Source\SourceFactoryInterface;
 use Omnilab\Source\SourceInterface;
@@ -86,6 +88,8 @@ final class OmnilabBundle extends AbstractBundle
         ExoplanetsSourceFactory::class,
         GaiaSourceFactory::class,
         ReactomeSourceFactory::class,
+        KeggSourceFactory::class,
+        RheaSourceFactory::class,
     ];
 
     public function configure(DefinitionConfigurator $definition): void
@@ -93,7 +97,7 @@ final class OmnilabBundle extends AbstractBundle
         $definition->rootNode()
             ->children()
                 ->arrayNode('sources')
-                    ->info('The sources, by name: a factory (pubchem, chebi, wikidata, uniprot, ensembl, pdb, reactome, gbif, inaturalist, simbad, gaia, exoplanets, usgs, open-meteo, noaa, copernicus, cds, cams, earthdata...) and its options.')
+                    ->info('The sources, by name: a factory (pubchem, chebi, wikidata, uniprot, ensembl, pdb, reactome, gbif, inaturalist, simbad, gaia, exoplanets, usgs, open-meteo, noaa, copernicus, cds, cams, earthdata, kegg, rhea...) and its options.')
                     ->useAttributeAsKey('name')
                     ->arrayPrototype()
                         ->children()

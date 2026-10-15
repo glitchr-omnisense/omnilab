@@ -224,6 +224,18 @@ pathways and 28 reactions in Reactome's release 97.
 A source that is down or rate limited is skipped and named in `$incomplete`; the others still
 answer. Do not cache an answer while `$incomplete` is not empty.
 
+**A reaction, from KEGG into Rhea, and back** - KEGG's reaction R00200 (pyruvate kinase) carries
+`rhea:18160`, the bidirectional id of Rhea's reaction 18157, and Rhea's 18157 carries
+`kegg.reaction:R00200` and its three other ids: the `Merger` knows it by any of them.
+
+```php
+$collector->collect('rhea', '18157', 1, ['kegg']);     // Rhea, then KEGG by R00200
+$collector->collect('kegg', 'R00200', 1, ['rhea']);     // KEGG, then Rhea by 18160 (its master 18157)
+```
+
+Not walked live: KEGG's API is for academic users only, and omnilab/kegg is not tested live
+against it. Rhea's half was answered on 2026-10-16 (one SPARQL query, one UniProt search).
+
 ## The Merger
 
 ```php

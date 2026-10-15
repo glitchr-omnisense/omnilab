@@ -34,4 +34,6 @@ return [
     'gaia' => ['factory' => 'gaia', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'reactome' => ['factory' => 'reactome', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'inaturalist' => ['factory' => 'inaturalist', 'needs' => [], 'options' => ['mailto' => $mailto, 'locale' => $env('INATURALIST_LOCALE')]],
+    'kegg' => ['factory' => 'kegg', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'rhea' => ['factory' => 'rhea', 'needs' => [], 'options' => ['mailto' => $mailto]],
 ];

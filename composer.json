@@ -64,6 +64,8 @@
         "omnilab/gaia": "ESA Gaia DR3: a source by its source_id or designation, its astrometry (position, parallax, proper motion), photometry, radial velocity and astrophysical parameters; the sources of a cone on the sky",
         "omnilab/reactome": "Reactome: pathways and reactions by stable id (R-HSA-70171), their compartments, GO process, inputs and outputs, their participants (UniProt proteins, ChEBI molecules) as related things; a search; the pathways of a protein or a molecule",
         "omnilab/earthdata": "NASA Earthdata (CMR): the granules of NASA's Earth observation collections (HLS, MODIS, VIIRS, GPM...) as products by place, period and cloud cover; their files with an Earthdata Login token",
+        "omnilab/kegg": "KEGG (academic use only): compounds, drugs, reactions, pathways and enzymes by KEGG id, their formula, masses, equations and classes, CAS, ChEBI, ChEMBL and Rhea ids, their reactions, pathways and enzymes as related things; a search",
+        "omnilab/rhea": "Rhea: biochemical reactions by any of their four Rhea ids or their KEGG reaction, their equation, sides and participants; ChEBI participants, EC numbers, GO term, Reactome events and the reviewed UniProt proteins that catalyse them as related things; a search",
         "symfony/config": "In a Symfony application: the configuration of Omnilab\\Bridge\\Symfony\\OmnilabBundle",
         "symfony/dependency-injection": "In a Symfony application: the services of Omnilab\\Bridge\\Symfony\\OmnilabBundle",
         "symfony/http-kernel": "In a Symfony application: Omnilab\\Bridge\\Symfony\\OmnilabBundle itself"
