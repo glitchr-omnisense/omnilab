@@ -287,6 +287,31 @@ $caffeine->properties('molecular_weight');       // 194.1926 g/mol [cactus], 194
 
 Walked on 2026-10-15 (`.samples/live.php`): CIR's eight calls, then PubChem by the InChIKey.
 
+**The Catalogue of Life, GBIF, iNaturalist and ITIS: the lion** (walked on 2026-10-16) -
+`collect('col', '4CGXP', 1, ['gbif', 'inaturalist', 'itis'])`: the Catalogue of Life gives its
+GBIF key (the same id: GBIF's taxonomy is the COL eXtended Release since June 2026), iNaturalist
+41964 (an id COL names) and ITIS 183803 (the record COL took the lion from); four calls, 5.4 s;
+`sources` = col, gbif, inaturalist, itis; `family` Felidae from the four, `taxonomic_status`
+accepted [col], accepted [gbif], valid [itis], `iucn_status` Vulnerable (VU) [gbif] and
+[inaturalist]. The other way, `collect('gbif', '4CGXP', 1, ['col'])`: omnilab/col reads the GBIF
+key as its own id (a legacy number, `gbif:5219404`, is refused: it is the Backbone's); two
+sources, 2.4 s.
+
+**The sea: OBIS, WoRMS, ITIS and NCBI, the common dolphin** (walked on 2026-10-16) - OBIS and
+WoRMS key a taxon by the same AphiaID (`worms:137094`): the `Merger` takes them for one.
+`collect('obis', '137094', 1, ['worms', 'ncbi'])`: OBIS's 121,709 records and NCBI 9728, then
+WoRMS's ITIS 180438 and IUCN 134817215 learnt on the way; 7.6 s. `collect('worms', '137094', 1,
+['itis', 'ncbi'])`: WoRMS's ITIS and NCBI ids followed; three common names, one a source (common
+dolphin [worms], saddle-backed dolphin [itis], saddleback dolphin [ncbi]); 7.4 s (WoRMS's seven
+calls weigh most). `collect('col', 'Delphinus delphis', 1, ['worms', 'itis'])`: COL's dolphin
+(34JWM) into WoRMS 137094 and ITIS 180438; 8.8 s. WoRMS also reads an ITIS, NCBI or IUCN id, so
+an entity carrying one reaches WoRMS. With `omnilab/iucn` and a token, WoRMS's IUCN id leads to
+the Red List's assessment (not walked: no token).
+
+**No path: PBDB and eBird** - the Paleobiology Database and eBird give no other base's id;
+Wikidata holds theirs (P10907, P3444), which omnilab/wikidata does not read yet. PBDB's fossils
+(`fossils()`) are outside the contract.
+
 **No path: the earth, water and sky sources of 2026-10-15/16** - omnilab/emsc, usgs-water, tides,
 brightsky, swpc, elevation and openaq give no id of another base (Bright Sky's stations carry
 their DWD and WIGOS ids, both its own), and Wikidata has no property for the EMSC's events: the

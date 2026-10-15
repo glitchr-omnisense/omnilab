@@ -48,4 +48,11 @@ return [
     'brightsky' => ['Omnilab\\BrightSky\\Tests\\', 'Omnilab\\BrightSky\\BrightSkySourceFactory'],
     'elevation' => ['Omnilab\\Elevation\\Tests\\', 'Omnilab\\Elevation\\ElevationSourceFactory'],
     'openaq' => ['Omnilab\\OpenAq\\Tests\\', 'Omnilab\\OpenAq\\OpenAqSourceFactory'],
+    'obis' => ['Omnilab\\Obis\\Tests\\', 'Omnilab\\Obis\\ObisSourceFactory'],
+    'worms' => ['Omnilab\\Worms\\Tests\\', 'Omnilab\\Worms\\WormsSourceFactory'],
+    'itis' => ['Omnilab\\Itis\\Tests\\', 'Omnilab\\Itis\\ItisSourceFactory'],
+    'col' => ['Omnilab\\Col\\Tests\\', 'Omnilab\\Col\\ColSourceFactory'],
+    'pbdb' => ['Omnilab\\Pbdb\\Tests\\', 'Omnilab\\Pbdb\\PbdbSourceFactory'],
+    'ebird' => ['Omnilab\\Ebird\\Tests\\', 'Omnilab\\Ebird\\EbirdSourceFactory'],
+    'iucn' => ['Omnilab\\Iucn\\Tests\\', 'Omnilab\\Iucn\\IucnSourceFactory'],
 ];

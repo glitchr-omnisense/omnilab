@@ -40,14 +40,20 @@ reuses a key before it makes one:
 
 | Key | Value | Read by |
 |---|---|---|
-| `OccurrenceQuery::TAXON` (`taxon`) | an `Identifier` of the source's scheme, a key, or a scientific name | gbif, inaturalist |
+| `OccurrenceQuery::TAXON` (`taxon`) | an `Identifier` of the source's scheme, a key, or a scientific name | gbif, inaturalist, obis, ebird (a species code) |
 | `OccurrenceQuery::COUNTRY` (`country`) | ISO 3166-1 alpha-2 (`ZA`), or a list | gbif |
 | `OccurrenceQuery::KIND` (`kind`) | the source's word for what it is, or a list: `earthquake`, `quarry blast` (usgs); `human_observation`, `preserved_specimen` (gbif's basis of record) | usgs, gbif |
 | `OccurrenceQuery::MIN_MAGNITUDE`, `MAX_MAGNITUDE` | a magnitude, included | usgs, emsc |
 | `OccurrenceQuery::LICENSE` (`license`) | the licence a record is shared under, as Creative Commons writes it lower case (`cc0`, `cc-by`, `cc-by-nc`...), or a list | inaturalist |
 
 A source may read keys of its own besides (the USGS reads `alert`, PAGER's level; the EMSC
-`magnitude_type`; iNaturalist `quality_grade`); its README lists them.
+`magnitude_type`; iNaturalist `quality_grade`; OBIS `min_depth`, `max_depth`, `dataset`, `red_list`;
+eBird `region`, `provisional`); its README lists them.
+
+A fossil is not an occurrence of this shape: its age is a span of geological time (72.2 to 66 Ma),
+no instant. `omnilab/pbdb` gives the fossils of a place and an age through `fossils()`, outside
+the contract: the same `OccurrenceQuery` for the place, filters and pages, a period refused, each
+entity with its place and no time, its age in `max_ma` and `min_ma`.
 
 ## The answer: a `Page` of `Entity`
 

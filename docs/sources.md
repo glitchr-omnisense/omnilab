@@ -105,6 +105,26 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | `series()` | `aurora` (%, OVATION's latest nowcast, one point, a forecast) | - | a pollutant by OpenAQ's name at the nearest location of a `Point` (25 km at most): hourly or daily averages |
 | Tested live | yes | yes | no: a key is required, none was created |
 
+| | obis | worms | itis | col |
+|---|---|---|---|---|
+| Shape | entity, occurrences | entity, search | entity, search | entity, search |
+| `entity()` by | an AphiaID (`worms:137094`, its LSID, its WoRMS page) or a name; a record's UUID (`obis.occurrence:`) | an AphiaID, a name, or an `itis`, `ncbi.taxon` or `iucn` identifier (AphiaRecordByExternalID) | a TSN (`itis:`, `tsn:`, its LSID) or a name | a COL id (`col:4CGXP`), a GBIF key of the new form (the same id), or a name |
+| `search()` | - (OBIS has none) | the names beginning with the text, 50 a page | scientific and common names, its count on the first page | ChecklistBank's search, its total |
+| `occurrences()` | the records of a `BBox` (across the antimeridian, its east past 180°) or a `Point`'s circle (64 sides, 10 km by default); whole days; `taxon`, `min_depth`, `max_depth`, `dataset`, `red_list`; OBIS's order, paged after the last id; 9,999 a page | - | - | - |
+| Units | m, °C, PSU | - | - | - |
+| Cross-references | `ncbi.taxon`; a record iNaturalist published: `inaturalist.observation` | `itis`, `ncbi.taxon`, `iucn` (one call each) | none | `gbif` (the same id, unless digits alone), and one of each base COL names or links to (`inaturalist`, `worms`, `itis`...) |
+| Related | `parent`, `accepted`; a record's `taxon` | `parent`, `accepted`, `synonym` | `parent`, `accepted`, `synonym`, `child` | `parent`, `accepted`, `synonym` |
+| Collector path | into NCBI Taxonomy; joined to WoRMS by the `worms` id | into ITIS, NCBI, IUCN; reached from any entity with an ITIS, NCBI or IUCN id | reached from WoRMS and COL | into GBIF, iNaturalist, ITIS, WoRMS; reached from GBIF by the key |
+
+| | pbdb | ebird | iucn |
+|---|---|---|---|
+| Shape | entity, search | entity, search, occurrences | entity |
+| Outside the contract | `fossils(OccurrenceQuery)`: the fossils of a place and an age, each with its place and no time (an age is in Ma, no date) | - | `assessment()`: an assessment by its id |
+| `entity()` by | a taxon (`pbdb:`, `txn:`) or a name; a fossil (`pbdb.occurrence:`, `occ:`) | a species code (no key); a name, a checklist (`ebird.checklist:`) with the key | a SIS id or a name, with its latest global assessment |
+| `occurrences()` | refused (a fossil has no time) | the latest of each species at each location around a `Point` (50 km, 30 days back) or in a region, or a region's day; the key | - |
+| Units | Ma | - | - |
+| Tested live | yes | the taxonomy; not the rest (a key needed, none created) | no: a token is required, none created |
+
 | | gaia | exoplanets |
 |---|---|---|
 | Shape | entity | entity |
@@ -359,6 +379,13 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
 - **Bright Sky**: observations dense in Germany, the forecasts sparse elsewhere; records from 2010; an unknown station or a point without records is a 404; the DWD's data under CC BY 4.0, the source acknowledged.
 - **Open Topo Data**: the public instance takes 100 locations a call, a call a second, 1,000 calls a day; a dataset answers null outside its extent.
 - **OpenAQ**: a key required (401 without, met on 2026-10-15), 60 calls a minute and 2,000 an hour per key; omnilab/openaq is not tested live, no key having been created.
+- **OBIS**: no rate published; 10,000 records a page at most (a 400 beyond: "Size 20000 too large"); dates as days only (a time: a 500, "Invalid date format"); its statistics take up to 8 s for a kingdom.
+- **WoRMS**: no rate published; one to three seconds a call, and once that evening a synonyms call answered 500 after 31 s (what fails besides the record is left out and said in `missing`); 204 for nothing; one external id type a call.
+- **ITIS**: no rate published; its JSON in ISO-8859-1 (read as such); an unknown TSN an empty 200.
+- **Catalogue of Life (ChecklistBank)**: no rate published; a release a month (3LXR, the latest XR); GBIF runs one release (315557, COL26.6 XR) behind it, so a newer taxon is in COL, not yet in GBIF.
+- **PBDB**: no rate published; its `max_ma`/`min_ma` orders answered 400 on 2026-10-16 though listed, and its wildcard name list left *Tyrannosaurus* out of "Tyranno%": the source searches through the autocompletion.
+- **eBird**: a key for everything but the taxonomy (403 without one, met on 2026-10-16); recent observations within 50 km and 30 days, the latest of each species at each location; times in local time without an offset; omnilab/ebird is not tested live beyond the taxonomy.
+- **IUCN Red List**: a token for every call (403 without one, met on 2026-10-16); half a second between calls asked; non-commercial use under its terms of use; omnilab/iucn is not tested live.
 - **OQMD**: no rate published; down on 2026-10-15 (502, then time-outs), so omnilab/oqmd is not tested live; one entry is asked by `filter=entry_id=...`, which its documentation does not list among the filter's keywords.
 
 ## Throttling and politeness
@@ -404,6 +431,13 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
 | brightsky | none (no rate published) | `mailto` in the User-Agent |
 | elevation | 1 s (the public instance's one a second) | `mailto` in the User-Agent |
 | openaq | 1 s (60 a minute per key) | the key as `X-API-Key`; `mailto` in the User-Agent |
+| obis | none (no rate published) | `mailto` in the User-Agent |
+| worms | none (no rate published) | `mailto` in the User-Agent |
+| itis | none (no rate published) | `mailto` in the User-Agent |
+| col | none (no rate published) | `mailto` in the User-Agent |
+| pbdb | none (no rate published) | `mailto` in the User-Agent |
+| ebird | none | the user's key as `X-eBirdApiToken`; `mailto` in the User-Agent |
+| iucn | 0.5 s (the IUCN's half second) | the user's token in `Authorization`; `mailto` in the User-Agent |
 
 Every factory takes `mailto`, `user_agent`, `throttle` (seconds between two calls of one source
 instance) and `base_uri`.

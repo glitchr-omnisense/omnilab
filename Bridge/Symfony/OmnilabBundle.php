@@ -32,6 +32,13 @@ use Omnilab\Swpc\SwpcSourceFactory;
 use Omnilab\BrightSky\BrightSkySourceFactory;
 use Omnilab\Elevation\ElevationSourceFactory;
 use Omnilab\OpenAq\OpenAqSourceFactory;
+use Omnilab\Obis\ObisSourceFactory;
+use Omnilab\Worms\WormsSourceFactory;
+use Omnilab\Itis\ItisSourceFactory;
+use Omnilab\Col\ColSourceFactory;
+use Omnilab\Pbdb\PbdbSourceFactory;
+use Omnilab\Ebird\EbirdSourceFactory;
+use Omnilab\Iucn\IucnSourceFactory;
 use Omnilab\Pdb\PdbSourceFactory;
 use Omnilab\PubChem\PubChemSourceFactory;
 use Omnilab\Registry;
@@ -128,6 +135,13 @@ final class OmnilabBundle extends AbstractBundle
         BrightSkySourceFactory::class,
         ElevationSourceFactory::class,
         OpenAqSourceFactory::class,
+        ObisSourceFactory::class,
+        WormsSourceFactory::class,
+        ItisSourceFactory::class,
+        ColSourceFactory::class,
+        PbdbSourceFactory::class,
+        EbirdSourceFactory::class,
+        IucnSourceFactory::class,
     ];
 
     public function configure(DefinitionConfigurator $definition): void
@@ -135,7 +149,7 @@ final class OmnilabBundle extends AbstractBundle
         $definition->rootNode()
             ->children()
                 ->arrayNode('sources')
-                    ->info('The sources, by name: a factory (pubchem, chebi, wikidata, uniprot, ensembl, pdb, reactome, string, interpro, quickgo, hgnc, opentargets, clinvar, gwas, gbif, inaturalist, simbad, gaia, exoplanets, usgs, open-meteo, noaa, copernicus, cds, cams, earthdata, kegg, rhea, cod, cactus, codata, materials-project, oqmd, emsc, usgs-water, tides, swpc, brightsky, elevation, openaq...) and its options.')
+                    ->info('The sources, by name: a factory (pubchem, chebi, wikidata, uniprot, ensembl, pdb, reactome, string, interpro, quickgo, hgnc, opentargets, clinvar, gwas, gbif, inaturalist, simbad, gaia, exoplanets, usgs, open-meteo, noaa, copernicus, cds, cams, earthdata, kegg, rhea, cod, cactus, codata, materials-project, oqmd, emsc, usgs-water, tides, swpc, brightsky, elevation, openaq, obis, worms, itis, col, pbdb, ebird, iucn...) and its options.')
                     ->useAttributeAsKey('name')
                     ->arrayPrototype()
                         ->children()

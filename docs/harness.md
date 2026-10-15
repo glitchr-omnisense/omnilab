@@ -58,6 +58,14 @@ docker compose run --rm omnilab entity clinvar VCV000015333        # the sickle 
 docker compose run --rm omnilab collect clinvar 15333              # then the GWAS Catalog by rs334
 docker compose run --rm omnilab entity gwas rs334                  # its associations, the smallest p-value first
 docker compose run --rm omnilab entity inaturalist 41964            # or "Panthera leo"
+docker compose run --rm omnilab entity col 4CGXP                    # the lion in the Catalogue of Life: its GBIF key, iNaturalist and ITIS ids
+docker compose run --rm omnilab collect col 4CGXP                  # then GBIF (the same key), iNaturalist and ITIS, merged
+docker compose run --rm omnilab entity worms 137094                # the common dolphin: ITIS, NCBI and IUCN ids
+docker compose run --rm omnilab entity obis 137094                 # its records in OBIS
+docker compose run --rm omnilab entity itis 180438
+docker compose run --rm omnilab entity pbdb "Tyrannosaurus rex"
+docker compose run --rm omnilab entity ebird eurrob1               # the taxonomy needs no key
+docker compose run --rm omnilab entity iucn 134817215              # needs IUCN_API_KEY
 docker compose run --rm omnilab entity chembl CHEMBL113
 docker compose run --rm omnilab entity simbad Betelgeuse
 docker compose run --rm omnilab entity jpl 433
@@ -95,6 +103,7 @@ docker compose run --rm omnilab series air-quality 48.5734,7.7521 pm2_5 nitrogen
 docker compose run --rm omnilab series air-quality 48.5734,7.7521 european_aqi --daily max --from 2026-10-08 --to 2026-10-14
 docker compose run --rm omnilab occurrences gbif --point -24.99,31.59 --radius 100 --from 2025-01-01 --to 2025-12-31 -f taxon=4CGXP --max 20
 docker compose run --rm omnilab occurrences inaturalist --point -24.99,31.59 --radius 100 --from 2025-01-01 --to 2025-12-31 -f taxon=41964 --max 20
+docker compose run --rm omnilab occurrences obis --bbox -10,43,-1,48 --from 2023-01-01 --to 2023-12-31 -f taxon=137094 --max 20
 docker compose run --rm omnilab occurrences usgs --bbox -25,35,45,72 --from 2026-10-01 --to 2026-10-07 -f min_magnitude=4 --sort magnitude
 docker compose run --rm omnilab occurrences emsc --bbox -25,35,45,72 --from 2026-10-01 --to 2026-10-07 -f min_magnitude=4 --sort magnitude
 docker compose run --rm omnilab datasets earthdata "sea surface temperature" --limit 5
@@ -141,6 +150,12 @@ Omnilab in bare PHP: the registry built by hand, no bundle, no container.
   cams         products area
   earthdata    products area cloud_cover
   inaturalist  entity search occurrences area
+  obis         entity occurrences area cross_references
+  worms        entity search cross_references
+  itis         entity search
+  col          entity search cross_references
+  pbdb         entity search
+  ebird        entity search occurrences
 
 PubChem, caffeine, asked of pubchem.ncbi.nlm.nih.gov:
   pubchem.cid:2519  Caffeine

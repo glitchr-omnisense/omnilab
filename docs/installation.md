@@ -13,6 +13,9 @@ composer require omnilab/reactome                            # pathways and reac
 composer require omnilab/hgnc omnilab/string omnilab/interpro omnilab/quickgo   # human genes; protein interactions, domains, GO
 composer require omnilab/opentargets omnilab/clinvar omnilab/gwas               # targets and diseases; clinical variants; GWAS associations
 composer require omnilab/inaturalist                         # taxa, and observations of species
+composer require omnilab/col omnilab/itis omnilab/worms omnilab/obis   # the Catalogue of Life (GBIF's taxonomy); ITIS; marine taxa and their records
+composer require omnilab/pbdb                                # fossils: taxa, their ages, the fossils of a place
+composer require omnilab/ebird omnilab/iucn                  # birds (eBird: a key beyond the taxonomy); the IUCN Red List (a token)
 composer require omnilab/noaa                                # weather stations' records (NCEI), the NWS
 composer require omnilab/cds omnilab/cams omnilab/earthdata  # climate and atmosphere data stores; NASA's Earth observation
 composer require omnilab/rhea omnilab/kegg                  # biochemical reactions; KEGG (academic use only)
@@ -24,7 +27,9 @@ composer require omnilab/swpc omnilab/elevation              # space weather (NO
 ```
 
 The weather and the air are both `omnilab/open-meteo` (`api: air_quality` for the air); the
-occurrences of a species are `omnilab/gbif`'s and `omnilab/inaturalist`'s (its observations), those
+occurrences of a species are `omnilab/gbif`'s, `omnilab/inaturalist`'s (its observations), `omnilab/obis`'s (in
+the sea) and `omnilab/ebird`'s (birds, with a key) - a fossil's are outside the contract (`omnilab/pbdb`'s
+`fossils()`, an age being no date) -, those
 of earthquakes `omnilab/usgs`'s and `omnilab/emsc`'s.
 
 PHP 8.2 or later.

@@ -85,6 +85,13 @@
         "omnilab/brightsky": "Bright Sky (Deutscher Wetterdienst open data): hourly observations and MOSMIX forecasts at a point or a DWD/WMO station",
         "omnilab/elevation": "Open Topo Data: the elevation of points and profiles from SRTM, ASTER, EU-DEM, GEBCO and other elevation models (outside the contract)",
         "omnilab/openaq": "OpenAQ API v3: hourly and daily air quality averages at the nearest location of a point (a key required)",
+        "omnilab/obis": "OBIS (Ocean Biodiversity Information System): marine taxa by WoRMS AphiaID or name with their record counts; the occurrences of a box or around a point, by taxon and depth",
+        "omnilab/worms": "WoRMS (World Register of Marine Species): taxa by AphiaID, name, ITIS TSN, NCBI or IUCN id; classification, synonyms, vernaculars, citation; ITIS, NCBI and IUCN cross-references",
+        "omnilab/itis": "ITIS: taxa by TSN or name; usage, accepted name, hierarchy, common names, geographic divisions and jurisdictional origins; a search of names",
+        "omnilab/col": "Catalogue of Life (ChecklistBank): taxa and synonyms by COL id, GBIF key (the same id since 2026) or name; GBIF, iNaturalist, WoRMS and ITIS cross-references",
+        "omnilab/pbdb": "Paleobiology Database: fossil and living taxa with their first and last appearances in Ma; fossil occurrences by place and age (outside the contract)",
+        "omnilab/ebird": "eBird API 2.0: bird taxa by species code; with the user's key, names, search, checklists and recent observations (not tested live)",
+        "omnilab/iucn": "IUCN Red List API v4: taxa with their latest global assessment, with the user's token (not tested live)",
         "symfony/config": "In a Symfony application: the configuration of Omnilab\\Bridge\\Symfony\\OmnilabBundle",
         "symfony/dependency-injection": "In a Symfony application: the services of Omnilab\\Bridge\\Symfony\\OmnilabBundle",
         "symfony/http-kernel": "In a Symfony application: Omnilab\\Bridge\\Symfony\\OmnilabBundle itself"

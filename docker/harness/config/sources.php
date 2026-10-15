@@ -55,4 +55,11 @@ return [
     'brightsky' => ['factory' => 'brightsky', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'elevation' => ['factory' => 'elevation', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'openaq' => ['factory' => 'openaq', 'needs' => ['OPENAQ_API_KEY'], 'options' => ['mailto' => $mailto, 'api_key' => $env('OPENAQ_API_KEY')]],
+    'obis' => ['factory' => 'obis', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'worms' => ['factory' => 'worms', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'itis' => ['factory' => 'itis', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'col' => ['factory' => 'col', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'pbdb' => ['factory' => 'pbdb', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'ebird' => ['factory' => 'ebird', 'needs' => [], 'options' => ['mailto' => $mailto, 'key' => $env('EBIRD_API_KEY')]],
+    'iucn' => ['factory' => 'iucn', 'needs' => ['IUCN_API_KEY'], 'options' => ['mailto' => $mailto, 'key' => $env('IUCN_API_KEY')]],
 ];
