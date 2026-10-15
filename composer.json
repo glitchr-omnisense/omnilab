@@ -12,6 +12,8 @@
         "weather",
         "stac",
         "pubchem",
+        "chebi",
+        "wikidata",
         "omnilab"
     ],
     "license": "MIT",
@@ -36,6 +38,8 @@
         "omnilab/pubchem": "PubChem: compounds by CID, name, InChIKey, CAS or SMILES, their computed properties, synonyms, structure image and cross-references",
         "omnilab/open-meteo": "Open-Meteo: hourly and daily weather series at a point, forecast and historical archive",
         "omnilab/copernicus": "Copernicus Data Space: Sentinel, Landsat and Copernicus service products from its STAC catalogue",
+        "omnilab/chebi": "ChEBI: chemical entities by ChEBI id, InChIKey, CAS, KEGG or name, their structure, ontology (classes, roles) and cross-references",
+        "omnilab/wikidata": "Wikidata: any item by Q-number, by a science base's identifier or by label, its labels in a language, its cross-references and a few properties with units",
         "symfony/config": "In a Symfony application: the configuration of Omnilab\\Bridge\\Symfony\\OmnilabBundle",
         "symfony/dependency-injection": "In a Symfony application: the services of Omnilab\\Bridge\\Symfony\\OmnilabBundle",
         "symfony/http-kernel": "In a Symfony application: Omnilab\\Bridge\\Symfony\\OmnilabBundle itself"

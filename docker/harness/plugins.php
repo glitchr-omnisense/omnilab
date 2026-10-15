@@ -8,4 +8,6 @@ return [
     'pubchem' => ['Omnilab\\PubChem\\Tests\\', 'Omnilab\\PubChem\\PubChemSourceFactory'],
     'open-meteo' => ['Omnilab\\OpenMeteo\\Tests\\', 'Omnilab\\OpenMeteo\\OpenMeteoSourceFactory'],
     'copernicus' => ['Omnilab\\Copernicus\\Tests\\', 'Omnilab\\Copernicus\\CopernicusSourceFactory'],
+    'chebi' => ['Omnilab\\Chebi\\Tests\\', 'Omnilab\\Chebi\\ChebiSourceFactory'],
+    'wikidata' => ['Omnilab\\Wikidata\\Tests\\', 'Omnilab\\Wikidata\\WikidataSourceFactory'],
 ];

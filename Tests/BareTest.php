@@ -3,10 +3,12 @@
 namespace Omnilab\Tests;
 
 use Omnilab\Bridge\Symfony\OmnilabBundle;
+use Omnilab\Chebi\ChebiSourceFactory;
 use Omnilab\Copernicus\CopernicusSourceFactory;
 use Omnilab\OpenMeteo\OpenMeteoSourceFactory;
 use Omnilab\PubChem\PubChemSourceFactory;
 use Omnilab\Registry;
+use Omnilab\Wikidata\WikidataSourceFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
@@ -14,7 +16,8 @@ use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
  * Omnilab outside Symfony: the harness's bare script (docker/harness/bin/bare)
  * run in a PHP process of its own - this one has loaded the bundle's tests -
  * builds the registry by hand, asks PubChem for an entity, Open-Meteo for a
- * series and the Copernicus Data Space for products, from recorded answers,
+ * series and the Copernicus Data Space for products, has the Collector
+ * follow the entity into ChEBI and Wikidata, from recorded answers,
  * and reports every class and file PHP loaded on the way. None may be a
  * framework's.
  */
@@ -61,6 +64,26 @@ final class BareTest extends TestCase
         self::assertSame([28.94, 1.84, 11.1, 5.62], array_column($report['products'], 'cloud'));
 
         self::assertContains('Symfony\Component\HttpClient\MockHttpClient', $report['symbols'], 'the answers came through the HTTP client given');
+        self::assertSame([], self::framework($report), 'no class nor file of a framework');
+    }
+
+    public function testTheCollectorFollowsCaffeineFromPubChemIntoChebiAndWikidataWithNoClassOfAFrameworkLoaded(): void
+    {
+        if (!class_exists(PubChemSourceFactory::class) || !class_exists(ChebiSourceFactory::class) || !class_exists(WikidataSourceFactory::class)) {
+            self::markTestSkipped('omnilab/pubchem, omnilab/chebi and omnilab/wikidata are not all installed.');
+        }
+        [$status, $report] = self::php([__DIR__.'/../docker/harness/bin/bare', '--recorded', '--json']);
+
+        self::assertSame(0, $status);
+        self::assertSame(['pubchem', 'chebi', 'wikidata'], $report['collected']['sources']);
+        self::assertSame([], $report['collected']['incomplete']);
+        self::assertSame('pubchem.cid:2519', $report['collected']['identifiers'][0]);
+        self::assertContains('chebi:3295', $report['collected']['identifiers'], 'a secondary ChEBI id, from ChEBI');
+        self::assertContains('kegg:D00528', $report['collected']['identifiers'], 'KEGG DRUG, from ChEBI and Wikidata');
+        self::assertSame(['194.19 g/mol [pubchem]', '194.194 g/mol [chebi]'], $report['collected']['properties']['molecular_weight'], 'each with its source, the first source\'s first');
+        self::assertSame(['purine alkaloid [chebi]', 'trimethylxanthine [chebi]'], $report['collected']['properties']['is_a']);
+        self::assertSame(['234 °C [wikidata]', '235 °C [wikidata]'], $report['collected']['properties']['melting_point']);
+        self::assertSame(['C8H10N4O2 [pubchem]', 'C8H10N4O2 [chebi]', 'C8H10N4O2 [wikidata]'], $report['collected']['properties']['molecular_formula']);
         self::assertSame([], self::framework($report), 'no class nor file of a framework');
     }
 

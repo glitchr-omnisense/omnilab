@@ -2,6 +2,7 @@
 
 ```sh
 composer require glitchr/omnilab omnilab/pubchem omnilab/open-meteo omnilab/copernicus
+composer require omnilab/chebi omnilab/wikidata   # the sources the Collector follows a compound into
 ```
 
 PHP 8.2 or later.
@@ -141,13 +142,34 @@ foreach ($page as $scene) {
 ## Several sources
 
 ```php
+use Omnilab\Chebi\ChebiSourceFactory;
 use Omnilab\Collector;
+use Omnilab\PubChem\PubChemSourceFactory;
+use Omnilab\Registry;
+use Omnilab\Wikidata\WikidataSourceFactory;
 
+$registry = new Registry([new PubChemSourceFactory($http), new ChebiSourceFactory($http), new WikidataSourceFactory($http)], [
+    'pubchem' => ['factory' => 'pubchem', 'options' => ['mailto' => 'you@example.org']],
+    'chebi' => ['factory' => 'chebi', 'options' => ['mailto' => 'you@example.org']],
+    'wikidata' => ['factory' => 'wikidata', 'options' => ['mailto' => 'you@example.org']],
+]);
 $collector = new Collector($registry);
-$caffeine = $collector->collect('pubchem', 'caffeine');   // then its ChEBI, Wikidata... ids offered to the sources that read them
-$caffeine->sources;                                       // those that answered
+$caffeine = $collector->collect('pubchem', 'caffeine');   // then its InChIKey offered to ChEBI, its CID to Wikidata
+$caffeine->sources;                                       // those that answered: pubchem, chebi, wikidata
 $collector->incomplete;                                   // the sources skipped (down, rate limited): do not cache this answer
+foreach (['molecular_weight', 'monoisotopic_mass', 'is_a', 'melting_point'] as $key) {
+    echo $key, ': ', implode('  ', array_map(fn ($p) => $p.' ['.$p->source.']', $caffeine->properties($key))), "\n";
+}
 ```
+
+```
+molecular_weight: 194.19 g/mol [pubchem]  194.194 g/mol [chebi]
+monoisotopic_mass: 194.08037557 Da [pubchem]  194.08038 Da [chebi]
+is_a: purine alkaloid [chebi]  trimethylxanthine [chebi]
+melting_point: 234 °C [wikidata]  235 °C [wikidata]
+```
+
+(as answered on 2026-10-15)
 
 See [Following cross-references, merging](merging.md).
 

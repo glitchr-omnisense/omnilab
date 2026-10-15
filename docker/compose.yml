@@ -5,7 +5,10 @@
 #   docker compose run --rm omnilab entity pubchem caffeine    # JSON
 #   docker compose run --rm omnilab entity pubchem CHEBI:27732
 #   docker compose run --rm omnilab search pubchem caffeine --limit 5
-#   docker compose run --rm omnilab collect pubchem caffeine   # its cross-references followed into the other sources
+#   docker compose run --rm omnilab collect pubchem caffeine   # its cross-references followed into ChEBI and Wikidata, merged
+#   docker compose run --rm omnilab entity chebi CHEBI:27732
+#   docker compose run --rm omnilab entity wikidata Q60235
+#   docker compose run --rm omnilab search wikidata caffeine --domain chemistry
 #   docker compose run --rm omnilab series open-meteo 48.5734,7.7521 temperature_2m --from tomorrow --to tomorrow
 #   docker compose run --rm omnilab series open-meteo 48.5734,7.7521 temperature_2m precipitation --daily max --from 2026-09-01 --to 2026-09-07
 #   docker compose run --rm omnilab products copernicus --point 48.5734,7.7521 --from=-10days --cloud 30

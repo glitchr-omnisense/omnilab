@@ -26,8 +26,12 @@ known.
 Property keys are lower case, snake case, and mean the same from one source to the next:
 `molecular_formula`, `molecular_weight`, `exact_mass`, `monoisotopic_mass`, `iupac_name`,
 `smiles`, `inchi`, `inchikey`, `xlogp`, `tpsa`, `complexity`, `charge`, `h_bond_donors`,
-`h_bond_acceptors`, `rotatable_bonds`, `heavy_atoms` (PubChem); a new source reuses a key that
-exists before it makes one.
+`h_bond_acceptors`, `rotatable_bonds`, `heavy_atoms` (PubChem); `chebi_stars`, `is_a`,
+`has_role`, `has_functional_parent`, `is_conjugate_acid_of`... (ChEBI: one key per relation of its
+ontology); `connectivity_smiles`, `mass`, `melting_point`, `boiling_point`, `flash_point`,
+`density`, `pka`, `taxon_name`, `radius`, `orbital_period`, `redshift`, `distance_from_earth`,
+`elevation`, `richter_magnitude` (Wikidata). A new source reuses a key that exists before it makes
+one; a key may hold several values of one source (`properties('has_role')`).
 
 ## Quantity
 

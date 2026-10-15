@@ -61,7 +61,7 @@ final class Console
     public static function create(): Application
     {
         $self = new self();
-        $source = new InputArgument('source', InputArgument::REQUIRED, 'A configured source: pubchem, open-meteo, copernicus');
+        $source = new InputArgument('source', InputArgument::REQUIRED, 'A configured source: pubchem, chebi, wikidata, open-meteo, copernicus');
         $period = [
             new InputOption('from', null, InputOption::VALUE_REQUIRED, 'From then: a date, a time, "tomorrow", "-10days"'),
             new InputOption('to', null, InputOption::VALUE_REQUIRED, 'Up to then'),

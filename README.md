@@ -10,6 +10,10 @@ $caffeine = $registry->get('pubchem')->entity('caffeine');
 $caffeine->property('molecular_weight');             // 194.19 g/mol, from pubchem
 $caffeine->identifier(Scheme::CHEBI);                // 27732: a cross-reference the Collector can follow
 
+$caffeine = $collector->collect('pubchem', 'caffeine');   // then ChEBI and Wikidata, by its InChIKey and its CID
+$caffeine->properties('molecular_weight');           // 194.19 g/mol from pubchem, 194.194 g/mol from chebi
+$caffeine->property('melting_point');                // 234 °C, from wikidata
+
 [$temperature] = $registry->get('open-meteo')->series(new SeriesQuery(['temperature_2m'], new Point(48.5734, 7.7521), $tomorrow, $tomorrow));
 $temperature->max();                                 // 20.4, in $temperature->unit: °C
 
@@ -40,6 +44,8 @@ source package `symfony/http-client`. Each source is a package of its own:
 | [`omnilab/pubchem`](https://github.com/glitchr-studio/omnilab-pubchem) | PubChem (NCBI): compounds by CID, name, InChIKey, CAS, SMILES; computed properties, synonyms, 2D structure, cross-references | entity | none (5 calls a second at most) |
 | [`omnilab/open-meteo`](https://github.com/glitchr-studio/omnilab-open-meteo) | Open-Meteo: hourly, 15-minute and daily weather at a point, forecast and archive (from 1940) | series | none for non-commercial use |
 | [`omnilab/copernicus`](https://github.com/glitchr-studio/omnilab-copernicus) | Copernicus Data Space: the STAC catalogue of Sentinel, Landsat, MODIS, the DEM and the Copernicus services | product | none to search (a CDSE token to download) |
+| [`omnilab/chebi`](https://github.com/glitchr-studio/omnilab-chebi) | ChEBI (EMBL-EBI): chemical entities by ChEBI id, InChIKey, CAS, KEGG or name; masses, structure, ontology (classes, roles), cross-references | entity | none |
+| [`omnilab/wikidata`](https://github.com/glitchr-studio/omnilab-wikidata) | Wikidata: any item by Q-number, by a science base's identifier (PubChem, ChEBI, CAS, UniProt, NCBI...) or by label; labels in a language, cross-references, a few properties with units | entity | none (a User-Agent that names the caller; 200 calls a minute) |
 
 A source answers what it can - `capabilities()` says what - and throws `NotSupportedException`
 for the rest, before any call. Unknown is `null`, an empty page or a series without points; a
@@ -58,19 +64,23 @@ never caches as "nothing".
 ## Plain PHP
 
 ```sh
-composer require glitchr/omnilab omnilab/pubchem omnilab/open-meteo omnilab/copernicus
+composer require glitchr/omnilab omnilab/pubchem omnilab/open-meteo omnilab/copernicus omnilab/chebi omnilab/wikidata
 ```
 
 ```php
+use Omnilab\Chebi\ChebiSourceFactory;
 use Omnilab\Copernicus\CopernicusSourceFactory;
 use Omnilab\OpenMeteo\OpenMeteoSourceFactory;
 use Omnilab\PubChem\PubChemSourceFactory;
 use Omnilab\Registry;
+use Omnilab\Wikidata\WikidataSourceFactory;
 use Symfony\Component\HttpClient\HttpClient;
 
 $http = HttpClient::create();   // or the application's client; a MockHttpClient in a test
-$registry = new Registry([new PubChemSourceFactory($http), new OpenMeteoSourceFactory($http), new CopernicusSourceFactory($http)], [
+$registry = new Registry([new PubChemSourceFactory($http), new ChebiSourceFactory($http), new WikidataSourceFactory($http), new OpenMeteoSourceFactory($http), new CopernicusSourceFactory($http)], [
     'pubchem' => ['factory' => 'pubchem', 'options' => ['mailto' => 'you@example.org']],
+    'chebi' => ['factory' => 'chebi', 'options' => ['mailto' => 'you@example.org']],
+    'wikidata' => ['factory' => 'wikidata', 'options' => ['mailto' => 'you@example.org', 'language' => 'fr']],
     'open-meteo' => ['factory' => 'open-meteo'],
     'copernicus' => ['factory' => 'copernicus'],
 ]);
@@ -90,6 +100,8 @@ the real services.
 omnilab:
     sources:
         pubchem: { factory: pubchem, options: { mailto: '%env(OMNILAB_MAILTO)%' } }
+        chebi: { factory: chebi, options: { mailto: '%env(OMNILAB_MAILTO)%' } }
+        wikidata: { factory: wikidata, options: { mailto: '%env(OMNILAB_MAILTO)%', language: fr } }
         meteo: { factory: open-meteo }
         copernicus: { factory: copernicus }
 ```
@@ -104,6 +116,7 @@ public function __construct(SourceInterface $pubchem, SourceInterface $meteo, Co
 cd docker && cp .env.dist .env
 docker compose run --rm omnilab sources
 docker compose run --rm omnilab entity pubchem caffeine
+docker compose run --rm omnilab collect pubchem caffeine   # then ChEBI and Wikidata, merged
 docker compose run --rm omnilab series open-meteo 48.5734,7.7521 temperature_2m --from tomorrow --to tomorrow
 docker compose run --rm omnilab products copernicus --point 48.5734,7.7521 --from=-10days --cloud 30
 docker compose run --rm omnilab bare      # plain PHP: no bundle, no container, and what PHP loaded

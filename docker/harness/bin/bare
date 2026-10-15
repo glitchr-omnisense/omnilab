@@ -8,7 +8,8 @@
  * needed: caffeine of PubChem (an entity), tomorrow's hourly temperature in
  * Strasbourg of Open-Meteo (a series), the Sentinel-2 L2A scenes over
  * Strasbourg in the last ten days under 30 % cloud of the Copernicus Data
- * Space (products) - and the script lists what PHP loaded on the way.
+ * Space (products), caffeine followed from PubChem into ChEBI and Wikidata
+ * by the Collector - and the script lists what PHP loaded on the way.
  *
  *   docker compose run --rm omnilab bare              # exits 1 when a class of a framework was loaded
  *   docker compose run --rm omnilab bare --recorded   # the answers recorded on 2026-10-15 (cut down) instead of calls
@@ -17,6 +18,7 @@
  * OMNILAB_AUTOLOAD names another autoloader than the harness's.
  */
 
+use Omnilab\Collector;
 use Omnilab\Model\Point;
 use Omnilab\Model\Product;
 use Omnilab\Model\Property;
@@ -40,6 +42,11 @@ $http = !$recorded ? null : new MockHttpClient(static function (string $method, 
         str_contains($url, '/compound/cid/2519/description/JSON') => 'pubchem-description-2519.json',
         str_contains($url, 'api.open-meteo.com/v1/forecast') && str_contains($url, 'start_date=2026-10-16') => 'open-meteo-forecast-2026-10-16.json',
         str_contains($url, 'stac.dataspace.copernicus.eu/v1/search') && str_contains($url, 'datetime=2026-10-05T00:00:00Z/2026-10-15T00:00:00Z') => 'copernicus-sentinel-2-l2a-strasbourg.json',
+        str_contains($url, '/chebi/backend/api/public/es_search/?term=RYYVLZVUVIJVGH-UHFFFAOYSA-N') => 'chebi-search-inchikey.json',
+        str_contains($url, '/chebi/backend/api/public/compound/27732/') => 'chebi-compound-27732.json',
+        str_contains($url, 'wikidata.org/w/api.php') && str_contains($url, 'srsearch=haswbstatement:P662=2519') => 'wikidata-statement-P662-2519.json',
+        str_contains($url, 'wikidata.org/w/api.php') && str_contains($url, 'ids=Q60235&') => 'wikidata-entities-Q60235.json',
+        str_contains($url, 'wikidata.org/w/api.php') && str_contains($url, 'ids=Q113145171&') => 'wikidata-labels-Q113145171.json',
         default => null,
     };
 
@@ -63,7 +70,7 @@ $now = $recorded ? new DateTimeImmutable('2026-10-15T00:00:00Z') : new DateTimeI
 $tomorrow = $recorded ? new DateTimeImmutable('2026-10-16', $paris) : new DateTimeImmutable('tomorrow', $paris);
 $strasbourg = new Point(48.5734, 7.7521);
 
-$report = ['recorded' => $recorded, 'sources' => [], 'entity' => null, 'series' => null, 'products' => null];
+$report = ['recorded' => $recorded, 'sources' => [], 'entity' => null, 'collected' => null, 'series' => null, 'products' => null];
 foreach ($registry->all() as $name => $source) {
     $report['sources'][$name] = array_map(static fn (Capability $capability) => $capability->value, $source->capabilities());
 }
@@ -76,6 +83,16 @@ if ($registry->has('pubchem')) {
         'identifiers' => $caffeine->identifiers->keys(),
         'image' => $caffeine->image,
     ];
+}
+if ($registry->has('pubchem') && $registry->has('chebi') && $registry->has('wikidata')) {
+    // PubChem -> ChEBI and Wikidata: caffeine's cross-references followed, the three answers merged.
+    $collector = new Collector($registry);
+    $collected = $collector->collect('pubchem', 'caffeine', 1, ['chebi', 'wikidata']);
+    $properties = [];
+    foreach ($collected?->properties ?? [] as $property) {
+        $properties[$property->key][] = $property.' ['.$property->source.']';
+    }
+    $report['collected'] = null === $collected ? null : ['sources' => $collected->sources, 'incomplete' => $collector->incomplete, 'identifiers' => $collected->identifiers()->keys(), 'properties' => $properties];
 }
 if ($registry->has('open-meteo')) {
     [$temperature] = $registry->get('open-meteo')->series(new SeriesQuery(['temperature_2m'], $strasbourg, $tomorrow, $tomorrow));
@@ -114,6 +131,13 @@ if (null !== $report['entity']) {
         printf("  %-18s %s\n", $key, $report['entity']['properties'][$key] ?? '-');
     }
     echo '  identifiers        ', implode(' ', $report['entity']['identifiers']), "\n";
+}
+if (null !== $report['collected']) {
+    echo "\nThe Collector, caffeine from PubChem followed into ChEBI and Wikidata", $from ?: ', asked of each', ":\n";
+    echo '  sources            ', implode(', ', $report['collected']['sources']), "\n";
+    foreach (['molecular_weight', 'monoisotopic_mass', 'is_a', 'melting_point', 'density'] as $key) {
+        printf("  %-18s %s\n", $key, implode('  ', $report['collected']['properties'][$key] ?? ['-']));
+    }
 }
 if (null !== $report['series']) {
     echo "\nOpen-Meteo, the hourly temperature in Strasbourg on ", $report['series']['day'], $from ?: ', asked of api.open-meteo.com', ":\n  ";

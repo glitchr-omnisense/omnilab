@@ -188,7 +188,7 @@ final readonly class Identifier implements \Stringable
 
         return match ($this->scheme) {
             Scheme::PUBCHEM_CID => 'https://pubchem.ncbi.nlm.nih.gov/compound/'.$v,
-            Scheme::CHEBI => 'https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:'.$v,
+            Scheme::CHEBI => 'https://www.ebi.ac.uk/chebi/CHEBI:'.$v,
             Scheme::CHEMBL => 'https://identifiers.org/chembl.compound:'.$v,
             Scheme::INCHIKEY, Scheme::INCHI => null,
             Scheme::CAS => 'https://commonchemistry.cas.org/detail?cas_rn='.$v,

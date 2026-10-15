@@ -41,6 +41,7 @@ final class IdentifierTest extends TestCase
         yield 'nor a SMILES' => ['CN1C=NC2=C1C(=O)N(C(=O)N2C)C', null];
         yield 'PubChem\'s page' => ['https://pubchem.ncbi.nlm.nih.gov/compound/2519', 'pubchem.cid:2519'];
         yield 'ChEBI\'s page' => ['https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:27732', 'chebi:27732'];
+        yield 'ChEBI 2.0\'s page' => ['https://www.ebi.ac.uk/chebi/CHEBI:27732', 'chebi:27732'];
         yield 'ChEMBL\'s page' => ['https://www.ebi.ac.uk/chembl/explore/compound/CHEMBL113', 'chembl:CHEMBL113'];
         yield 'Wikidata\'s page' => ['https://www.wikidata.org/wiki/Q60235', 'wikidata:Q60235'];
         yield 'Wikidata\'s entity URI' => ['http://www.wikidata.org/entity/Q60235', 'wikidata:Q60235'];
@@ -76,6 +77,7 @@ final class IdentifierTest extends TestCase
 
         self::assertSame('https://pubchem.ncbi.nlm.nih.gov/compound/2519', Identifier::cid(2519)->url());
         self::assertSame('https://www.wikidata.org/wiki/Q60235', Identifier::wikidata('q60235')->url());
+        self::assertSame('https://www.ebi.ac.uk/chebi/CHEBI:27732', Identifier::chebi('CHEBI:27732')->url(), 'ChEBI 2.0\'s page: the old searchId.do answers 301 to it');
         self::assertSame('https://simbad.cds.unistra.fr/simbad/sim-id?Ident=M%2031', Identifier::of('simbad', 'M 31')->url());
         self::assertNull(Identifier::inchikey('RYYVLZVUVIJVGH-UHFFFAOYSA-N')->url());
         self::assertSame('CHEBI:27732', Identifier::chebi('CHEBI:27732')->display());

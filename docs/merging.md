@@ -20,9 +20,26 @@ found nothing for is not asked again; a source that read none of the identifiers
 the next round's. With `depth: 2`, the identifiers the second round brought (a ChEBI entry's
 Wikidata item, say) are offered to the sources not asked yet.
 
-PubChem → ChEBI → Wikidata is the path the family was drawn for: PubChem gives caffeine's ChEBI
-and Wikidata ids among its synonyms, a ChEBI source would read the first, a Wikidata source the
-second; each answer is merged into one entity.
+PubChem → ChEBI → Wikidata is the path the family was drawn for. With the three configured,
+caffeine from PubChem (as answered on 2026-10-15):
+
+```php
+$caffeine = $collector->collect('pubchem', 'caffeine');
+$caffeine->sources;                       // ['pubchem', 'chebi', 'wikidata']
+$caffeine->properties('molecular_weight'); // 194.19 g/mol [pubchem], 194.194 g/mol [chebi]
+$caffeine->properties('monoisotopic_mass');// 194.08037557 Da [pubchem], 194.08038 Da [chebi]
+$caffeine->properties('is_a');            // purine alkaloid [chebi], trimethylxanthine [chebi]
+$caffeine->properties('melting_point');   // 234 °C [wikidata], 235 °C [wikidata]
+$caffeine->property('density');           // 1.23 g/cm³ [wikidata]
+$caffeine->identifier(Scheme::KEGG);      // C07481 (PubChem's synonyms); ChEBI and Wikidata add D00528
+```
+
+Nine calls: four of PubChem (the CID, the properties, the synonyms, the description); ChEBI is
+offered the CID first, refuses it without a call, then reads the InChIKey (a search, then the
+entry); Wikidata reads the CID (`haswbstatement:P662=2519`, then the item, then the label of its
+class). ChEBI 2.0 gives no PubChem CID nor Wikidata item for caffeine: the InChIKey and the CID,
+which PubChem gave, are what joins them. About eight seconds, PubChem's throttle and Wikidata's
+answer (260 kB) for most of it.
 
 A source that is down or rate limited is skipped and named in `$incomplete`; the others still
 answer. Do not cache an answer while `$incomplete` is not empty.
