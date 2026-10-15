@@ -11,8 +11,10 @@ namespace Omnilab\Model;
  *
  * $datetime is the nominal time; $start and $end the interval when the
  * product covers one (a mosaic, an average).
+ *
+ * Not final: a Job (a product being made on request) extends it.
  */
-final readonly class Product
+readonly class Product
 {
     /**
      * @param array<string, mixed>|null $geometry   GeoJSON

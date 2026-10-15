@@ -71,6 +71,7 @@ final class Console
         $app->addCommand($self->command('sources', 'Which sources are installed, configured, and what each can do', [], fn ($in, $out) => $self->sources($out)));
         $app->addCommand($self->command('entity', 'One entity by an identifier or a name (JSON)', [$source, new InputArgument('id', InputArgument::REQUIRED, 'An identifier (CID, InChIKey, CAS, CHEBI:..., Q..., a URL) or, where the source reads names, a name')], fn ($in, $out) => $self->entity($in, $out)));
         $app->addCommand($self->command('search', 'Entities matching a text', [$source, new InputArgument('text', InputArgument::REQUIRED), new InputOption('domain', 'd', InputOption::VALUE_REQUIRED, implode(', ', array_map(static fn (Domain $d) => $d->value, Domain::cases()))), new InputOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Entities per page', '10')], fn ($in, $out) => $self->search($in, $out)));
+        $app->addCommand($self->command('datasets', 'The datasets of a catalogue matching a text', [$source, new InputArgument('text', InputArgument::REQUIRED), new InputOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Datasets per page', '10')], fn ($in, $out) => $self->datasets($in, $out)));
         $app->addCommand($self->command('collect', 'One entity, its cross-references followed into the other sources and merged (JSON)', [$source, new InputArgument('id', InputArgument::REQUIRED), new InputOption('depth', null, InputOption::VALUE_REQUIRED, 'Rounds of following', '1')], fn ($in, $out) => $self->collect($in, $out)));
         $app->addCommand($self->command('series', 'Variables at a point over a period', [
             $source,
@@ -168,6 +169,18 @@ final class Console
         $table->setHeaders(['Id', 'Label', 'Kind', 'Properties']);
         foreach ($page as $entity) {
             $table->addRow([$entity->id->key(), self::cut($entity->label, 50), $entity->kind, self::cut(implode('; ', array_map(static fn (Property $p) => $p->key.' '.$p, \array_slice($entity->properties, 0, 3))), 70)]);
+        }
+        $table->render();
+        $this->stderr($out)->writeln(\sprintf('<info>%d of %s; next page: %s.</info>', \count($page), $page->total ?? '?', $page->next ?? 'none'));
+    }
+
+    private function datasets(InputInterface $in, OutputInterface $out): void
+    {
+        $page = $this->registry->get((string) $in->getArgument('source'))->datasets(new Query((string) $in->getArgument('text'), limit: max(1, (int) $in->getOption('limit'))));
+        $table = new Table($out);
+        $table->setHeaders(['Id', 'Title', 'From', 'To']);
+        foreach ($page as $dataset) {
+            $table->addRow([$dataset->id, self::cut((string) ($dataset->properties['title'] ?? ''), 70), $dataset->start?->format('Y-m-d'), $dataset->end?->format('Y-m-d')]);
         }
         $table->render();
         $this->stderr($out)->writeln(\sprintf('<info>%d of %s; next page: %s.</info>', \count($page), $page->total ?? '?', $page->next ?? 'none'));

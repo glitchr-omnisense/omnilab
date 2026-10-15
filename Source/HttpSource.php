@@ -6,12 +6,14 @@ use Omnilab\Exception\NotSupportedException;
 use Omnilab\Exception\ProviderException;
 use Omnilab\Exception\RateLimitedException;
 use Omnilab\Exception\UnavailableException;
+use Omnilab\Model\Asset;
 use Omnilab\Model\Entity;
 use Omnilab\Model\Identifier;
 use Omnilab\Model\Scheme;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * What the sources over HTTP share: the calls (GET, and POST for the
@@ -61,6 +63,16 @@ abstract class HttpSource implements SourceInterface
     public function occurrences(OccurrenceQuery $query): Page
     {
         throw NotSupportedException::operation($this->getName(), 'list occurrences');
+    }
+
+    public function datasets(Query $query): Page
+    {
+        throw NotSupportedException::operation($this->getName(), 'search datasets');
+    }
+
+    public function open(Asset|string $file): ResponseInterface
+    {
+        throw NotSupportedException::operation($this->getName(), 'open files');
     }
 
     /**

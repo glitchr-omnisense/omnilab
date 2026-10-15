@@ -17,6 +17,7 @@ air_quality`).
 | `sources` | the sources installed and configured, and what each can do |
 | `entity <source> <id>` | one entity, by an identifier or a name (JSON) |
 | `search <source> <text>` | `--domain`, `--limit` |
+| `datasets <source> <text>` | the datasets of a catalogue (cds, cams, earthdata); `--limit` |
 | `collect <source> <id>` | one entity, its cross-references followed into the other sources, merged (JSON); `--depth` |
 | `series <source> <place> <variable>...` (a place `lat,lon`, a box, or a station: `ghcn:USW00094728`, `nws.station:KNYC`) | `--from`, `--to`, `--daily mean\|max\|min\|sum`, `--step PT15M`, `--timezone` |
 | `products <source>` | `--point` or `--bbox`, `--collection` (repeatable), `--from`, `--to`, `--cloud`, `--oldest`, `--max`, `--json` |
@@ -61,6 +62,7 @@ docker compose run --rm omnilab series air-quality 48.5734,7.7521 european_aqi -
 docker compose run --rm omnilab occurrences gbif --point -24.99,31.59 --radius 100 --from 2025-01-01 --to 2025-12-31 -f taxon=4CGXP --max 20
 docker compose run --rm omnilab occurrences inaturalist --point -24.99,31.59 --radius 100 --from 2025-01-01 --to 2025-12-31 -f taxon=41964 --max 20
 docker compose run --rm omnilab occurrences usgs --bbox -25,35,45,72 --from 2026-10-01 --to 2026-10-07 -f min_magnitude=4 --sort magnitude
+docker compose run --rm omnilab datasets earthdata "sea surface temperature" --limit 5
 docker compose run --rm omnilab products copernicus --point 48.5734,7.7521 --from=-10days --cloud 30
 docker compose run --rm omnilab products copernicus --bbox 7.68,48.53,7.83,48.64 --collection sentinel-1-grd --from=-3days
 ```

@@ -39,6 +39,12 @@ Every answer takes one of four shapes, not one per domain:
   period - the observations of a species, the earthquakes of a region -, each with its time and
   its place ([occurrences](docs/occurrences.md)).
 
+A series may be asked at a station (`ghcn:USW00094728`) rather than a point; a catalogue's
+datasets are found by text (`datasets()`), its files read with the source's credentials (`open()`),
+and a file made on request is followed as a `Model\Job` until it is ready
+([datasets](docs/datasets.md)); the catalogues that speak STAC are read by one reader
+(`Source\Stac`).
+
 This package holds the contract (`Source\SourceInterface`, `Source\SourceFactory`, `Registry`), the
 models, the `Collector` that follows an entity's cross-references into the other sources and the
 `Merger` that makes one entity of several, keeping the source of every property; and a bridge for
@@ -78,6 +84,7 @@ never caches as "nothing".
 - [Sources: what each can and cannot do](docs/sources.md)
 - [Models and identifiers](docs/models.md)
 - [Occurrences: the things of a place and a period](docs/occurrences.md)
+- [Datasets, requests, files](docs/datasets.md)
 - [Decisions: what the contract settled, and why](docs/decisions.md)
 - [Following cross-references, merging](docs/merging.md)
 - [Symfony](docs/symfony.md)

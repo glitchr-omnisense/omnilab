@@ -11,6 +11,10 @@ Every source implements `Omnilab\Source\SourceInterface`:
 | `series(SeriesQuery)` | a list of `Series`, one per variable asked, in the order asked |
 | `products(ProductQuery)` | a `Page` of `Product`, newest first by default |
 | `occurrences(OccurrenceQuery)` | a `Page` of `Entity`, each with its `time` and `place`: what was found or happened at a place in a period ([occurrences](occurrences.md)) |
+| `datasets(Query)` | a `Page` of `Product`, each a dataset of the catalogue, the best match first; its id is what `ProductQuery::$collections` takes ([datasets](datasets.md)) |
+| `open(Asset\|string)` | a file read with the source's credentials: the HTTP response, streamed ([datasets](datasets.md)) |
+
+A source that makes files on request implements `Source\JobSourceInterface` besides: `submit($dataset, $request)`, `job($id)`, `jobs(ProductQuery)` answer a `Model\Job` - a `Product` in the making, its status, progress and file ([datasets](datasets.md#asynchronous-requests-job)).
 
 What a source does not do throws `NotSupportedException`, before any call. `HttpSource`, the base
 of the sources over HTTP, throws it for every operation a source does not override.
@@ -29,6 +33,9 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | `forecast` | `series()` answers ahead of now |
 | `historical` | `series()` answers for the past: observations, an archive, a reanalysis |
 | `area` | `series()`, `products()` or `occurrences()` take a `BBox`; without it, a box is refused rather than answered for its centre |
+| `datasets` | `datasets()` finds the catalogue's datasets by text |
+| `jobs` | the source implements `JobSourceInterface`: requests for a file, submitted and followed |
+| `open` | `open()` reads a file with the source's credentials |
 | `station` | `series()` takes a station's `Identifier` (`ghcn`, `wigos`, `nws.station`) in place of a `Point`, and answers its own records; without it, a station is refused ([stations](models.md#stations)) |
 | `cloud_cover` | `products()` applies `ProductQuery::$maxCloudCover`; without it, the query is refused rather than answered unfiltered |
 

@@ -7,6 +7,7 @@ use Omnilab\Exception\ProviderException;
 use Omnilab\Model\Asset;
 use Omnilab\Model\BBox;
 use Omnilab\Model\Identifier;
+use Omnilab\Model\Job;
 use Omnilab\Model\Point;
 use Omnilab\Model\Product;
 use Omnilab\Model\Property;
@@ -85,6 +86,38 @@ final class ModelsTest extends TestCase
         self::assertSame('https://download.example/x.jp2', $product->asset('TCI_10m')->httpsHref());
         self::assertSame(['thumbnail'], array_keys($product->assets('overview')));
         self::assertNull((new Product('L', 'sentinel-1-grd'))->cloudCover(), 'radar: no cloud cover');
+    }
+
+    public function testAJobIsAProductInTheMaking(): void
+    {
+        $file = new Asset('data', 'https://object-store.example/x.nc', 'application/netcdf', ['data'], size: 8);
+        $done = new Job('9bfc1362', 'reanalysis-era5-single-levels', Job::SUCCESSFUL, 100.0, created: new \DateTimeImmutable('2026-10-15T08:00:00Z'), finished: new \DateTimeImmutable('2026-10-15T08:05:00Z'), properties: ['status' => 'successful'], file: $file, source: 'cds');
+
+        self::assertInstanceOf(Product::class, $done);
+        self::assertSame(['reanalysis-era5-single-levels', 'successful', $file, $file, true, true], [$done->collection, $done->properties['status'], $done->file(), $done->asset('data'), $done->isDone(), $done->isSuccessful()]);
+        self::assertSame(['2026-10-15T08:00:00+00:00', null, '2026-10-15T08:05:00+00:00'], [$done->datetime->format(\DATE_ATOM), $done->start, $done->end->format(\DATE_ATOM)]);
+        $queued = new Job('x', 'd', Job::ACCEPTED);
+        self::assertSame([false, false, null, [], null], [$queued->isDone(), $queued->isSuccessful(), $queued->file(), $queued->assets, $queued->progress]);
+        self::assertTrue((new Job('y', 'd', Job::FAILED, message: 'no data'))->isDone());
+
+        $source = new class(new MockHttpClient(), 'https://example.org/') extends HttpSource {
+            public function getName(): string
+            {
+                return 'example';
+            }
+
+            public function capabilities(): array
+            {
+                return [];
+            }
+        };
+        foreach ([static fn () => $source->datasets(new Query('era5')), static fn () => $source->open($file)] as $refusal) {
+            try {
+                $refusal();
+                self::fail('not done');
+            } catch (NotSupportedException) {
+            }
+        }
     }
 
     public function testQueriesRefuseWhatCannotBeAsked(): void

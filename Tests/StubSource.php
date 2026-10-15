@@ -4,6 +4,7 @@ namespace Omnilab\Tests;
 
 use Omnilab\Exception\NotSupportedException;
 use Omnilab\Exception\UnavailableException;
+use Omnilab\Model\Asset;
 use Omnilab\Model\Entity;
 use Omnilab\Model\Identifier;
 use Omnilab\Model\Scheme;
@@ -14,6 +15,7 @@ use Omnilab\Source\ProductQuery;
 use Omnilab\Source\Query;
 use Omnilab\Source\SeriesQuery;
 use Omnilab\Source\SourceInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * A source that knows the entities it is given, under every identifier of
@@ -89,5 +91,15 @@ final class StubSource implements SourceInterface
     public function occurrences(OccurrenceQuery $query): Page
     {
         throw NotSupportedException::operation($this->name, 'list occurrences');
+    }
+
+    public function datasets(Query $query): Page
+    {
+        throw NotSupportedException::operation($this->name, 'search datasets');
+    }
+
+    public function open(Asset|string $file): ResponseInterface
+    {
+        throw NotSupportedException::operation($this->name, 'open files');
     }
 }

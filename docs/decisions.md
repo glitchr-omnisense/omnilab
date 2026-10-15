@@ -35,6 +35,45 @@ and keeps among a gene's identifiers its NCBI Gene record and its Swiss-Prot ent
 UniProt already joined a gene and its protein. A GBIF occurrence published by iNaturalist carries
 the observation's number among its identifiers: it is that very record (`inaturalist.observation`).
 
+## Datasets, requests and files in the contract (2026-10-15)
+
+`SourceInterface::datasets(Query)` (`Capability::DATASETS`) and `open(Asset|string)`
+(`Capability::OPEN`); `JobSourceInterface` (`submit()`, `job()`, `jobs()`, `Capability::JOBS`)
+and `Model\Job` ([datasets](datasets.md)).
+
+**Why**: omnilab/cds and omnilab/cams searched their catalogue (`datasets()`) and took requests
+(`submit()`, `job()`, `jobs()`), omnilab/earthdata searched its collections (`datasets()`) and read
+a file with its token (`open()`), each outside the contract: an application could not ask "which
+datasets speak of sea surface temperature" or "read this file" of a source without knowing which.
+
+**Why "datasets"**: what a scientist looks for, and what the stores call their entries (the CDS's
+datasets, the CMR's "data set" landing pages, DataCite's and schema.org's `Dataset`); the
+methods already had the name, so no call changes. Not *collections*: STAC's word, which
+`ProductQuery::$collections` keeps for what a search of products is narrowed to - a dataset's id
+is what goes there. Not `search()`: it answers entities, a thing named; a dataset is a catalogue's
+entry, a `Product` without a time of its own, as `products()` of the CDS already answered.
+
+**Why a `Job` is a `Product`**: what a request becomes is a product - a file of a dataset over a
+place and a period, with an address -, and the `Product` cds answered for a job (its status in
+`properties`, its file the `data` asset) is what callers already read: `Job` extends `Product`
+(no longer final) and adds the status, the progress, the message; every read of before reads the
+same.
+
+**Why a separate interface for jobs**: cds's `submit()`, `job()`, `jobs()` answered a `Product`.
+Put in `SourceInterface` and given defaults in `HttpSource`, they would have made an older cds
+fatal against this core (a `Product` cannot answer for a `Job`); a source that takes requests
+implements `JobSourceInterface` beside, and says `Capability::JOBS`. `datasets()` and `open()`
+had the very signatures of the methods before them: in `SourceInterface`, with `HttpSource`'s
+refusals.
+
+**Why `open()` and no decoding**: the files are NetCDF, GRIB, GeoTIFF, HDF, zip - each the
+application's tools' to read; what the source owns is the credential (Earthdata Login's token,
+the store's key) and where the file is. It answers the response streamed, not read.
+
+**Not copernicus's `datasets()`**: its catalogue's free-text search ranks nothing, breaks on a
+space and finds nothing for "temperature"; reading its 427 collections to rank them here took over
+a minute (2026-10-15). Its collections stay named in its docs.
+
 ## A station in place of a point (2026-10-15)
 
 `SeriesQuery::$place` is a `Point`, a `BBox` or an `Identifier`: a station's (`ghcn`, `wigos`,

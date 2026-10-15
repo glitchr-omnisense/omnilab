@@ -15,6 +15,12 @@ enum Capability: string
     case PRODUCTS = 'products';
     /** occurrences(): the things found or happened at a place in a period - each an entity with its time and its place -, one page at a time. */
     case OCCURRENCES = 'occurrences';
+    /** datasets(): the catalogue's datasets by text, one page at a time. */
+    case DATASETS = 'datasets';
+    /** The source implements JobSourceInterface: submit() a request for a file, job() and jobs() follow it. */
+    case JOBS = 'jobs';
+    /** open(): a file read with the source's credentials (a token, a key). */
+    case OPEN = 'open';
     /** An entity's image is its structure: a 2D depiction of a molecule, a 3D model of a protein. */
     case STRUCTURE = 'structure';
     /** An entity carries identifiers of other bases, which the Collector can follow. */

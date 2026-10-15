@@ -5,10 +5,12 @@ namespace Omnilab\Source;
 use Omnilab\Exception\NotSupportedException;
 use Omnilab\Exception\ProviderException;
 use Omnilab\Exception\UnavailableException;
+use Omnilab\Model\Asset;
 use Omnilab\Model\Entity;
 use Omnilab\Model\Identifier;
 use Omnilab\Model\Product;
 use Omnilab\Model\Series;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * A service that publishes what science knows or measures: PubChem,
@@ -23,6 +25,10 @@ use Omnilab\Model\Series;
  * - occurrences: the entities found or happened at a place in a period,
  *   each with its time and its place - the observations of a species, the
  *   earthquakes of a region (occurrences()).
+ *
+ * A catalogue's datasets are Products too (datasets()), and its files are
+ * read with the source's credentials (open()); a source that makes files
+ * on request implements JobSourceInterface besides.
  *
  * A source answers what it can, says what that is (capabilities()), and
  * throws NotSupportedException for the rest: an operation it does not do,
@@ -85,4 +91,19 @@ interface SourceInterface
      * @return Page<Entity>
      */
     public function occurrences(OccurrenceQuery $query): Page;
+
+    /**
+     * The datasets of the source's catalogue that match a text, the best
+     * match first, one page at a time: each a Product whose id is what
+     * ProductQuery::$collections takes.
+     *
+     * @return Page<Product>
+     */
+    public function datasets(Query $query): Page;
+
+    /**
+     * A file (an asset, or its address) opened with the source's
+     * credentials: the response, streamed, not read. Nothing is decoded.
+     */
+    public function open(Asset|string $file): ResponseInterface;
 }
