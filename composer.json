@@ -60,6 +60,8 @@
         "omnilab/noaa": "NOAA: weather and climate observations as series at a point - NCEI's station records (GHCN-Daily, monthly and yearly summaries) and the National Weather Service's observations and forecasts in the United States",
         "omnilab/cds": "Copernicus Climate Data Store: its datasets (ERA5, seasonal forecasts, projections) as products over a place and a period, its catalogue's search; with an account's key, a request submitted and followed to its file",
         "omnilab/cams": "Copernicus Atmosphere Data Store (CAMS): air quality forecasts and reanalyses, atmospheric composition, greenhouse gases as products, through omnilab/cds",
+        "omnilab/exoplanets": "NASA Exoplanet Archive: confirmed exoplanets by name, their mass, radius, orbit and temperature with uncertainties, their discovery and their host star, related by its designations (SIMBAD, Gaia DR3)",
+        "omnilab/gaia": "ESA Gaia DR3: a source by its source_id or designation, its astrometry (position, parallax, proper motion), photometry, radial velocity and astrophysical parameters; the sources of a cone on the sky",
         "omnilab/earthdata": "NASA Earthdata (CMR): the granules of NASA's Earth observation collections (HLS, MODIS, VIIRS, GPM...) as products by place, period and cloud cover; their files with an Earthdata Login token",
         "symfony/config": "In a Symfony application: the configuration of Omnilab\\Bridge\\Symfony\\OmnilabBundle",
         "symfony/dependency-injection": "In a Symfony application: the services of Omnilab\\Bridge\\Symfony\\OmnilabBundle",

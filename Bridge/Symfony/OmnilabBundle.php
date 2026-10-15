@@ -9,6 +9,8 @@ use Omnilab\Chembl\ChemblSourceFactory;
 use Omnilab\Collector;
 use Omnilab\Copernicus\CopernicusSourceFactory;
 use Omnilab\Earthdata\EarthdataSourceFactory;
+use Omnilab\Exoplanets\ExoplanetsSourceFactory;
+use Omnilab\Gaia\GaiaSourceFactory;
 use Omnilab\Ensembl\EnsemblSourceFactory;
 use Omnilab\Gbif\GbifSourceFactory;
 use Omnilab\INaturalist\INaturalistSourceFactory;
@@ -80,6 +82,8 @@ final class OmnilabBundle extends AbstractBundle
         CdsSourceFactory::class,
         CamsSourceFactory::class,
         EarthdataSourceFactory::class,
+        ExoplanetsSourceFactory::class,
+        GaiaSourceFactory::class,
     ];
 
     public function configure(DefinitionConfigurator $definition): void
@@ -87,7 +91,7 @@ final class OmnilabBundle extends AbstractBundle
         $definition->rootNode()
             ->children()
                 ->arrayNode('sources')
-                    ->info('The sources, by name: a factory (pubchem, chebi, wikidata, uniprot, ensembl, pdb, gbif, inaturalist, simbad, usgs, open-meteo, noaa, copernicus, cds, cams, earthdata...) and its options.')
+                    ->info('The sources, by name: a factory (pubchem, chebi, wikidata, uniprot, ensembl, pdb, gbif, inaturalist, simbad, gaia, exoplanets, usgs, open-meteo, noaa, copernicus, cds, cams, earthdata...) and its options.')
                     ->useAttributeAsKey('name')
                     ->arrayPrototype()
                         ->children()

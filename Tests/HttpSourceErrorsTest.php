@@ -73,6 +73,29 @@ final class HttpSourceErrorsTest extends TestCase
         }
     }
 
+    public function testAMaintenancePageIsUnavailable(): void
+    {
+        $source = new class(new MockHttpClient(new MockResponse("<!DOCTYPE html>\n<html class=\"lt-ie9\"><head><title>Gaia (OPER) Downtime Page</title></head><body>Maintenance ongoing!</body></html>")), 'https://example.org/') extends HttpSource {
+            public function getName(): string
+            {
+                return 'example';
+            }
+
+            public function capabilities(): array
+            {
+                return [];
+            }
+
+            public function read(): ?array
+            {
+                return $this->getJson('anything');
+            }
+        };
+        $this->expectException(UnavailableException::class);
+        $this->expectExceptionMessage('[example] it answered a web page, not JSON: Gaia (OPER) Downtime Page');
+        $source->read();
+    }
+
     public function testALongTextIsCut(): void
     {
         $source = new class(new MockHttpClient([new MockResponse(str_repeat('a ', 400), ['http_code' => 400]), new MockResponse('{"errors":["down"]}', ['http_code' => 503])]), 'https://example.org/') extends HttpSource {

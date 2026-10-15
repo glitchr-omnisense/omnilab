@@ -87,6 +87,17 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | Related | `organism` (NCBI taxon), a gene's canonical `transcript`, a transcript's `gene` and `protein`, a protein's `transcript` and `gene` | `protein` (its chains' UniProt), `organism`, `ligand` (ChEBI, else PubChem, else InChIKey) | `parent`, or an inactive taxon's `accepted`; an observation's `taxon` |
 | Collector path | NCBI Gene or UniProt -> Ensembl by the Ensembl gene id; Ensembl -> NCBI Gene, UniProt, Wikidata (P594) | none: an entry is taken alone, reached from UniProt's `structure`s; its `protein`s lead back | Wikidata -> iNaturalist (P3151), and back; GBIF -> Wikidata -> iNaturalist at depth 2; a GBIF occurrence -> its iNaturalist observation |
 
+| | gaia | exoplanets |
+|---|---|---|
+| Shape | entity | entity |
+| `entity()` by | Gaia DR3 source_id (`gaia:4472832130942575872`), designation (`Gaia DR3 ...`, its `simbad` form too) | a confirmed planet's name: the archive's (`exoplanet:51 Peg b`), SIMBAD's (`* 51 Peg b`), or an alias the archive resolves (`Dimidium`); a star's name refused |
+| `search()` | - | by planet or star name, paged by name |
+| Outside the contract | `cone()`: the sources of a cone on the sky (the core's places are on the Earth) | `planets()`: planets by simple criteria |
+| Units | deg, mas, mas/yr, km/s, mag, K, pc, R☉, M☉, Gyr | the archive's (Earth and Jupiter masses and radii, days, au, K) |
+| Cross-references | its designation and its Hipparcos best neighbour as SIMBAD names them | its name as SIMBAD reads it (and SIMBAD's main identifier when asked by it) |
+| Related | - | `host`: the star by each designation (name, HD, HIP, TIC, Gaia DR3, the last in the `gaia` scheme too) |
+| Collector path | SIMBAD -> Gaia (the designation), Wikidata -> Gaia (P13228) | Wikidata -> SIMBAD + the archive (P3083, P5667) |
+
 Their limits and politeness are in each package's `docs/index.md`.
 
 ## Errors
@@ -116,6 +127,10 @@ service said - the services write it each its own way, all read:
 | `{"error": "..."}`, `{"error": {"info"}}` | Ensembl, iNaturalist's v1; Wikidata | the error, its info |
 | an HTML page, a VOTable | GBIF's front (Varnish), the EBI's; SIMBAD's TAP | the page's title; the `QUERY_STATUS` error |
 | any other text | the USGS, GBIF | the text, white space collapsed, cut at 300 characters |
+
+A web page answered where JSON was asked, whatever its status, is an `UnavailableException` that
+gives the page's title: a service's maintenance page (the ESA Gaia Archive answered 200 with its
+"Gaia (OPER) Downtime Page" on the evening of 2026-10-15).
 
 ```php
 use Omnilab\Cds\CdsSourceFactory;
@@ -234,6 +249,8 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
 | gbif | none (no rate published) | `mailto` in the User-Agent, as GBIF asks |
 | chembl | none (no rate published; UniChem's POST is not spaced) | `mailto` in the User-Agent |
 | simbad | 0.2 s (SIMBAD blacklists beyond five to ten a second) | `mailto` in the User-Agent |
+| gaia | none (no rate published; an anonymous query has 10 s) | `mailto` in the User-Agent |
+| exoplanets | none (no rate published) | `mailto` in the User-Agent |
 | jpl | 0.2 s (one request at a time, as JPL asks) | `mailto` in the User-Agent, as JPL asks |
 | usgs | none (no rate published) | `mailto` in the User-Agent |
 | ensembl | 0.07 s (Ensembl's 15 a second) | `mailto` in the User-Agent; `Content-Type: application/json` |

@@ -30,5 +30,7 @@ return [
     'cds' => ['factory' => 'cds', 'needs' => [], 'options' => ['mailto' => $mailto, 'key' => $env('CDS_KEY')]],
     'cams' => ['factory' => 'cams', 'needs' => [], 'options' => ['mailto' => $mailto, 'key' => $env('ADS_KEY')]],
     'earthdata' => ['factory' => 'earthdata', 'needs' => [], 'options' => ['mailto' => $mailto, 'token' => $env('EARTHDATA_TOKEN')]],
+    'exoplanets' => ['factory' => 'exoplanets', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'gaia' => ['factory' => 'gaia', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'inaturalist' => ['factory' => 'inaturalist', 'needs' => [], 'options' => ['mailto' => $mailto, 'locale' => $env('INATURALIST_LOCALE')]],
 ];

@@ -177,6 +177,30 @@ $both->value('quality_grade');            // research [inaturalist], beside GBIF
 A page of occurrences is not followed (see [occurrences](occurrences.md#not-in-the-collector)); one
 occurrence is an entity like any.
 
+**A planet, from Wikidata into SIMBAD and the NASA Exoplanet Archive** - Wikidata's item for 51 Peg
+b (Q242309) carries its SIMBAD identifier (P3083, `* 51 Peg b`) and its name at the archive (P5667,
+`51 Peg b`, the `exoplanet` scheme):
+
+```php
+$planet = $collector->collect('wikidata', 'Q242309', 1, ['simbad', 'exoplanets']);
+$planet->sources;                         // ['wikidata', 'simbad', 'exoplanets']
+$planet->identifiers()->keys();           // wikidata:Q242309, simbad:* 51 Peg b, exoplanet:51 Peg b, simbad:51 Peg b
+$planet->properties('orbital_period');    // 4.2307969 ± 0.00000755 d [wikidata], 4.2307966 ± 0.0000027 days [exoplanets]
+$planet->properties('parallax');          // 64.4048 ± 0.0771 mas [simbad], 64.6488 ± 0.123201 mas [exoplanets]
+$planet->related('host');                 // 51 Peg by its designations, gaia:2835207319109249920 among them
+```
+
+(3.9 s on the evening of 2026-10-15)
+
+**A star, from SIMBAD into Gaia DR3** - SIMBAD gives a star's Gaia DR3 designation among its
+identifiers (`simbad:Gaia DR3 4472832130942575872` for Barnard's star), which omnilab/gaia reads; the
+Gaia entity carries it beside its own `gaia:4472832130942575872`, so the two merge:
+`collect('simbad', "Barnard's star", 1, ['gaia'])` took two calls in 8.7 s on 2026-10-15
+(SIMBAD's query, Gaia's for that source_id; the parallax 546.98 mas of each). Wikidata reaches Gaia
+directly by P13228 (`collect('wikidata', 'Q14268', 1, ['gaia'])`: the item carries
+`gaia:4472832130942575872`). That evening the ESA Gaia Archive answered its maintenance page (an
+`UnavailableException`): the `Collector` named gaia in `$incomplete` and gave SIMBAD's answer alone.
+
 A source that is down or rate limited is skipped and named in `$incomplete`; the others still
 answer. Do not cache an answer while `$incomplete` is not empty.
 

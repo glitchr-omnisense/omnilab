@@ -169,6 +169,11 @@ abstract class HttpSource implements SourceInterface
         try {
             $data = json_decode($answer[0], true, 512, \JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
+            // A web page where JSON was asked: the service's maintenance or downtime page (the ESA Gaia Archive's, answered 200), not an error of the call.
+            if (str_starts_with(ltrim($answer[0]), '<') && preg_match('~<html~i', $answer[0])) {
+                throw new UnavailableException($this->getName(), 'it answered a web page, not JSON: '.self::reason($answer[0]), null, $e);
+            }
+
             throw new ProviderException($this->getName(), 'the answer is not JSON: '.$e->getMessage(), null, $e);
         }
 

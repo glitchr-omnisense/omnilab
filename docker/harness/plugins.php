@@ -24,4 +24,6 @@ return [
     'cds' => ['Omnilab\\Cds\\Tests\\', 'Omnilab\\Cds\\CdsSourceFactory'],
     'cams' => ['Omnilab\\Cams\\Tests\\', 'Omnilab\\Cams\\CamsSourceFactory'],
     'earthdata' => ['Omnilab\\Earthdata\\Tests\\', 'Omnilab\\Earthdata\\EarthdataSourceFactory'],
+    'exoplanets' => ['Omnilab\\Exoplanets\\Tests\\', 'Omnilab\\Exoplanets\\ExoplanetsSourceFactory'],
+    'gaia' => ['Omnilab\\Gaia\\Tests\\', 'Omnilab\\Gaia\\GaiaSourceFactory'],
 ];

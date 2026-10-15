@@ -6,6 +6,7 @@ composer require omnilab/chebi omnilab/wikidata   # the sources the Collector fo
 composer require omnilab/uniprot omnilab/ncbi omnilab/gbif   # proteins, genes and taxa
 composer require omnilab/chembl                              # bioactive molecules, their targets
 composer require omnilab/simbad omnilab/jpl                  # stars and galaxies; asteroids and comets
+composer require omnilab/gaia omnilab/exoplanets             # Gaia DR3's sources; the confirmed exoplanets
 composer require omnilab/usgs                                # earthquakes
 composer require omnilab/ensembl omnilab/pdb                 # genomes; protein structures
 composer require omnilab/inaturalist                         # taxa, and observations of species

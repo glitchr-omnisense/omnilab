@@ -50,6 +50,9 @@ docker compose run --rm omnilab entity inaturalist 41964            # or "Panthe
 docker compose run --rm omnilab entity chembl CHEMBL113
 docker compose run --rm omnilab entity simbad Betelgeuse
 docker compose run --rm omnilab entity jpl 433
+docker compose run --rm omnilab entity gaia "Gaia DR3 4472832130942575872"   # Barnard's star
+docker compose run --rm omnilab entity exoplanets "51 Peg b"
+docker compose run --rm omnilab collect wikidata Q242309          # 51 Peg b, then SIMBAD and the archive (P3083, P5667)
 docker compose run --rm omnilab entity usgs us7000pn9s
 docker compose run --rm omnilab collect wikidata Q133574091         # the 2025 Myanmar earthquake, then the USGS by P3196
 docker compose run --rm omnilab series usgs 35.6812,139.7671 count magnitude --daily max --from 2026-10-01 --to 2026-10-07
