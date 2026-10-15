@@ -115,7 +115,7 @@ Identifier::tryOf('cas', '58-08-3');                                 // null: wr
 | `ncbi.taxon`, `inaturalist` | taxonomy | the number (`txid` read for NCBI) |
 | `gbif` | taxonomy | the key of the Catalogue of Life eXtended Release, GBIF's taxonomy since June 2026, upper case (`4CGXP`: one to six of the digits 2 to 9 and the consonants, Wikidata's P14607); or the number of the legacy GBIF Backbone (`5219404`, P846). A key of digits alone is read as a legacy number |
 | `simbad`, `jpl.sbdb` | astronomy | the name, spaces collapsed: `M 31`, `433`, `1P/Halley` |
-| `usgs.event` | earth | lower case: `us6000u24c` |
+| `usgs.event` | earth | lower case, a network's code then the event's: `us6000u24c`, `official20110311054624120_30` (the catalogues ComCat keeps, as Wikidata's P3196 names some) |
 | `wikidata` | any | `Q60235` |
 
 `parse()` reads `scheme:value` (the schemes' names, identifiers.org's prefixes, `CHEBI:`), the

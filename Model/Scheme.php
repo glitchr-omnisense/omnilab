@@ -49,7 +49,7 @@ enum Scheme: string
     case SIMBAD = 'simbad';
     /** A small body of JPL's database (asteroid, comet): 433, 1P/Halley, 2004 MN4. */
     case JPL_SBDB = 'jpl.sbdb';
-    /** A USGS earthquake event (ComCat): us6000u24c. */
+    /** A USGS earthquake event (ComCat): us6000u24c, official20110311054624120_30. */
     case USGS_EVENT = 'usgs.event';
     /** A Wikidata item, whatever its domain: Q60235. */
     case WIKIDATA = 'wikidata';

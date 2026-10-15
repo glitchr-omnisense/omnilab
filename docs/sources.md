@@ -39,7 +39,7 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | `series()` | - | - | - | any Open-Meteo variable at a `Point`: hourly (`PT1H`), 15 minutes (`PT15M`), daily (`P1D`, with `mean`, `max`, `min`, `sum`) | - |
 | `products()` | - | - | - | - | any collection of the catalogue, at a `Point` or over a `BBox`, a period, a cloud cover maximum |
 | Units | from PubChem's documentation (g/mol, Da, Å²) | g/mol (average mass), Da | the unit item's symbol (Da, °C, g/cm³...) | as Open-Meteo answers (°C, mm, km/h...) | as the catalogue names its properties |
-| Cross-references | InChIKey, InChI, CAS, ChEBI, ChEMBL, Wikidata, UNII, DSSTox, KEGG | secondary ChEBI ids, InChIKey, InChI, CAS, KEGG (and ChEMBL, PubChem, Wikidata, UniProt where ChEBI keeps them) | PubChem CID, ChEBI, CAS, InChIKey, InChI, ChEMBL, UNII, DSSTox, KEGG, UniProt, NCBI Gene, Ensembl, NCBI Taxonomy, GBIF, iNaturalist, SIMBAD, JPL SBDB | - | - |
+| Cross-references | InChIKey, InChI, CAS, ChEBI, ChEMBL, Wikidata, UNII, DSSTox, KEGG | secondary ChEBI ids, InChIKey, InChI, CAS, KEGG (and ChEMBL, PubChem, Wikidata, UniProt where ChEBI keeps them) | PubChem CID, ChEBI, CAS, InChIKey, InChI, ChEMBL, UNII, DSSTox, KEGG, UniProt, NCBI Gene, Ensembl, NCBI Taxonomy, GBIF, iNaturalist, SIMBAD, JPL SBDB, USGS event | - | - |
 | Paging (cursor) | offset over the CIDs found | ChEBI's page number | the search's offset | - | the next link's token |
 | Per page, at most | 100 | 100 | 50 | - | 100 |
 
@@ -62,7 +62,7 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | `series()` | - | - | - | per step: count, magnitude, depth, at a `BBox` or around a `Point` |
 | Cross-references | InChIKey, InChI; ChEBI, PubChem, UNII, DSSTox (UniChem) | its own id alone | its SPK-ID (a second `jpl.sbdb`) | the other networks' ids for the event |
 | Related | the targets of its mechanisms, their proteins (UniProt) | - | - | - |
-| Collector path | PubChem -> ChEMBL by the InChIKey | Wikidata -> SIMBAD (P3083) | Wikidata -> JPL (P716) | none yet: Wikidata's P3196 is not read |
+| Collector path | PubChem -> ChEMBL by the InChIKey | Wikidata -> SIMBAD (P3083) | Wikidata -> JPL (P716) | Wikidata -> USGS (P3196), and back |
 
 Their limits and politeness are in each package's `docs/index.md`.
 

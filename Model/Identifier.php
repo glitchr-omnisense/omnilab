@@ -83,7 +83,8 @@ final readonly class Identifier implements \Stringable
             Scheme::ENSEMBL => preg_match(self::ENSEMBL, $upper, $m) ? $m[1] : null,
             Scheme::PDB => preg_match('~^\d[A-Z0-9]{3}$~', $upper) ? $upper : (preg_match('~^PDB_\d{4}[A-Z0-9]{4}$~', $upper) ? strtolower($upper) : null),
             Scheme::SIMBAD, Scheme::JPL_SBDB => self::name($value),
-            Scheme::USGS_EVENT => preg_match('~^[a-z]{2}[a-z0-9]{6,14}$~', $v = strtolower($value)) ? $v : null,
+            // A network's code then the event's own (ComCat keeps the catalogues' long ones: official20110311054624120_30, iscgemsup16957911).
+            Scheme::USGS_EVENT => preg_match('~^[a-z]{2,10}[a-z0-9_]{6,24}$~', $v = strtolower($value)) ? $v : null,
             Scheme::WIKIDATA => preg_match('~^(?:WD:)?(Q[1-9]\d*)$~', $upper, $m) ? $m[1] : null,
         };
 
@@ -234,7 +235,7 @@ final readonly class Identifier implements \Stringable
             str_ends_with($host, 'rcsb.org') => self::tryOf(Scheme::PDB, $last),
             str_ends_with($host, 'gbif.org') => $found('~/(?:species|taxon)/([0-9A-Za-z]+)~', Scheme::GBIF),
             str_ends_with($host, 'inaturalist.org') => $found('~/taxa/(\d+)~', Scheme::INATURALIST),
-            'earthquake.usgs.gov' === $host => $found('~/eventpage/([a-z0-9]+)~i', Scheme::USGS_EVENT),
+            'earthquake.usgs.gov' === $host => $found('~/eventpage/([a-z0-9_]+)~i', Scheme::USGS_EVENT),
             str_ends_with($host, 'ncbi.nlm.nih.gov') && str_starts_with($path, 'gene/') => self::tryOf(Scheme::NCBI_GENE, $last),
             str_ends_with($host, 'ncbi.nlm.nih.gov') && str_contains(strtolower($path), 'taxonomy') => self::tryOf(Scheme::NCBI_TAXON, (string) ($query['id'] ?? $last)),
             str_ends_with($host, 'ensembl.org') => $found('~(ENS[A-Z]*[EFGPRT]\d{11})~i', Scheme::ENSEMBL),

@@ -41,6 +41,7 @@ docker compose run --rm omnilab entity chembl CHEMBL113
 docker compose run --rm omnilab entity simbad Betelgeuse
 docker compose run --rm omnilab entity jpl 433
 docker compose run --rm omnilab entity usgs us7000pn9s
+docker compose run --rm omnilab collect wikidata Q133574091         # the 2025 Myanmar earthquake, then the USGS by P3196
 docker compose run --rm omnilab series usgs 35.6812,139.7671 count magnitude --daily max --from 2026-10-01 --to 2026-10-07
 docker compose run --rm omnilab series open-meteo 48.5734,7.7521 temperature_2m --from tomorrow --to tomorrow
 docker compose run --rm omnilab series open-meteo 48.5734,7.7521 temperature_2m precipitation_sum --daily max --from 2026-09-01 --to 2026-09-07

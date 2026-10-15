@@ -36,6 +36,8 @@ final class IdentifierTest extends TestCase
         yield 'a PDB structure' => ['pdb:1a3n', 'pdb:1A3N'];
         yield 'a SIMBAD object, spaces collapsed' => ['simbad:M  31', 'simbad:M 31'];
         yield 'a USGS event' => ['usgs:US6000U24C', 'usgs.event:us6000u24c'];
+        yield 'one of the catalogues ComCat keeps, its code long' => ['usgs:official20110311054624120_30', 'usgs.event:official20110311054624120_30'];
+        yield 'not a USGS event: no network' => ['usgs:20110311', null];
         yield 'a bare number needs its scheme' => ['2519', null];
         yield 'a name is no identifier' => ['caffeine', null];
         yield 'nor a SMILES' => ['CN1C=NC2=C1C(=O)N(C(=O)N2C)C', null];
@@ -54,6 +56,7 @@ final class IdentifierTest extends TestCase
         yield 'nor: seven characters' => ['gbif:4CGXPBB', null];
         yield 'an iNaturalist taxon' => ['https://www.inaturalist.org/taxa/42007-Puma-concolor', 'inaturalist:42007'];
         yield 'a USGS event page' => ['https://earthquake.usgs.gov/earthquakes/eventpage/us6000u24c/executive', 'usgs.event:us6000u24c'];
+        yield 'the page of a long one' => ['https://earthquake.usgs.gov/earthquakes/eventpage/iscgemsup16957911', 'usgs.event:iscgemsup16957911'];
         yield 'CAS Common Chemistry' => ['https://commonchemistry.cas.org/detail?cas_rn=58-08-2', 'cas:58-08-2'];
         yield 'identifiers.org' => ['https://identifiers.org/uniprot:P69905', 'uniprot:P69905'];
         yield 'NCBI Taxonomy' => ['https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=9606', 'ncbi.taxon:9606'];

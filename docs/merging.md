@@ -82,6 +82,34 @@ then its links, which give the legacy GBIF number back); Wikidata is offered GBI
 (`haswbstatement:P14607=4CGXP`: no item carries it yet), then the legacy number (`P846=5219404`:
 Q140), then the item and the label of its class. The iNaturalist id comes from Wikidata's item.
 
+**An earthquake, from Wikidata into the USGS catalogue** - the 2025 Myanmar earthquake, Wikidata's
+Q133574091, whose P3196 is the USGS id `us7000pn9s` (answered on 2026-10-15). Wikidata gives the
+day (P585) and its own epicentre; the USGS the second and its epicentre: preferring the USGS for
+`time` and `place` takes those.
+
+```php
+$collector = new Collector($registry, new Merger(['time' => ['usgs'], 'place' => ['usgs']]));
+$quake = $collector->collect('wikidata', 'Q133574091', 1, ['usgs']);
+$quake->sources;                          // ['wikidata', 'usgs']
+$quake->identifiers()->keys();            // wikidata:Q133574091, usgs.event:us7000pn9s, usgs.event:usauto7000pn9s, usgs.event:pt25087002, usgs.event:at00sttln4
+$quake->time;                             // 2025-03-28 06:20:52 UTC [usgs] (Wikidata: 2025-03-28)
+$quake->place;                            // 22.011, 95.9363 [usgs] (Wikidata: 22.013, 95.922)
+$quake->property('moment_magnitude');     // 7.7 [wikidata]
+$quake->property('magnitude');            // 7.7 ± 0.028 [usgs], magnitude_type mww
+$quake->property('depth');                // 10 ± 1.719 km [usgs]
+$quake->value('alert');                   // red (PAGER) [usgs]
+$quake->value('felt');                    // 2545 "Did You Feel It?" reports [usgs]; mmi 9.953, cdi 9.1
+```
+
+Three calls, about two seconds: Wikidata's item and the label of its class (earthquake), then the
+USGS's event (`query?format=geojson&eventid=us7000pn9s`), whose other networks' ids join the
+identifiers. Starting from the USGS (`collect('usgs', 'us7000pn9s', 1, ['wikidata'])`) costs four:
+the event, then Wikidata's `haswbstatement:P3196=us7000pn9s`, the item and its class. The great
+historical earthquakes carry in P3196 the id of a catalogue the USGS keeps rather than its own:
+the 2011 Tohoku earthquake (Q36204) has `official20110311054624120_30`, which the USGS answers
+with its M 9.1 (mww), depth 29 km and 05:46:24 UTC, joined in three calls as well - Wikidata adding
+its Richter (9) and moment (9.1) magnitudes.
+
 A source that is down or rate limited is skipped and named in `$incomplete`; the others still
 answer. Do not cache an answer while `$incomplete` is not empty.
 
