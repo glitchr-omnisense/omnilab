@@ -77,7 +77,8 @@ final readonly class Identifier implements \Stringable
             Scheme::DSSTOX => preg_match('~^DTXSID\d+$~', $upper) ? $upper : null,
             Scheme::KEGG => preg_match('~^(?:CPD:|DR:)?([CD]\d{5})$~', $upper, $m) ? $m[1] : null,
             Scheme::UNIPROT => preg_match(self::UNIPROT, $upper) ? $upper : null,
-            Scheme::NCBI_GENE, Scheme::GBIF, Scheme::INATURALIST => preg_match('~^0*([1-9]\d*)$~', $value, $m) ? $m[1] : null,
+            Scheme::NCBI_GENE, Scheme::INATURALIST => preg_match('~^0*([1-9]\d*)$~', $value, $m) ? $m[1] : null,
+            Scheme::GBIF => self::normalizeGbif($upper),
             Scheme::NCBI_TAXON => preg_match('~^(?:TXID)?0*([1-9]\d*)$~', $upper, $m) ? $m[1] : null,
             Scheme::ENSEMBL => preg_match(self::ENSEMBL, $upper, $m) ? $m[1] : null,
             Scheme::PDB => preg_match('~^\d[A-Z0-9]{3}$~', $upper) ? $upper : (preg_match('~^PDB_\d{4}[A-Z0-9]{4}$~', $upper) ? strtolower($upper) : null),
@@ -200,7 +201,7 @@ final readonly class Identifier implements \Stringable
             Scheme::NCBI_TAXON => 'https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id='.$v,
             Scheme::ENSEMBL => 'https://www.ensembl.org/id/'.$v,
             Scheme::PDB => 'https://www.rcsb.org/structure/'.$v,
-            Scheme::GBIF => 'https://www.gbif.org/species/'.$v,
+            Scheme::GBIF => ctype_digit($this->value) ? 'https://www.gbif.org/species/'.$v : 'https://www.gbif.org/taxon/'.$v,
             Scheme::INATURALIST => 'https://www.inaturalist.org/taxa/'.$v,
             Scheme::SIMBAD => 'https://simbad.cds.unistra.fr/simbad/sim-id?Ident='.$v,
             Scheme::JPL_SBDB => 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr='.$v,
@@ -231,7 +232,7 @@ final readonly class Identifier implements \Stringable
             str_ends_with($host, 'wikidata.org') => $found('~/(?:wiki|entity)/(Q\d+)~i', Scheme::WIKIDATA),
             str_ends_with($host, 'uniprot.org') => self::firstOf(Scheme::UNIPROT, $path),
             str_ends_with($host, 'rcsb.org') => self::tryOf(Scheme::PDB, $last),
-            str_ends_with($host, 'gbif.org') => $found('~/species/(\d+)~', Scheme::GBIF),
+            str_ends_with($host, 'gbif.org') => $found('~/(?:species|taxon)/([0-9A-Za-z]+)~', Scheme::GBIF),
             str_ends_with($host, 'inaturalist.org') => $found('~/taxa/(\d+)~', Scheme::INATURALIST),
             'earthquake.usgs.gov' === $host => $found('~/eventpage/([a-z0-9]+)~i', Scheme::USGS_EVENT),
             str_ends_with($host, 'ncbi.nlm.nih.gov') && str_starts_with($path, 'gene/') => self::tryOf(Scheme::NCBI_GENE, $last),
@@ -257,6 +258,25 @@ final readonly class Identifier implements \Stringable
         }
 
         return null;
+    }
+
+    /**
+     * A GBIF taxon key in either of its forms: the number of the legacy GBIF
+     * Backbone Taxonomy (5219404, frozen since 2023, Wikidata's P846), or the
+     * key of the Catalogue of Life eXtended Release GBIF's taxonomy has been
+     * since June 2026 (4CGXP: one to six of the digits 2 to 9 and the
+     * consonants, Wikidata's P14607). A key of digits alone is read as a
+     * legacy number.
+     */
+    private static function normalizeGbif(string $value): ?string
+    {
+        $value = (string) preg_replace('~^GBIF:~', '', $value);
+
+        return match (true) {
+            (bool) preg_match('~^0*([1-9]\d{0,9})$~', $value, $m) => $m[1],
+            (bool) preg_match('~^[2-9BCDFGHJKLMNPQRSTVWXYZ]{1,6}$~', $value) => $value,
+            default => null,
+        };
     }
 
     private static function normalizeCas(string $value): ?string

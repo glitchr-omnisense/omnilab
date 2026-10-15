@@ -10,4 +10,7 @@ return [
     'copernicus' => ['Omnilab\\Copernicus\\Tests\\', 'Omnilab\\Copernicus\\CopernicusSourceFactory'],
     'chebi' => ['Omnilab\\Chebi\\Tests\\', 'Omnilab\\Chebi\\ChebiSourceFactory'],
     'wikidata' => ['Omnilab\\Wikidata\\Tests\\', 'Omnilab\\Wikidata\\WikidataSourceFactory'],
+    'chembl' => ['Omnilab\\Chembl\\Tests\\', 'Omnilab\\Chembl\\ChemblSourceFactory'],
+    'uniprot' => ['Omnilab\\UniProt\\Tests\\', 'Omnilab\\UniProt\\UniProtSourceFactory'],
+    'ncbi' => ['Omnilab\\Ncbi\\Tests\\', 'Omnilab\\Ncbi\\NcbiSourceFactory'],
 ];

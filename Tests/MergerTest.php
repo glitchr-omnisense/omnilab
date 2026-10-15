@@ -9,6 +9,7 @@ use Omnilab\Model\Identifier;
 use Omnilab\Model\Identifiers;
 use Omnilab\Model\Property;
 use Omnilab\Model\Quantity;
+use Omnilab\Model\Scheme;
 use PHPUnit\Framework\TestCase;
 
 final class MergerTest extends TestCase
@@ -65,6 +66,37 @@ final class MergerTest extends TestCase
         self::assertTrue($merger->same($base, $chebi));
         self::assertCount(2, $merger->merge([$base, $salt, $chebi]), 'ChEBI joins the base, the salt stays apart');
         self::assertSame(['pubchem', 'chebi'], $merger->merge([$base, $salt, $chebi])[0]->sources);
+    }
+
+    public function testAnotherIdentifierOfItsOwnSchemeIsStillItself(): void
+    {
+        // GBIF gives its new key and its legacy one; Wikidata may carry only the legacy one.
+        $gbif = new Entity(Identifier::of('gbif', '4CGXP'), 'Panthera leo', identifiers: Identifiers::of(Identifier::of('gbif', '5219404'), Identifier::of('ncbi.taxon', '9689')), source: 'gbif');
+        $wikidata = new Entity(Identifier::wikidata('Q140'), 'lion', identifiers: Identifiers::of(Identifier::of('gbif', '5219404')), source: 'wikidata');
+        $tiger = new Entity(Identifier::of('gbif', '5219416'), 'Panthera tigris', identifiers: Identifiers::of(Identifier::of('ncbi.taxon', '9689')), source: 'gbif');
+
+        $merger = new Merger();
+        self::assertTrue($merger->same($gbif, $wikidata));
+        self::assertFalse($merger->same($gbif, $tiger), 'a GBIF key the lion does not have is another taxon, whatever else they share');
+    }
+
+    public function testRelatedThingsAreKeptAndJoinNothing(): void
+    {
+        $taxon = Identifier::of('ncbi.taxon', '9606');
+        $hbb = new Entity(Identifier::of('uniprot', 'P68871'), 'Hemoglobin subunit beta', related: ['organism' => Identifiers::of($taxon), 'ligand' => Identifiers::of(Identifier::chebi(60344))], source: 'uniprot');
+        $ins = new Entity(Identifier::of('uniprot', 'P01308'), 'Insulin', related: ['organism' => Identifiers::of($taxon)], source: 'uniprot');
+        $human = new Entity(Identifier::wikidata('Q15978631'), 'Homo sapiens', identifiers: Identifiers::of($taxon), source: 'wikidata');
+        $gene = new Entity(Identifier::of('ncbi.gene', '3043'), 'HBB', identifiers: Identifiers::of(Identifier::of('uniprot', 'P68871')), related: ['organism' => Identifiers::of($taxon), 'ligand' => Identifiers::of(Identifier::chebi(58248))], source: 'ncbi');
+
+        $merger = new Merger();
+        self::assertCount(3, $merger->merge([$hbb, $ins, $human]), 'sharing an organism makes nothing one');
+        self::assertSame('9606', $hbb->related('organism')->value(Scheme::NCBI_TAXON));
+        self::assertCount(0, $hbb->related('structure'));
+
+        $one = $merger->combine($hbb, $gene);
+        self::assertSame(['ncbi.taxon:9606'], $one->related('organism')->keys());
+        self::assertSame(['chebi:60344', 'chebi:58248'], $one->related('ligand')->keys(), 'united by relation');
+        self::assertFalse($one->identifiers()->has($taxon));
     }
 
     public function testCombiningOneGivesItsSource(): void

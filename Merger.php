@@ -15,9 +15,10 @@ use Omnilab\Source\Page;
  * it, the preferred source's first when two give the same key.
  *
  * Two entities are the same thing when they share an identifier, unless one
- * carries, in the scheme of the other's own id, a different value: two
- * PubChem compounds with two CIDs stay two, whatever CAS number they share
- * (a salt and its base often do).
+ * carries, in the scheme of the other's own id, only values the other does
+ * not know itself by: two PubChem compounds with two CIDs stay two,
+ * whatever CAS number they share (a salt and its base often do). What they
+ * are related to ($related: an organism, a ligand) does not join them.
  *
  * Preferences name, for a field or a property key, the sources in the order
  * they are trusted; "default" orders the others. A source not listed comes
@@ -126,10 +127,14 @@ final class Merger
         }
 
         $identifiers = new Identifiers();
+        $related = [];
         $synonyms = [];
         $sources = [];
         foreach ($default as $entity) {
             $identifiers = $identifiers->merge($entity->identifiers());
+            foreach ($entity->related as $relation => $others) {
+                $related[$relation] = ($related[$relation] ?? new Identifiers())->merge($others);
+            }
             array_push($synonyms, $entity->label, ...$entity->synonyms);
             array_push($sources, ...($entity->sources ?: array_filter([$entity->source])));
         }
@@ -150,6 +155,7 @@ final class Merger
             place: $values['place'] ?? null,
             source: $default[0]->source,
             sources: array_values(array_unique($sources)),
+            related: $related,
         );
     }
 
@@ -189,7 +195,9 @@ final class Merger
 
     /**
      * Whether two groups describe two things: one carries, in the scheme of
-     * an id of the other, values none of which is that id.
+     * an id of the other, values none of which that other knows itself by
+     * (its id, or another of its identifiers of that scheme: a secondary
+     * accession, GBIF's legacy key beside its new one).
      *
      * @param list<Entity> $a
      * @param list<Entity> $b
@@ -200,7 +208,7 @@ final class Merger
             foreach ($owners as $owner) {
                 foreach ($others as $other) {
                     $values = $other->identifiers()->values($owner->id->scheme);
-                    if ($values && !\in_array($owner->id->value, $values, true)) {
+                    if ($values && !array_intersect($owner->identifiers()->values($owner->id->scheme), $values)) {
                         return true;
                     }
                 }

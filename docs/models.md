@@ -14,10 +14,15 @@ give modified copies.
 | `synonyms` | the other names it goes by |
 | `description` | |
 | `properties` | `Property` list: `key`, `label`, `value` (a `Quantity`, a text, a number, a boolean), `source` |
-| `identifiers` | `Identifiers`: its own, then the cross-references to other bases; `identifiers()` adds `id` |
+| `identifiers` | `Identifiers`: its own, then the cross-references to other bases - other names of the same thing; `identifiers()` adds `id` |
+| `related` | `array<string, Identifiers>`: other things it is tied to, by relation - a protein's `organism` (`ncbi.taxon:9606`), its `structure`s (`pdb:1A3N`), its `ligand`s and `cofactor`s (`chebi:60344`), a taxon's `parent`; `related($relation)` gives one relation's |
 | `url`, `image` | its page; its picture (a structure, where the source has `Capability::STRUCTURE`) |
 | `time`, `place` | for what happens somewhere at a moment (an earthquake) or sits somewhere (a station): a `Point` or a `BBox` |
 | `source`, `sources` | the source of the record; after a merge, every source merged |
+
+Identifiers name the thing itself: the `Collector` follows them into the other sources, and the
+`Merger` takes two entities that share one for the same thing. Related things are not followed and
+join nothing: a protein and the human species share the taxon 9606 without being one.
 
 `property($key)` gives the preferred source's property of a key, `properties($key)` every source's,
 `value($key)` its value, `identifier(Scheme::CAS)` the first value of a scheme, `keys()` the keys
@@ -30,7 +35,12 @@ Property keys are lower case, snake case, and mean the same from one source to t
 `has_role`, `has_functional_parent`, `is_conjugate_acid_of`... (ChEBI: one key per relation of its
 ontology); `connectivity_smiles`, `mass`, `melting_point`, `boiling_point`, `flash_point`,
 `density`, `pka`, `taxon_name`, `radius`, `orbital_period`, `redshift`, `distance_from_earth`,
-`elevation`, `richter_magnitude` (Wikidata). A new source reuses a key that exists before it makes
+`elevation`, `richter_magnitude` (Wikidata); `gene`, `organism`, `organism_common_name`,
+`sequence_length`, `sequence`, `reviewed`, `protein_existence`, `annotation_score`, `ec_number`,
+`subcellular_location`, `cofactor`, `ligand`, `keyword` (UniProt; `mass` as Wikidata's); `gene_name`,
+`gene_type`, `chromosome`, `map_location`, `genomic_location`, `taxon_rank`, `taxon_authority`,
+`common_name`, `group`, `basionym`, `lineage` and one key per rank of the lineage (`kingdom`,
+`phylum`, `class`, `order`, `family`, `genus`) (NCBI; `taxon_name` as Wikidata's). A new source reuses a key that exists before it makes
 one; a key may hold several values of one source (`properties('has_role')`).
 
 ## Quantity
@@ -88,7 +98,8 @@ Identifier::parse('RYYVLZVUVIJVGH-UHFFFAOYSA-N');                    // inchikey
 Identifier::parse('https://www.uniprot.org/uniprotkb/P69905/entry'); // uniprot:P69905
 Identifier::parse('https://identifiers.org/ncbigene:7157');          // ncbi.gene:7157
 Identifier::parse('ncbigene:7157');                                  // identifiers.org's prefixes are read
-Identifier::of(Scheme::GBIF, '2435099')->url();                      // https://www.gbif.org/species/2435099
+Identifier::of(Scheme::GBIF, '4CGXP')->url();                        // https://www.gbif.org/taxon/4CGXP
+Identifier::of(Scheme::GBIF, '5219404')->url();                      // https://www.gbif.org/species/5219404 (a legacy key)
 Identifier::tryOf('cas', '58-08-3');                                 // null: wrong check digit
 ```
 
@@ -101,7 +112,8 @@ Identifier::tryOf('cas', '58-08-3');                                 // null: wr
 | `cas` | chemistry | `58-08-2`, check digit checked |
 | `unii`, `dsstox`, `kegg` | chemistry | `3G6A5W338E` (`UNII-` read), `DTXSID...`, `C00001` / `D00528` |
 | `uniprot`, `ncbi.gene`, `ensembl`, `pdb` | biology | upper case; Ensembl without its version |
-| `ncbi.taxon`, `gbif`, `inaturalist` | taxonomy | the number |
+| `ncbi.taxon`, `inaturalist` | taxonomy | the number (`txid` read for NCBI) |
+| `gbif` | taxonomy | the key of the Catalogue of Life eXtended Release, GBIF's taxonomy since June 2026, upper case (`4CGXP`: one to six of the digits 2 to 9 and the consonants, Wikidata's P14607); or the number of the legacy GBIF Backbone (`5219404`, P846). A key of digits alone is read as a legacy number |
 | `simbad`, `jpl.sbdb` | astronomy | the name, spaces collapsed: `M 31`, `433`, `1P/Halley` |
 | `usgs.event` | earth | lower case: `us6000u24c` |
 | `wikidata` | any | `Q60235` |
@@ -110,5 +122,6 @@ Identifier::tryOf('cas', '58-08-3');                                 // null: wr
 pages of each base and identifiers.org's links, and the values whose shape tells their scheme
 (an InChIKey, a CAS number, `CHEMBL...`, `DTXSID...`, `UNII-...`, an Ensembl id, a Wikidata
 Q-number). A bare number, a UniProt accession or a PDB code needs its scheme: other values share
-their shapes. `Identifiers` keeps each identifier once: `get()`, `value()`, `values()`, `has()`,
+their shapes. An entity may carry two identifiers of one scheme (GBIF's new key and its legacy
+number, a secondary accession): the `Merger` knows it by either. `Identifiers` keeps each identifier once: `get()`, `value()`, `values()`, `has()`,
 `with()`, `merge()`, `toArray()` / `fromArray()` for storage.

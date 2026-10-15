@@ -37,7 +37,11 @@ enum Scheme: string
     case ENSEMBL = 'ensembl';
     /** A Protein Data Bank structure: 1A3N. */
     case PDB = 'pdb';
-    /** A GBIF taxon (backbone key): 2435099 (Puma concolor). */
+    /**
+     * A GBIF taxon: the key of the Catalogue of Life eXtended Release, GBIF's
+     * taxonomy since June 2026 (4CGXP, Panthera leo), or the number of the
+     * legacy GBIF Backbone (5219404, the same lion).
+     */
     case GBIF = 'gbif';
     /** An iNaturalist taxon: 42007 (Puma concolor). */
     case INATURALIST = 'inaturalist';

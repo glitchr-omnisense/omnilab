@@ -47,6 +47,11 @@ final class IdentifierTest extends TestCase
         yield 'Wikidata\'s entity URI' => ['http://www.wikidata.org/entity/Q60235', 'wikidata:Q60235'];
         yield 'UniProt\'s page' => ['https://www.uniprot.org/uniprotkb/P69905/entry', 'uniprot:P69905'];
         yield 'a GBIF species' => ['https://www.gbif.org/species/2435099', 'gbif:2435099'];
+        yield 'a GBIF taxon of the Catalogue of Life eXtended Release' => ['https://www.gbif.org/taxon/4CGXP', 'gbif:4CGXP'];
+        yield 'its key, lower case' => ['gbif:4cgxp', 'gbif:4CGXP'];
+        yield 'a legacy GBIF key' => ['gbif:5219404', 'gbif:5219404'];
+        yield 'not a GBIF key: a vowel' => ['gbif:4CGXA', null];
+        yield 'nor: seven characters' => ['gbif:4CGXPBB', null];
         yield 'an iNaturalist taxon' => ['https://www.inaturalist.org/taxa/42007-Puma-concolor', 'inaturalist:42007'];
         yield 'a USGS event page' => ['https://earthquake.usgs.gov/earthquakes/eventpage/us6000u24c/executive', 'usgs.event:us6000u24c'];
         yield 'CAS Common Chemistry' => ['https://commonchemistry.cas.org/detail?cas_rn=58-08-2', 'cas:58-08-2'];
@@ -91,6 +96,21 @@ final class IdentifierTest extends TestCase
                 Scheme::USGS_EVENT => 'us6000u24c', Scheme::WIKIDATA => 'Q283', default => '962',
             })?->url();
             self::assertTrue(null === $url || str_starts_with($url, 'https://'), $scheme->value);
+        }
+    }
+
+    public function testAGbifKeyInEitherForm(): void
+    {
+        $new = Identifier::of(Scheme::GBIF, '4cgxp');
+        $legacy = Identifier::of(Scheme::GBIF, '05219404');
+
+        self::assertSame(['4CGXP', '5219404'], [$new->value, $legacy->value]);
+        self::assertSame('https://www.gbif.org/taxon/4CGXP', $new->url());
+        self::assertSame('https://www.gbif.org/species/5219404', $legacy->url(), 'GBIF sends a legacy key\'s page to the new one');
+        self::assertSame('N', Identifier::of(Scheme::GBIF, 'N')->value, 'Animalia: one character');
+        self::assertSame('gbif:59R5F', Identifier::tryOf('gbif', 'GBIF:59R5F')?->key());
+        foreach (['0', '1A2B', '4CGX0', 'ABCDE', '', '12345678901'] as $value) {
+            self::assertNull(Identifier::tryOf(Scheme::GBIF, $value), $value);
         }
     }
 

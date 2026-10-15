@@ -46,6 +46,9 @@ source package `symfony/http-client`. Each source is a package of its own:
 | [`omnilab/copernicus`](https://github.com/glitchr-studio/omnilab-copernicus) | Copernicus Data Space: the STAC catalogue of Sentinel, Landsat, MODIS, the DEM and the Copernicus services | product | none to search (a CDSE token to download) |
 | [`omnilab/chebi`](https://github.com/glitchr-studio/omnilab-chebi) | ChEBI (EMBL-EBI): chemical entities by ChEBI id, InChIKey, CAS, KEGG or name; masses, structure, ontology (classes, roles), cross-references | entity | none |
 | [`omnilab/wikidata`](https://github.com/glitchr-studio/omnilab-wikidata) | Wikidata: any item by Q-number, by a science base's identifier (PubChem, ChEBI, CAS, UniProt, NCBI...) or by label; labels in a language, cross-references, a few properties with units | entity | none (a User-Agent that names the caller; 200 calls a minute) |
+| [`omnilab/chembl`](https://github.com/glitchr-studio/omnilab-chembl) | ChEMBL (EMBL-EBI): bioactive molecules by ChEMBL id, InChIKey or name; development phase, computed properties, mechanisms of action and their targets, cross-references from UniChem | entity | none |
+| [`omnilab/uniprot`](https://github.com/glitchr-studio/omnilab-uniprot) | UniProtKB: proteins by accession or entry name; function, gene, organism, sequence, mass, cofactors, ligands; their genes in NCBI and Ensembl | entity | none |
+| [`omnilab/ncbi`](https://github.com/glitchr-studio/omnilab-ncbi) | NCBI Gene and Taxonomy (Datasets v2, E-utilities): genes by GeneID, taxa by id or name; location, summary, lineage; UniProt, Ensembl and GBIF ids | entity | none (3 calls a second; 10 with an API key) |
 
 A source answers what it can - `capabilities()` says what - and throws `NotSupportedException`
 for the rest, before any call. Unknown is `null`, an empty page or a series without points; a

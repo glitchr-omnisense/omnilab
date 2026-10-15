@@ -65,17 +65,32 @@ abstract class HttpSource implements SourceInterface
      */
     protected function getJson(string $path, array $query = [], array $headers = []): ?array
     {
-        $body = $this->get($path, $query, ['Accept' => 'application/json'] + $headers);
-        if (null === $body) {
+        return $this->getJsonWithHeaders($path, $query, $headers)[0] ?? null;
+    }
+
+    /**
+     * GETs JSON with the answer's headers, for a service that pages or
+     * counts in them (a Link to the next page, a total): [the data, the
+     * headers by lower-case name]. Null when the service answers 404 / 410.
+     *
+     * @param array<string, mixed>  $query
+     * @param array<string, string> $headers
+     *
+     * @return array{0: array<mixed>, 1: array<string, list<string>>}|null
+     */
+    protected function getJsonWithHeaders(string $path, array $query = [], array $headers = []): ?array
+    {
+        $answer = $this->fetch($path, $query, ['Accept' => 'application/json'] + $headers);
+        if (null === $answer) {
             return null;
         }
         try {
-            $data = json_decode($body, true, 512, \JSON_THROW_ON_ERROR);
+            $data = json_decode($answer[0], true, 512, \JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
             throw new ProviderException($this->getName(), 'the answer is not JSON: '.$e->getMessage(), null, $e);
         }
 
-        return \is_array($data) ? $data : throw new ProviderException($this->getName(), 'the answer is not a JSON object');
+        return \is_array($data) ? [$data, $answer[1]] : throw new ProviderException($this->getName(), 'the answer is not a JSON object');
     }
 
     /**
@@ -85,6 +100,19 @@ abstract class HttpSource implements SourceInterface
      * @param array<string, string> $headers
      */
     protected function get(string $path, array $query = [], array $headers = []): ?string
+    {
+        return $this->fetch($path, $query, $headers)[0] ?? null;
+    }
+
+    /**
+     * The body and the headers of a GET; null on 404 / 410.
+     *
+     * @param array<string, mixed>  $query
+     * @param array<string, string> $headers
+     *
+     * @return array{0: string, 1: array<string, list<string>>}|null
+     */
+    private function fetch(string $path, array $query, array $headers): ?array
     {
         $this->wait();
         $url = str_starts_with($path, 'http') ? $path : rtrim($this->baseUri, '/').'/'.ltrim($path, '/');
@@ -117,7 +145,8 @@ abstract class HttpSource implements SourceInterface
                 throw new ProviderException($this->getName(), \sprintf('the service answered %d: %s', $status, self::reason($response->getContent(false))), $status);
             }
 
-            return $response->getContent();
+            // A redirection the client did not follow (MockHttpClient, max_redirects 0) gives its own body.
+            return [$response->getContent(false), $response->getHeaders(false)];
         } catch (TransportExceptionInterface $e) {
             throw new UnavailableException($this->getName(), 'unreachable: '.$e->getMessage(), null, $e);
         } catch (ExceptionInterface $e) {

@@ -43,6 +43,17 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | Paging (cursor) | offset over the CIDs found | ChEBI's page number | the search's offset | - | the next link's token |
 | Per page, at most | 100 | 100 | 50 | - | 100 |
 
+| | uniprot | ncbi |
+|---|---|---|
+| Shape | entity | entity |
+| `entity()` by | accession (a merged one gives its entry), entry name (`HBB_HUMAN`) | GeneID; NCBI taxon id (`txid9689`); a taxon's scientific or common name |
+| `search()` | UniProt's query syntax, page by the `Link` header's cursor | Entrez's syntax (`esearch`): NCBI Gene, or NCBI Taxonomy for `Domain::TAXONOMY` |
+| Units | aa, Da | - |
+| Cross-references | NCBI Gene, Ensembl gene | a gene: UniProt (Swiss-Prot), Ensembl; a taxon: GBIF (from its links) |
+| Related | `organism` (NCBI taxon), `structure` (PDB, 20 by default), `ligand`, `cofactor` (ChEBI) | a gene's `organism`, a taxon's `parent` |
+| Paging (cursor) | UniProt's cursor | the search's offset |
+| Per page, at most | 500 | 100 |
+
 ## What the services do not allow
 
 - **PubChem**: five calls a second and 400 a minute at most (the throttle leaves 0.2 s between
@@ -68,6 +79,16 @@ of the sources over HTTP, throws it for every operation a source does not overri
   page without fields selection; a radar collection has no cloud cover, so a cloud filter matches
   nothing there.
 
+- **UniProt**: no rate published (only the `stream` endpoint, not used, answers 429); an entry
+  whole is large (hemoglobin beta: 342 kB), so each call names its fields; asked for `gzip` alone,
+  UniProt compresses the body twice - the source asks for `identity`; an accession merged into
+  another is answered 303 (a client that follows it gets the entry whole, its fields dropped); no
+  Wikidata item among its cross-references, no secondary accessions among the fields.
+- **NCBI**: three calls a second for E-utilities, five for Datasets, ten for both with an API key;
+  `tool` and `email` asked of every E-utilities client; Datasets has no text search (E-utilities'
+  `esearch` does it, Datasets then reads the page in one call); a taxon's links name GBIF, EOL and
+  Wikipedia, not Wikidata nor iNaturalist; GBIF's page there is a legacy key.
+
 ## Throttling and politeness
 
 | Source | Default `throttle` | Contact |
@@ -77,6 +98,8 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | wikidata | 0.3 s (Wikimedia's 200 a minute) | a User-Agent with `mailto` or the project's URL: required |
 | open-meteo | none | User-Agent; `api_key` for a commercial plan |
 | copernicus | none | User-Agent |
+| uniprot | none (no rate published) | `mailto` in the User-Agent |
+| ncbi | 0.34 s without a key, 0.1 s with one (`auto`) | `tool` and `email` (from `mailto`) on E-utilities; `api_key` |
 
 Every factory takes `mailto`, `user_agent`, `throttle` (seconds between two calls of one source
 instance) and `base_uri`.

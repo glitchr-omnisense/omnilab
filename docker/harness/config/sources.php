@@ -15,4 +15,7 @@ return [
     'copernicus' => ['factory' => 'copernicus', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'chebi' => ['factory' => 'chebi', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'wikidata' => ['factory' => 'wikidata', 'needs' => [], 'options' => ['mailto' => $mailto, 'language' => $env('WIKIDATA_LANGUAGE')]],
+    'chembl' => ['factory' => 'chembl', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'uniprot' => ['factory' => 'uniprot', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'ncbi' => ['factory' => 'ncbi', 'needs' => [], 'options' => ['mailto' => $mailto, 'api_key' => $env('NCBI_API_KEY')]],
 ];

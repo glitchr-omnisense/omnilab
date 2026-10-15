@@ -13,6 +13,12 @@ namespace Omnilab\Model;
  * property says which source it came from: after a merge, two sources'
  * values for one key are both kept, the preferred first.
  *
+ * $related names other things it is tied to, by relation: a protein's
+ * organism (ncbi.taxon:9606), its structures (pdb:1A3N), the ligands it
+ * binds (chebi:60344). They are not its identifiers: the Collector does not
+ * follow them, and the Merger does not take two entities for one thing
+ * because they share them.
+ *
  * $time and $place are set for what happens somewhere at a moment (an
  * earthquake, an eruption, an observation) or sits somewhere (a station).
  */
@@ -23,6 +29,7 @@ final readonly class Entity
      * @param list<string>   $synonyms   the other names it goes by
      * @param list<Property> $properties
      * @param list<string>   $sources    the sources merged into this record
+     * @param array<string, Identifiers> $related other things it is tied to, by relation ("organism", "structure", "ligand"...)
      */
     public function __construct(
         public Identifier $id,
@@ -39,6 +46,7 @@ final readonly class Entity
         public Point|BBox|null $place = null,
         public ?string $source = null,
         public array $sources = [],
+        public array $related = [],
     ) {
     }
 
@@ -58,6 +66,12 @@ final readonly class Entity
     public function identifier(Scheme $scheme): ?string
     {
         return $this->identifiers()->value($scheme);
+    }
+
+    /** The identifiers of the things tied to it by a relation: $protein->related('organism')->value(Scheme::NCBI_TAXON) is "9606". */
+    public function related(string $relation): Identifiers
+    {
+        return $this->related[$relation] ?? new Identifiers();
     }
 
     /** The property of that key from the preferred source; null when none is known. */

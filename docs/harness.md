@@ -5,7 +5,7 @@ or from the checkouts beside this one when `OMNILAB_PLUGINS=../..` is set in `do
 a console that asks the real services.
 
 ```sh
-cd docker && cp .env.dist .env       # OMNILAB_MAILTO, WIKIDATA_LANGUAGE, an Open-Meteo key if you have one
+cd docker && cp .env.dist .env       # OMNILAB_MAILTO, WIKIDATA_LANGUAGE, an NCBI or Open-Meteo key if you have one
 docker compose run --rm omnilab sources
 ```
 
@@ -31,6 +31,10 @@ docker compose run --rm omnilab collect pubchem caffeine            # then ChEBI
 docker compose run --rm omnilab entity chebi CHEBI:27732
 docker compose run --rm omnilab entity wikidata Q60235
 docker compose run --rm omnilab search wikidata caffeine --domain chemistry --limit 5
+docker compose run --rm omnilab entity uniprot P68871
+docker compose run --rm omnilab collect uniprot P68871              # then NCBI Gene and Wikidata, merged
+docker compose run --rm omnilab entity ncbi txid9689
+docker compose run --rm omnilab search ncbi "Panthera[subtree]" --domain taxonomy
 docker compose run --rm omnilab series open-meteo 48.5734,7.7521 temperature_2m --from tomorrow --to tomorrow
 docker compose run --rm omnilab series open-meteo 48.5734,7.7521 temperature_2m precipitation_sum --daily max --from 2026-09-01 --to 2026-09-07
 docker compose run --rm omnilab products copernicus --point 48.5734,7.7521 --from=-10days --cloud 30
