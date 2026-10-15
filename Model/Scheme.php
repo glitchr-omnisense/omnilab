@@ -35,6 +35,12 @@ enum Scheme: string
     case NCBI_TAXON = 'ncbi.taxon';
     /** An Ensembl gene, transcript or protein, without its version: ENSG00000141510. */
     case ENSEMBL = 'ensembl';
+    /**
+     * An Ensembl gene, transcript or protein of a genome Ensembl annotates
+     * under its community's ids (FlyBase, WormBase, SGD, Araport,
+     * PomBase...): FBgn0000008, AT5G10140, YAL001C.
+     */
+    case ENSEMBL_GENOMES = 'ensembl.genomes';
     /** A Protein Data Bank structure: 1A3N. */
     case PDB = 'pdb';
     /**
@@ -86,6 +92,7 @@ enum Scheme: string
             self::NCBI_GENE => 'NCBI Gene',
             self::NCBI_TAXON => 'NCBI Taxonomy',
             self::ENSEMBL => 'Ensembl',
+            self::ENSEMBL_GENOMES => 'Ensembl (community id)',
             self::PDB => 'PDB',
             self::GBIF => 'GBIF',
             self::GBIF_OCCURRENCE => 'GBIF occurrence',
@@ -109,7 +116,7 @@ enum Scheme: string
     {
         return match ($this) {
             self::PUBCHEM_CID, self::CHEBI, self::CHEMBL, self::INCHIKEY, self::INCHI, self::CAS, self::UNII, self::DSSTOX, self::KEGG => Domain::CHEMISTRY,
-            self::UNIPROT, self::NCBI_GENE, self::ENSEMBL, self::PDB, self::REACTOME => Domain::BIOLOGY,
+            self::UNIPROT, self::NCBI_GENE, self::ENSEMBL, self::ENSEMBL_GENOMES, self::PDB, self::REACTOME => Domain::BIOLOGY,
             self::NCBI_TAXON, self::GBIF, self::GBIF_OCCURRENCE, self::INATURALIST, self::INATURALIST_OBSERVATION => Domain::TAXONOMY,
             self::SIMBAD, self::JPL_SBDB, self::GAIA, self::EXOPLANET => Domain::ASTRONOMY,
             self::USGS_EVENT, self::GHCN, self::WIGOS, self::NWS_STATION => Domain::EARTH,

@@ -177,6 +177,11 @@ $both->value('quality_grade');            // research [inaturalist], beside GBIF
 A page of occurrences is not followed (see [occurrences](occurrences.md#not-in-the-collector)); one
 occurrence is an entity like any.
 
+**A fly's gene, from Ensembl into NCBI Gene** - Ensembl serves the fly under FlyBase's ids (the
+`ensembl.genomes` scheme), and gives the NCBI Gene record among a gene's cross-references:
+`collect('ensembl', 'FBgn0000008', 1, ['ncbi'])` - the fly's `a`, GeneID 43852, `arc` from each,
+21.5 s on the evening of 2026-10-15 (Ensembl slow that day).
+
 **A planet, from Wikidata into SIMBAD and the NASA Exoplanet Archive** - Wikidata's item for 51 Peg
 b (Q242309) carries its SIMBAD identifier (P3083, `* 51 Peg b`) and its name at the archive (P5667,
 `51 Peg b`, the `exoplanet` scheme):

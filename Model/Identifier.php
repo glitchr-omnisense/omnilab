@@ -25,6 +25,27 @@ final readonly class Identifier implements \Stringable
     /** A WIGOS station id: its series, issuer, issue number and local id (the WMO's own pattern, as Wikidata's P4136 writes it). */
     private const WIGOS = '~^(?:\d|1[0-4])(?:-(?:\d|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-4])){2}-[0-9A-Za-z]{1,16}$~';
 
+    /**
+     * The genomes Ensembl serves under their community's ids, told by the
+     * shape of their ids: the pattern (case aside), the prefix as written,
+     * the case of the rest, the genome (Ensembl's production name, which a
+     * lookup needs). Each checked on 2026-10-15 against rest.ensembl.org.
+     *
+     * @var list<array{string, string, string, string}>
+     */
+    public const ENSEMBL_GENOMES = [
+        ['~^FB(?:gn|tr|pp)\d{7}$~i', 'FB', 'lower', 'drosophila_melanogaster'],
+        ['~^WBGene\d{8}$~i', 'WBGene', 'keep', 'caenorhabditis_elegans'],
+        ['~^Y[A-P][LR]\d{3}[WC](?:-[A-Z])?$~i', '', 'upper', 'saccharomyces_cerevisiae'],
+        ['~^AT[1-5CM]G\d{5}(?:\.\d+)?$~i', '', 'upper', 'arabidopsis_thaliana'],
+        ['~^Os\d{2}g\d{7}$~i', 'Os', 'lower', 'oryza_sativa'],
+        ['~^Zm00001eb\d{6}$~i', 'Zm00001eb', 'keep', 'zea_mays'],
+        ['~^TraesCS[1-7U][ABD]?\d{2}G\d{6}$~i', 'TraesCS', 'upper', 'triticum_aestivum'],
+        ['~^SP[ABC][A-Z0-9]+\.\d+[a-z]?$~', '', 'keep', 'schizosaccharomyces_pombe'],
+        ['~^PF3D7_\d{7}$~i', '', 'upper', 'plasmodium_falciparum'],
+        ['~^AGAP\d{6}$~i', '', 'upper', 'anopheles_gambiae'],
+    ];
+
     /** The other names a "prefix:value" may give a scheme: identifiers.org's prefixes, the bases' own. */
     private const PREFIXES = [
         'cid' => Scheme::PUBCHEM_CID, 'pubchem' => Scheme::PUBCHEM_CID, 'pubchem.compound' => Scheme::PUBCHEM_CID,
@@ -40,6 +61,7 @@ final readonly class Identifier implements \Stringable
         'usgs' => Scheme::USGS_EVENT,
         'ghcnd' => Scheme::GHCN,
         'wmo' => Scheme::WIGOS,
+        'ensembl.plant' => Scheme::ENSEMBL_GENOMES, 'ensembl.fungi' => Scheme::ENSEMBL_GENOMES, 'ensembl.metazoa' => Scheme::ENSEMBL_GENOMES, 'ensembl.protist' => Scheme::ENSEMBL_GENOMES, 'ensembl.bacteria' => Scheme::ENSEMBL_GENOMES,
         'gaia.dr3' => Scheme::GAIA,
         'nasa.exoplanet' => Scheme::EXOPLANET, 'exoplanetarchive' => Scheme::EXOPLANET,
         'wd' => Scheme::WIKIDATA,
@@ -89,6 +111,8 @@ final readonly class Identifier implements \Stringable
             Scheme::GBIF_OCCURRENCE, Scheme::INATURALIST_OBSERVATION => preg_match('~^0*([1-9]\d{0,18})$~', $value, $m) ? $m[1] : null,
             Scheme::NCBI_TAXON => preg_match('~^(?:TXID)?0*([1-9]\d*)$~', $upper, $m) ? $m[1] : null,
             Scheme::ENSEMBL => preg_match(self::ENSEMBL, $upper, $m) ? $m[1] : null,
+            // A known genome's id as its community writes it; any other as given (not an ENS id: that is the ensembl scheme).
+            Scheme::ENSEMBL_GENOMES => self::ensemblGenomes($value) ?? (preg_match('~^[A-Za-z0-9][A-Za-z0-9_.:-]{2,40}$~', $value) && !preg_match(self::ENSEMBL, $upper) ? $value : null),
             Scheme::PDB => preg_match('~^\d[A-Z0-9]{3}$~', $upper) ? $upper : (preg_match('~^PDB_\d{4}[A-Z0-9]{4}$~', $upper) ? strtolower($upper) : null),
             Scheme::SIMBAD, Scheme::JPL_SBDB => self::name($value),
             // A network's code then the event's own (ComCat keeps the catalogues' long ones: official20110311054624120_30, iscgemsup16957911).
@@ -144,6 +168,7 @@ final readonly class Identifier implements \Stringable
             (bool) preg_match(self::ENSEMBL, $upper) => self::tryOf(Scheme::ENSEMBL, $upper),
             (bool) preg_match('~^Q[1-9]\d*$~', $upper) => self::tryOf(Scheme::WIKIDATA, $upper),
             (bool) preg_match(self::WIGOS, $input) => self::tryOf(Scheme::WIGOS, $input),
+            null !== self::ensemblGenomes($input) => self::tryOf(Scheme::ENSEMBL_GENOMES, $input),
             (bool) preg_match('~^R-[A-Z]{3}-\d+(?:\.\d+)?$~', $upper) => self::tryOf(Scheme::REACTOME, $upper),
             (bool) preg_match('~^GAIA\s*DR3\s+\d+$~', $upper) => self::tryOf(Scheme::GAIA, $upper),
             default => null,
@@ -221,7 +246,8 @@ final readonly class Identifier implements \Stringable
             Scheme::UNIPROT => 'https://www.uniprot.org/uniprotkb/'.$v,
             Scheme::NCBI_GENE => 'https://www.ncbi.nlm.nih.gov/gene/'.$v,
             Scheme::NCBI_TAXON => 'https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id='.$v,
-            Scheme::ENSEMBL => 'https://www.ensembl.org/id/'.$v,
+            // Every division's site sends its ids to www.ensembl.org's (checked on 2026-10-15).
+            Scheme::ENSEMBL, Scheme::ENSEMBL_GENOMES => 'https://www.ensembl.org/id/'.$v,
             Scheme::PDB => 'https://www.rcsb.org/structure/'.$v,
             Scheme::GBIF => ctype_digit($this->value) ? 'https://www.gbif.org/species/'.$v : 'https://www.gbif.org/taxon/'.$v,
             Scheme::GBIF_OCCURRENCE => 'https://www.gbif.org/occurrence/'.$v,
@@ -269,7 +295,7 @@ final readonly class Identifier implements \Stringable
             'earthquake.usgs.gov' === $host => $found('~/eventpage/([a-z0-9_]+)~i', Scheme::USGS_EVENT),
             str_ends_with($host, 'ncbi.nlm.nih.gov') && str_starts_with($path, 'gene/') => self::tryOf(Scheme::NCBI_GENE, $last),
             str_ends_with($host, 'ncbi.nlm.nih.gov') && str_contains(strtolower($path), 'taxonomy') => self::tryOf(Scheme::NCBI_TAXON, (string) ($query['id'] ?? $last)),
-            str_ends_with($host, 'ensembl.org') => $found('~(ENS[A-Z]*[EFGPRT]\d{11})~i', Scheme::ENSEMBL),
+            str_ends_with($host, 'ensembl.org') => $found('~(ENS[A-Z]*[EFGPRT]\d{11})~i', Scheme::ENSEMBL) ?? (preg_match('~/id/([^/?#]+)~', $path === '' ? '' : '/'.$path, $m) ? self::tryOf(Scheme::ENSEMBL_GENOMES, $m[1]) : null),
             'commonchemistry.cas.org' === $host => self::tryOf(Scheme::CAS, (string) ($query['cas_rn'] ?? '')),
             'comptox.epa.gov' === $host => $found('~(DTXSID\d+)~i', Scheme::DSSTOX),
             'precision.fda.gov' === $host => self::tryOf(Scheme::UNII, $last),
@@ -292,6 +318,42 @@ final readonly class Identifier implements \Stringable
         foreach (explode('/', $path) as $segment) {
             if (null !== ($identifier = self::tryOf($scheme, (string) preg_replace('~\.\w+$~', '', $segment)))) {
                 return $identifier;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The genome (Ensembl's production name) of an id of the ensembl.genomes
+     * scheme, when its shape tells it: "drosophila_melanogaster" for
+     * FBgn0000008; null otherwise.
+     */
+    public static function ensemblSpecies(self|string $id): ?string
+    {
+        $value = $id instanceof self ? $id->value : trim($id);
+        foreach (self::ENSEMBL_GENOMES as [$pattern, , , $species]) {
+            if (preg_match($pattern, $value)) {
+                return $species;
+            }
+        }
+
+        return null;
+    }
+
+    /** A known genome's id as its community writes it; null when no known shape. */
+    private static function ensemblGenomes(string $value): ?string
+    {
+        $value = trim($value);
+        foreach (self::ENSEMBL_GENOMES as [$pattern, $prefix, $case]) {
+            if (preg_match($pattern, $value)) {
+                $rest = substr($value, \strlen($prefix));
+
+                return $prefix.match ($case) {
+                    'upper' => strtoupper($rest),
+                    'lower' => strtolower($rest),
+                    default => $rest,
+                };
             }
         }
 

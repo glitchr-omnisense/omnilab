@@ -35,6 +35,23 @@ and keeps among a gene's identifiers its NCBI Gene record and its Swiss-Prot ent
 UniProt already joined a gene and its protein. A GBIF occurrence published by iNaturalist carries
 the observation's number among its identifiers: it is that very record (`inaturalist.observation`).
 
+## Ensembl Genomes: a scheme beside `ensembl` (2026-10-15)
+
+`Scheme::ENSEMBL_GENOMES` (`ensembl.genomes`) names the genes, transcripts and proteins Ensembl
+serves under their community's ids - FlyBase's `FBgn0000008`, Araport's `AT5G10140`, SGD's
+`YAL001C` -, which `ensembl` (`ENS...` only) leaves out.
+
+**Why a scheme of its own**: `ensembl` is told by its shape (`ENSG00000244734` is nothing else),
+which `parse()` and every source rely on; widened to every community's id, it would read any code
+as an Ensembl id. A scheme beside it keeps that, and is itself told by its shape only for the ten
+genomes whose ids were checked one by one against rest.ensembl.org (a table, `Identifier::
+ENSEMBL_GENOMES`); any other id of Ensembl Genomes goes with its scheme. **Why a table with the
+species**: rest.ensembl.org serves these genomes (the old rest.ensemblgenomes.org no longer
+answers: its certificate is another host's), but a lookup without the species took 7 to 23 s, or
+answered 500; with it, a few seconds. **Why not the communities' schemes** (`flybase`, `tair`,
+`sgd`): their own ids are not all Ensembl's (SGD's `S000003909` is not), and what the sources share
+is the id Ensembl gives.
+
 ## Datasets, requests and files in the contract (2026-10-15)
 
 `SourceInterface::datasets(Query)` (`Capability::DATASETS`) and `open(Asset|string)`

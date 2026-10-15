@@ -38,6 +38,25 @@ final class IdentifierTest extends TestCase
         yield 'a USGS event' => ['usgs:US6000U24C', 'usgs.event:us6000u24c'];
         yield 'one of the catalogues ComCat keeps, its code long' => ['usgs:official20110311054624120_30', 'usgs.event:official20110311054624120_30'];
         yield 'not a USGS event: no network' => ['usgs:20110311', null];
+        yield 'a fly gene' => ['FBgn0000008', 'ensembl.genomes:FBgn0000008'];
+        yield 'a fly gene, its case as FlyBase writes it' => ['fbgn0000008', 'ensembl.genomes:FBgn0000008'];
+        yield 'a fly transcript' => ['FBtr0071764', 'ensembl.genomes:FBtr0071764'];
+        yield 'a worm gene' => ['WBGene00000001', 'ensembl.genomes:WBGene00000001'];
+        yield 'a yeast gene' => ['yal001c', 'ensembl.genomes:YAL001C'];
+        yield 'a yeast gene with its letter' => ['YIL177W-A', 'ensembl.genomes:YIL177W-A'];
+        yield 'an Arabidopsis gene' => ['At5g10140', 'ensembl.genomes:AT5G10140'];
+        yield 'an Arabidopsis transcript' => ['AT5G10140.1', 'ensembl.genomes:AT5G10140.1'];
+        yield 'a rice gene' => ['Os01g0100100', 'ensembl.genomes:Os01g0100100'];
+        yield 'a maize gene' => ['Zm00001eb000010', 'ensembl.genomes:Zm00001eb000010'];
+        yield 'a wheat gene' => ['TraesCS1A02G000100', 'ensembl.genomes:TraesCS1A02G000100'];
+        yield 'a fission yeast gene' => ['SPBC1105.02c', 'ensembl.genomes:SPBC1105.02c'];
+        yield 'a Plasmodium gene' => ['PF3D7_0100100', 'ensembl.genomes:PF3D7_0100100'];
+        yield 'an Anopheles gene' => ['AGAP000002', 'ensembl.genomes:AGAP000002'];
+        yield 'another genome\'s id with its scheme' => ['ensembl.genomes:Solyc01g005000.3', 'ensembl.genomes:Solyc01g005000.3'];
+        yield 'identifiers.org\'s Ensembl Plants' => ['ensembl.plant:AT1G73965', 'ensembl.genomes:AT1G73965'];
+        yield 'an ENS id is not of the scheme' => ['ensembl.genomes:ENSG00000244734', null];
+        yield 'an Ensembl page of a fly gene' => ['https://www.ensembl.org/id/FBgn0000008', 'ensembl.genomes:FBgn0000008'];
+        yield 'an Ensembl page of a human gene, still' => ['https://www.ensembl.org/id/ENSG00000244734', 'ensembl:ENSG00000244734'];
         yield 'a Reactome pathway' => ['R-HSA-70171', 'reactome:R-HSA-70171'];
         yield 'a Reactome pathway, its version dropped' => ['r-hsa-70171.5', 'reactome:R-HSA-70171'];
         yield 'a Reactome small molecule' => ['reactome:R-ALL-29356', 'reactome:R-ALL-29356'];
@@ -136,10 +155,20 @@ final class IdentifierTest extends TestCase
                 Scheme::INCHIKEY => 'RYYVLZVUVIJVGH-UHFFFAOYSA-N', Scheme::INCHI => 'InChI=1S/H2O/h1H2', Scheme::CAS => '7732-18-5',
                 Scheme::CHEMBL => 'CHEMBL1098659', Scheme::UNII => '059QF0KO0R', Scheme::DSSTOX => 'DTXSID6026296', Scheme::KEGG => 'C00001',
                 Scheme::UNIPROT => 'P69905', Scheme::ENSEMBL => 'ENSG00000141510', Scheme::PDB => '1A3N', Scheme::SIMBAD => 'M 31', Scheme::JPL_SBDB => '433',
-                Scheme::USGS_EVENT => 'us6000u24c', Scheme::WIKIDATA => 'Q283', Scheme::GHCN => 'USW00094728', Scheme::NWS_STATION => 'KNYC', Scheme::REACTOME => 'R-HSA-70171', Scheme::GAIA => '4472832130942575872', Scheme::EXOPLANET => '51 Peg b', default => '962',
+                Scheme::USGS_EVENT => 'us6000u24c', Scheme::WIKIDATA => 'Q283', Scheme::GHCN => 'USW00094728', Scheme::NWS_STATION => 'KNYC', Scheme::REACTOME => 'R-HSA-70171', Scheme::ENSEMBL_GENOMES => 'FBgn0000008', Scheme::GAIA => '4472832130942575872', Scheme::EXOPLANET => '51 Peg b', default => '962',
             })?->url();
             self::assertTrue(null === $url || str_starts_with($url, 'https://'), $scheme->value);
         }
+    }
+
+    public function testAnEnsemblGenomesIdSaysItsGenome(): void
+    {
+        self::assertSame('drosophila_melanogaster', Identifier::ensemblSpecies(Identifier::of(Scheme::ENSEMBL_GENOMES, 'FBgn0000008')));
+        self::assertSame('arabidopsis_thaliana', Identifier::ensemblSpecies('AT5G10140.1'));
+        self::assertSame('schizosaccharomyces_pombe', Identifier::ensemblSpecies('SPAC1002.01'));
+        self::assertNull(Identifier::ensemblSpecies('Solyc01g005000.3'), 'not a known genome');
+        self::assertSame('https://www.ensembl.org/id/AT5G10140', Identifier::of(Scheme::ENSEMBL_GENOMES, 'AT5G10140')->url());
+        self::assertSame(Domain::BIOLOGY, Scheme::ENSEMBL_GENOMES->domain());
     }
 
     public function testAGbifKeyInEitherForm(): void

@@ -79,7 +79,7 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | | ensembl | pdb | inaturalist |
 |---|---|---|---|
 | Shape | entity | entity | entity, occurrences |
-| `entity()` by | Ensembl id (gene, transcript, protein, exon; its version dropped); a gene's symbol in a species (`HBB`, `mus_musculus/Hbb-bs`) | PDB id (`4HHB`, `pdb_00004hhb`); a removed entry gives its only replacement | taxon id, a name matched exactly (scientific, synonym, common); an observation by its number (`inaturalist.observation:332912788`) |
+| `entity()` by | Ensembl id (gene, transcript, protein, exon; its version dropped); a community's id of a genome Ensembl serves (`ensembl.genomes`: `FBgn0000008`, `YAL001C`, `AT5G10140`); a gene's symbol in a species (`HBB`, `mus_musculus/Hbb-bs`, `drosophila_melanogaster/w`) | PDB id (`4HHB`, `pdb_00004hhb`); a removed entry gives its only replacement | taxon id, a name matched exactly (scientific, synonym, common); an observation by its number (`inaturalist.observation:332912788`) |
 | `search()` | the genes a symbol names in a species, page by offset | RCSB's full-text search (experimental structures), then GraphQL for the page | iNaturalist's search of its names, page by number |
 | `occurrences()` | - | - | the observations of a `BBox` (across the antimeridian too) or around a `Point` (10 km by default) in a period, to the second; `taxon`, `license`, `quality_grade` (research by default); unsorted (latest added first, paged by id, no depth limit) or `newest`, `oldest` (10,000 deep); 200 a page |
 | Units | bp, aa | Å, kDa | m |
