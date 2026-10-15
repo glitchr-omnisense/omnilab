@@ -95,6 +95,12 @@ enum Scheme: string
     case JPL_SBDB = 'jpl.sbdb';
     /** A minor planet, comet or natural satellite as the IAU's Minor Planet Center designates it: its number (433), else its designation (2024 YR4, 1P, C/2020 F3); Wikidata's P5736. */
     case MPC = 'mpc';
+    /** An object of NED, the NASA/IPAC Extragalactic Database, by its preferred name: Messier 031, 3C 273. */
+    case NED = 'ned';
+    /** An event of NASA's DONKI (space weather: a solar flare, a coronal mass ejection, a geomagnetic storm...) by its activity id: 2026-10-04T06:13:00-FLR-001. */
+    case DONKI = 'donki';
+    /** A launch of The Space Devs' Launch Library 2 by its id, a UUID: df88cfbf-f504-4e11-8370-e33dd6280b5b. */
+    case LAUNCH_LIBRARY = 'launchlibrary';
     /** A USGS earthquake event (ComCat): us6000u24c, official20110311054624120_30. */
     case USGS_EVENT = 'usgs.event';
     /** A Reactome pathway, reaction or physical entity, by its stable identifier without its version: R-HSA-70171 (glycolysis, human). */
@@ -188,6 +194,9 @@ enum Scheme: string
             self::SIMBAD => 'SIMBAD',
             self::JPL_SBDB => 'JPL SBDB',
             self::MPC => 'Minor Planet Center',
+            self::NED => 'NED',
+            self::DONKI => 'DONKI event',
+            self::LAUNCH_LIBRARY => 'Launch Library 2 launch',
             self::USGS_EVENT => 'USGS event',
             self::REACTOME => 'Reactome',
             self::STRING => 'STRING',
@@ -226,7 +235,7 @@ enum Scheme: string
                 self::STRING, self::INTERPRO, self::PFAM, self::GO, self::HGNC, self::OMIM, self::EFO, self::MONDO, self::ORPHANET, self::HP, self::CLINVAR, self::DBSNP, self::GWAS => Domain::BIOLOGY,
             self::NCBI_TAXON, self::GBIF, self::GBIF_OCCURRENCE, self::INATURALIST, self::INATURALIST_OBSERVATION,
                 self::WORMS, self::OBIS_OCCURRENCE, self::ITIS, self::COL, self::PBDB, self::PBDB_OCCURRENCE, self::EBIRD, self::EBIRD_CHECKLIST, self::IUCN => Domain::TAXONOMY,
-            self::SIMBAD, self::JPL_SBDB, self::MPC, self::GAIA, self::EXOPLANET => Domain::ASTRONOMY,
+            self::SIMBAD, self::JPL_SBDB, self::MPC, self::NED, self::DONKI, self::GAIA, self::EXOPLANET => Domain::ASTRONOMY,
             self::USGS_EVENT, self::GHCN, self::WIGOS, self::NWS_STATION, self::EMSC_EVENT, self::USGS_SITE, self::COOPS_STATION, self::DWD_STATION => Domain::EARTH,
             self::CODATA => Domain::OTHER,
             self::WIKIDATA => null,

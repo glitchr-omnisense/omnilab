@@ -57,7 +57,7 @@ final readonly class Identifier implements \Stringable
         'ncbigene' => Scheme::NCBI_GENE, 'gene' => Scheme::NCBI_GENE,
         'taxonomy' => Scheme::NCBI_TAXON, 'ncbitaxon' => Scheme::NCBI_TAXON, 'txid' => Scheme::NCBI_TAXON,
         'inaturalist.taxon' => Scheme::INATURALIST,
-        'sbdb' => Scheme::JPL_SBDB, 'jpl' => Scheme::JPL_SBDB, 'minorplanetcenter' => Scheme::MPC,
+        'sbdb' => Scheme::JPL_SBDB, 'jpl' => Scheme::JPL_SBDB, 'minorplanetcenter' => Scheme::MPC, 'launch' => Scheme::LAUNCH_LIBRARY,
         'usgs' => Scheme::USGS_EVENT,
         'ghcnd' => Scheme::GHCN,
         'wmo' => Scheme::WIGOS,
@@ -166,6 +166,10 @@ final readonly class Identifier implements \Stringable
             Scheme::PDB => preg_match('~^\d[A-Z0-9]{3}$~', $upper) ? $upper : (preg_match('~^PDB_\d{4}[A-Z0-9]{4}$~', $upper) ? strtolower($upper) : null),
             Scheme::SIMBAD, Scheme::JPL_SBDB => self::name($value),
             // Its number without the brackets the IAU writes it in: (433) is 433.
+            Scheme::NED => self::name($value),
+            // Its start (UTC, to the second), its kind (FLR, CME, GST, SEP, IPS, MPC, RBE, HSS...), its number that day.
+            Scheme::DONKI => preg_match('~^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2})-([A-Z]{2,5})-(\d{3})$~i', trim($value), $m) ? $m[1].'T'.$m[2].'-'.strtoupper($m[3]).'-'.$m[4] : null,
+            Scheme::LAUNCH_LIBRARY => preg_match('~^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$~', $v = strtolower(trim($value))) ? $v : null,
             Scheme::MPC => self::name((string) preg_replace('~^\((\d+)\)$~', '$1', trim($value))),
             // A network's code then the event's own (ComCat keeps the catalogues' long ones: official20110311054624120_30, iscgemsup16957911).
             Scheme::USGS_EVENT => preg_match('~^[a-z]{2,10}[a-z0-9_]{6,24}$~', $v = strtolower($value)) ? $v : null,
@@ -249,6 +253,7 @@ final readonly class Identifier implements \Stringable
             null !== self::ensemblGenomes($input) => self::tryOf(Scheme::ENSEMBL_GENOMES, $input),
             (bool) preg_match('~^R-[A-Z]{3}-\d+(?:\.\d+)?$~', $upper) => self::tryOf(Scheme::REACTOME, $upper),
             (bool) preg_match('~^GAIA\s*DR3\s+\d+$~', $upper) => self::tryOf(Scheme::GAIA, $upper),
+            (bool) preg_match('~^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}-[A-Z]{2,5}-\d{3}$~', $upper) => self::tryOf(Scheme::DONKI, $upper),
             (bool) preg_match('~^EC\s+\d~', $upper) => self::tryOf(Scheme::EC, $upper),
             (bool) preg_match('~^(?:mp|mvc)-\d+$~i', $input) => self::tryOf(Scheme::MATERIALS_PROJECT, $input),
             (bool) preg_match('~^IPR\d{6}$~', $upper) => self::tryOf(Scheme::INTERPRO, $upper),
@@ -374,6 +379,10 @@ final readonly class Identifier implements \Stringable
             Scheme::SIMBAD => 'https://simbad.cds.unistra.fr/simbad/sim-id?Ident='.$v,
             Scheme::JPL_SBDB => 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr='.$v,
             Scheme::MPC => 'https://minorplanetcenter.net/db_search/show_object?object_id='.$v,
+            Scheme::NED => 'https://ned.ipac.caltech.edu/byname?objname='.$v,
+            // DONKI's pages are numbered by its database, not by the activity id.
+            Scheme::DONKI => null,
+            Scheme::LAUNCH_LIBRARY => 'https://ll.thespacedevs.com/2.3.0/launches/'.$v.'/',
             Scheme::USGS_EVENT => 'https://earthquake.usgs.gov/earthquakes/eventpage/'.$v,
             Scheme::REACTOME => 'https://reactome.org/content/detail/'.$v,
             Scheme::STRING => 'https://string-db.org/network/'.$v,
@@ -473,6 +482,8 @@ final readonly class Identifier implements \Stringable
             str_ends_with($host, 'seismicportal.eu') => self::tryOf(Scheme::EMSC_EVENT, (string) ($query['unid'] ?? '')),
             str_ends_with($host, 'waterdata.usgs.gov') => $found('~/(USGS-\d{8,15})(?:[/?#]|$)~i', Scheme::USGS_SITE),
             str_ends_with($host, 'tidesandcurrents.noaa.gov') => preg_match('~stations/(\d{7})~', $path, $m) ? self::tryOf(Scheme::COOPS_STATION, $m[1]) : self::tryOf(Scheme::COOPS_STATION, (string) ($query['id'] ?? '')),
+            'ned.ipac.caltech.edu' === $host => self::tryOf(Scheme::NED, (string) ($query['objname'] ?? '')),
+            'll.thespacedevs.com' === $host => preg_match('~/launches?/([0-9a-f-]{36})~i', $path === '' ? '' : '/'.$path, $m) ? self::tryOf(Scheme::LAUNCH_LIBRARY, $m[1]) : null,
             str_ends_with($host, 'minorplanetcenter.net') => self::tryOf(Scheme::MPC, (string) ($query['object_id'] ?? $query['utf8'] ?? '')),
             'ssd.jpl.nasa.gov' === $host => preg_match('~sstr=([^&]+)~', $fragment.'&'.http_build_query($query), $m) ? self::tryOf(Scheme::JPL_SBDB, $m[1]) : null,
             default => null,

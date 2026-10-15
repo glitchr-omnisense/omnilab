@@ -163,6 +163,13 @@ final class IdentifierTest extends TestCase
         yield 'SIMBAD\'s page' => ['https://simbad.cds.unistra.fr/simbad/sim-id?Ident=M%2031', 'simbad:M 31'];
         yield 'JPL\'s lookup' => ['https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=433', 'jpl.sbdb:433'];
         yield 'a minor planet at the MPC' => ['mpc:(433)', 'mpc:433'];
+        yield 'an object of NED' => ['ned:Messier  031', 'ned:Messier 031'];
+        yield 'NED\'s page' => ['https://ned.ipac.caltech.edu/byname?objname=3C%20273', 'ned:3C 273'];
+        yield 'a DONKI event, by its shape' => ['2026-10-04T06:13:00-FLR-001', 'donki:2026-10-04T06:13:00-FLR-001'];
+        yield 'a DONKI event, its kind upper-cased' => ['donki:2026-10-10t15:00:00-gst-001', 'donki:2026-10-10T15:00:00-GST-001'];
+        yield 'a launch of Launch Library 2' => ['launch:DF88CFBF-F504-4E11-8370-E33DD6280B5B', 'launchlibrary:df88cfbf-f504-4e11-8370-e33dd6280b5b'];
+        yield 'a launch\'s API record' => ['https://ll.thespacedevs.com/2.3.0/launches/df88cfbf-f504-4e11-8370-e33dd6280b5b/', 'launchlibrary:df88cfbf-f504-4e11-8370-e33dd6280b5b'];
+        yield 'a UUID alone is no launch' => ['df88cfbf-f504-4e11-8370-e33dd6280b5b', null];
         yield 'a comet at the MPC' => ['mpc:C/2020  F3', 'mpc:C/2020 F3'];
         yield 'the MPC\'s page' => ['https://minorplanetcenter.net/db_search/show_object?object_id=2024+YR4', 'mpc:2024 YR4'];
         yield 'a KEGG reaction' => ['rn:R00200', 'kegg.reaction:R00200'];
@@ -247,7 +254,7 @@ final class IdentifierTest extends TestCase
             $url = Identifier::tryOf($scheme, match ($scheme) {
                 Scheme::INCHIKEY => 'RYYVLZVUVIJVGH-UHFFFAOYSA-N', Scheme::INCHI => 'InChI=1S/H2O/h1H2', Scheme::CAS => '7732-18-5',
                 Scheme::CHEMBL => 'CHEMBL1098659', Scheme::UNII => '059QF0KO0R', Scheme::DSSTOX => 'DTXSID6026296', Scheme::KEGG => 'C00001',
-                Scheme::UNIPROT => 'P69905', Scheme::ENSEMBL => 'ENSG00000141510', Scheme::PDB => '1A3N', Scheme::SIMBAD => 'M 31', Scheme::JPL_SBDB => '433', Scheme::MPC => '433',
+                Scheme::UNIPROT => 'P69905', Scheme::ENSEMBL => 'ENSG00000141510', Scheme::PDB => '1A3N', Scheme::SIMBAD => 'M 31', Scheme::JPL_SBDB => '433', Scheme::MPC => '433', Scheme::NED => 'Messier 031', Scheme::DONKI => '2026-10-04T06:13:00-FLR-001', Scheme::LAUNCH_LIBRARY => 'df88cfbf-f504-4e11-8370-e33dd6280b5b',
                 Scheme::USGS_EVENT => 'us6000u24c', Scheme::WIKIDATA => 'Q283', Scheme::GHCN => 'USW00094728', Scheme::NWS_STATION => 'KNYC', Scheme::REACTOME => 'R-HSA-70171', Scheme::ENSEMBL_GENOMES => 'FBgn0000008', Scheme::GAIA => '4472832130942575872', Scheme::EXOPLANET => '51 Peg b',
                 Scheme::STRING => '9606.ENSP00000269305', Scheme::INTERPRO => 'IPR000971', Scheme::PFAM => 'PF00042', Scheme::GO, Scheme::EFO, Scheme::MONDO, Scheme::HP => '0005829', Scheme::OMIM => '141900', Scheme::DBSNP => 'rs334', Scheme::GWAS => 'GCST000854',
                 Scheme::KEGG_REACTION => 'R00200', Scheme::KEGG_PATHWAY => 'map00010', Scheme::RHEA => '18157', Scheme::EC => '2.7.1.40', Scheme::COD => '1000000', Scheme::MATERIALS_PROJECT => 'mp-149', Scheme::CODATA => 'mp',

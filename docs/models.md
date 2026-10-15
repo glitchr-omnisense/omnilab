@@ -224,6 +224,9 @@ Identifier::tryOf('cas', '58-08-3');                                 // null: wr
 | `exoplanet` | astronomy | a planet or a system of the NASA Exoplanet Archive by the archive's name, spaces collapsed: `51 Peg b`, `Proxima Cen`; its overview page read; Wikidata's P5667 |
 | `simbad`, `jpl.sbdb` | astronomy | the name, spaces collapsed: `M 31`, `433`, `1P/Halley` |
 | `mpc` | astronomy | a minor planet, comet or natural satellite as the Minor Planet Center designates it, spaces collapsed: its number (`433`; `(433)` read so), else its designation (`2024 YR4`, `1P`, `C/2020 F3`); never read by its shape (JPL's are the same); its page `minorplanetcenter.net/db_search/show_object` read; Wikidata's P5736 |
+| `ned` | astronomy | an object of NED by its preferred name, spaces collapsed: `Messier 031`, `3C 273`; its page `ned.ipac.caltech.edu/byname?objname=` read |
+| `donki` | astronomy | a space weather event of NASA's DONKI by its activity id, its start then its kind and number: `2026-10-04T06:13:00-FLR-001`, read by its shape; no page by that id (DONKI numbers its pages itself) |
+| `launchlibrary` | other | a launch of The Space Devs' Launch Library 2 by its UUID, lower case (`launch:` read); never read by its shape (OBIS's records are UUIDs too); its API record read and given |
 | `usgs.event` | earth | lower case, a network's code then the event's: `us6000u24c`, `official20110311054624120_30` (the catalogues ComCat keeps, as Wikidata's P3196 names some) |
 | `ghcn`, `wigos`, `nws.station` | earth | stations ([above](#stations)): `USW00094728`; `0-20000-0-07190` (`wmo:07190` read); `KNYC` |
 | `usgs.site`, `coops.station`, `dwd.station` | earth | stations ([above](#stations)): `USGS-01646500` (read by its shape); `8518750`; `01420` |
