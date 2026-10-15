@@ -39,6 +39,42 @@ final class ModelsTest extends TestCase
         self::assertNull((new Property('f', 'F', 'C8H10N4O2'))->number());
     }
 
+    public function testVerySmallAndVeryLargeQuantitiesKeepTheirDigits(): void
+    {
+        $proton = new Quantity(1.67262192595e-27, 'kg', 5.2e-37);
+        self::assertSame('1.67262192595e-27 ± 0.00000000052e-27 kg', (string) $proton, 'CODATA\'s proton mass: no longer "0 ± 0 kg"; the uncertainty in the value\'s exponent');
+        self::assertSame(1.67262192595e-27, $proton->value, 'the number itself untouched');
+        self::assertSame('6.62607015e-34 J Hz^-1', (string) new Quantity(6.62607015e-34, 'J Hz^-1'), 'an exact constant: no uncertainty');
+        self::assertSame('-1.602176634e-19 C', (string) new Quantity(-1.602176634e-19, 'C'));
+        self::assertSame('9.9e-5', (string) new Quantity(9.9e-5), 'just under 1e-4');
+        self::assertSame('1.98841e30 ± 0.00004e30 kg', (string) new Quantity(1.98841e30, 'kg', 4e25), 'the Sun\'s mass');
+        self::assertSame('1e9 Pa', (string) new Quantity(1.0e9, 'Pa'), 'from 1e9 up');
+        self::assertSame('1.2e10 ± 3e10 m', (string) new Quantity(1.2e10, 'm', 3e10), 'an uncertainty larger than the value');
+        self::assertSame('6.02214076e23 mol^-1', (string) new Quantity(6.02214076e23, 'mol^-1'));
+        self::assertSame('1e-27 ± 0 kg', (string) new Quantity(1e-27, 'kg', 0.0));
+    }
+
+    public function testOrdinaryQuantitiesDisplayAsBefore(): void
+    {
+        foreach ([
+            ['194.19 g/mol', new Quantity(194.19, 'g/mol')],
+            ['0.0001', new Quantity(0.0001)],
+            ['0.00012', new Quantity(0.00012)],
+            ['999999999.5', new Quantity(999999999.5)],
+            ['61000000000 kg', new Quantity(61000000000, 'kg')],
+            ['0.9223592225 ± 0.0000000003 au', new Quantity(0.9223592225, 'au', 3.0e-10)],
+            ['4.2307969 ± 0.00000755 d', new Quantity(4.2307969, 'd', 0.00000755)],
+            ['7.7 ± 0.028', new Quantity(7.7, null, 0.028)],
+            ['10 ± 1.719 km', new Quantity(10, 'km', 1.719)],
+            ['0', new Quantity(0.0)],
+            ['-40 °C', new Quantity(-40.0, '°C')],
+            ['299792458 m s^-1', new Quantity(299792458, 'm s^-1')],
+        ] as [$text, $quantity]) {
+            self::assertSame($text, (string) $quantity);
+        }
+        self::assertSame('1.5 ± 3e-13', (string) new Quantity(1.5, null, 3e-13), 'an uncertainty ten decimals would round to 0: in scientific notation of its own');
+    }
+
     public function testPlaces(): void
     {
         $strasbourg = Point::parse('48.5734, 7.7521');

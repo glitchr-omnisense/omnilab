@@ -49,7 +49,7 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | `series()` | - | - | - | any Open-Meteo variable at a `Point`: hourly (`PT1H`), 15 minutes (`PT15M`), daily (`P1D`, with `mean`, `max`, `min`, `sum`); with `api: air_quality`, the air's (`pm2_5`, `pm10`, `nitrogen_dioxide`, `ozone`, `european_aqi`, `us_aqi`, pollens...), hourly or each day's `mean`, `max`, `min`, `sum` of the hours | - |
 | `products()` | - | - | - | - | any collection of the catalogue, at a `Point` or over a `BBox`, a period, a cloud cover maximum |
 | Units | from PubChem's documentation (g/mol, Da, Å²) | g/mol (average mass), Da | the unit item's symbol (Da, °C, g/cm³...) | as Open-Meteo answers (°C, mm, km/h...; μg/m³, EAQI, USAQI, grains/m³) | as the catalogue names its properties |
-| Cross-references | InChIKey, InChI, CAS, ChEBI, ChEMBL, Wikidata, UNII, DSSTox, KEGG | secondary ChEBI ids, InChIKey, InChI, CAS, KEGG (and ChEMBL, PubChem, Wikidata, UniProt where ChEBI keeps them) | PubChem CID, ChEBI, CAS, InChIKey, InChI, ChEMBL, UNII, DSSTox, KEGG, UniProt, NCBI Gene, Ensembl, NCBI Taxonomy, GBIF, iNaturalist, SIMBAD, JPL SBDB, USGS event | - | - |
+| Cross-references | InChIKey, InChI, CAS, ChEBI, ChEMBL, Wikidata, UNII, DSSTox, KEGG | secondary ChEBI ids, InChIKey, InChI, CAS, KEGG (and ChEMBL, PubChem, Wikidata, UniProt where ChEBI keeps them) | PubChem CID, ChEBI, CAS, InChIKey, InChI, ChEMBL, UNII, DSSTox, KEGG, UniProt, NCBI Gene, Ensembl, NCBI Taxonomy, GBIF, iNaturalist, SIMBAD, JPL SBDB, USGS event, Reactome, Gaia, NASA Exoplanet Archive, HGNC, OMIM, Mondo, Orphanet, HPO, EFO, ClinVar, dbSNP, GO, InterPro, Pfam, EC (a gene's or a protein's GO, InterPro, Pfam and EC related), WoRMS, ITIS, COL, PBDB, eBird, IUCN, MPC, USGS water site, CODATA; related: COD and Materials Project `structure`s | - | - |
 | Paging (cursor) | offset over the CIDs found | ChEBI's page number | the search's offset | - | the next link's token |
 | Per page, at most | 100 | 100 | 50 | - | 100 |
 
@@ -114,7 +114,7 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | Units | m, °C, PSU | - | - | - |
 | Cross-references | `ncbi.taxon`; a record iNaturalist published: `inaturalist.observation` | `itis`, `ncbi.taxon`, `iucn` (one call each) | none | `gbif` (the same id, unless digits alone), and one of each base COL names or links to (`inaturalist`, `worms`, `itis`...) |
 | Related | `parent`, `accepted`; a record's `taxon` | `parent`, `accepted`, `synonym` | `parent`, `accepted`, `synonym`, `child` | `parent`, `accepted`, `synonym` |
-| Collector path | into NCBI Taxonomy; joined to WoRMS by the `worms` id | into ITIS, NCBI, IUCN; reached from any entity with an ITIS, NCBI or IUCN id | reached from WoRMS and COL | into GBIF, iNaturalist, ITIS, WoRMS; reached from GBIF by the key |
+| Collector path | into NCBI Taxonomy; joined to WoRMS by the `worms` id | into ITIS, NCBI, IUCN; reached from any entity with an ITIS, NCBI or IUCN id, and from Wikidata (P850) | reached from WoRMS, COL and Wikidata (P815) | into GBIF, iNaturalist, ITIS, WoRMS; reached from GBIF by the key and from Wikidata (P10585) |
 
 | | pbdb | ebird | iucn |
 |---|---|---|---|
@@ -148,7 +148,7 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | Units | au, deg, d, mag | deg, au, km/s, mag, %, arcsec | deg | each column's | km/s, deg | % |
 | Cross-references | `jpl.sbdb` (the same designation), its primary designation | - | none | - | none | none |
 | Related | - | - | - | - | `linked`: the events DONKI links it to | - |
-| Collector path | MPC <-> JPL by the designation | - | SIMBAD -> NED by SIMBAD's name; Wikidata -> SIMBAD -> NED | - | - | - |
+| Collector path | MPC <-> JPL by the designation; Wikidata -> MPC (P5736) | - | SIMBAD -> NED by SIMBAD's name; Wikidata -> SIMBAD -> NED | - | - | - |
 | Tested live | yes | yes | yes | yes | yes (at ccmc.gsfc.nasa.gov/DONKI-API: api.nasa.gov/DONKI answers 301 since 30 September 2026) | yes, within 15 calls an hour |
 
 | | reactome |
@@ -182,7 +182,7 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | Units | - | - | aa | - |
 | Cross-references | NCBI Gene, Ensembl gene, UniProt, OMIM | its Ensembl protein; the UniProt accession it was asked by | none | none (a secondary GO id it was asked by) |
 | Related | `organism` | `organism`, `interactor` (STRING ids; each partner's score a property) | an entry's `member` (Pfam), `integrated`, `go`, `structure`, `overlap`, `parent`, `child`; a protein's entries by type (`domain`, `family`, `homologous_superfamily`...), `go`, `organism` | a term's `parent`, one relation each (`is_a`, `part_of`...), `child`; a protein's `function`, `process`, `component`, `organism` |
-| Collector path | HGNC <-> NCBI Gene, Ensembl, UniProt; HGNC -> Open Targets | UniProt -> STRING | UniProt -> InterPro | UniProt -> QuickGO |
+| Collector path | HGNC <-> NCBI Gene, Ensembl, UniProt; HGNC -> Open Targets; Wikidata <-> HGNC (P354) | UniProt -> STRING | UniProt -> InterPro | UniProt -> QuickGO |
 
 | | opentargets | clinvar | gwas |
 |---|---|---|---|
@@ -205,7 +205,7 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | Units | Å, °, Å³, K, kPa | g/mol | NIST's (`kg`, `m s^-1`, `J Hz^-1`...) |
 | Cross-references | none | standard InChI, CAS numbers (the id is the InChIKey) | none |
 | Related | `duplicate_of` (COD) | - | - |
-| Collector path | none yet (Wikidata's P9824 not read) | CIR -> PubChem, ChEBI, ChEMBL by the InChIKey | none yet (Wikidata's P1645 not read) |
+| Collector path | none: Wikidata keeps a compound's COD structures (P9824) as related things, not followed | CIR -> PubChem, ChEBI, ChEMBL by the InChIKey | Wikidata -> CODATA (P1645) |
 
 | | materials-project | oqmd |
 |---|---|---|

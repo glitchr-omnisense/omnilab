@@ -308,17 +308,60 @@ calls weigh most). `collect('col', 'Delphinus delphis', 1, ['worms', 'itis'])`: 
 an entity carrying one reaches WoRMS. With `omnilab/iucn` and a token, WoRMS's IUCN id leads to
 the Red List's assessment (not walked: no token).
 
-**No path: PBDB and eBird** - the Paleobiology Database and eBird give no other base's id;
-Wikidata holds theirs (P10907, P3444), which omnilab/wikidata does not read yet. PBDB's fossils
-(`fossils()`) are outside the contract.
+**PBDB and eBird, from Wikidata** - the Paleobiology Database and eBird give no other base's id;
+Wikidata holds theirs (P10907, P3444), which omnilab/wikidata reads since 2026-10-16: a taxon's
+item leads into both (below). Nothing leads out of them. PBDB's fossils (`fossils()`) are outside
+the contract.
 
 **No path: the earth, water and sky sources of 2026-10-15/16** - omnilab/emsc, usgs-water, tides,
 brightsky, swpc, elevation and openaq give no id of another base (Bright Sky's stations carry
 their DWD and WIGOS ids, both its own), and Wikidata has no property for the EMSC's events: the
-`Collector` has nothing to follow into them or out of them. The EMSC's and the USGS's records of
+`Collector` has nothing to follow out of them. Into USGS Water Data, Wikidata's P13020 (a NWIS
+site, read by omnilab/wikidata since 2026-10-16) leads from the four items that carry it on that
+day (rain gauges in Mississippi): not walked. The EMSC's and the USGS's records of
 one earthquake (the M 5.0 of central Turkey on 2026-10-04 at 11:43:23 UTC: `emsc.event:20261004_0000156`,
 mb; `usgs.event:us6000tzip`, mww) stay two entities: joining them by time and place would be a
 guess, which the `Merger` does not make.
+
+## From Wikidata into the sources of 2026-10-15/16
+
+omnilab/wikidata reads, since 2026-10-16, the ids Wikidata keeps of the sources added those two
+days (HGNC P354, OMIM P492, Mondo P5270, Orphanet P1550, HPO P3841, EFO P11956, ClinVar P1929,
+dbSNP P6861, GO P686, InterPro P2926, Pfam P3519, EC P591, WoRMS P850, ITIS P815, the Catalogue of
+Life P10585, PBDB P10907, eBird P3444, the IUCN P627, the MPC P5736, a USGS water site P13020,
+CODATA P1645): an item leads into them. Walked against the real services on 2026-10-16
+(`.samples/live.php`, section 60):
+
+```php
+$gene = $collector->collect('wikidata', 'Q14905542', 1, ['hgnc']);   // the HBB gene's item
+$gene->sources;                           // ['wikidata', 'hgnc']: 3 calls, 3.1 s
+$gene->identifiers()->keys();             // wikidata:Q14905542, ncbi.gene:3043, ensembl:ENSG00000244734, hgnc:4827, omim:141900, uniprot:P68871
+$gene->property('map_location');          // 11p15.4 [hgnc]
+$collector->collect('hgnc', 'HBB', 1, ['wikidata']);                 // and back: HGNC:4827 finds the gene's item (3 calls, 2.1 s)
+
+$apophis = $collector->collect('wikidata', 'Q118931', 1, ['mpc']);   // 99942 Apophis
+$apophis->sources;                        // ['wikidata', 'mpc']: 5 calls, 3.9 s
+$apophis->identifiers()->keys();          // wikidata:Q118931, jpl.sbdb:20099942, mpc:99942, jpl.sbdb:99942, mpc:2004 MN4
+$apophis->properties('orbital_period');   // 323.5664375491 ± 0.0000012706 d [wikidata], 323.5553376252 d [mpc]
+$apophis->property('semi_major_axis');    // 0.9223592225 ± 0.0000000003 au [mpc]
+
+$robin = $collector->collect('wikidata', 'Q460967', 1, ['ebird', 'itis', 'worms', 'col']);   // the American Robin
+$robin->sources;                          // ['wikidata', 'ebird', 'itis', 'worms', 'col']: 13 calls, 7.3 to 15.5 s (two runs)
+$robin->properties('family');             // Turdidae [ebird], [itis], [worms], [col]
+$robin->properties('taxonomic_status');   // valid [itis], accepted [worms], accepted [col]
+$robin->value('banding_codes');           // AMRO [ebird]
+
+$proton = $collector->collect('wikidata', 'Q97275155', 1, ['codata']);   // the proton mass
+$proton->sources;                         // ['wikidata', 'codata']: 4 calls, 1.7 s
+$proton->property('value');               // 1.67262192595e-27 ± 0.00000000052e-27 kg [codata]
+```
+
+Wikidata offers an HGNC id or a MIM number to the item of the gene, not of its protein (both carry
+HGNC:4827: the protein's item is left out of the lookup). On a gene's or a protein's item, a GO
+term, an InterPro entry, a Pfam family or an EC number is a class it belongs to: related (`go`,
+`domain`, `enzyme`), not followed - two kinases that share EC 2.7.10.1 are not one. A compound's
+COD structures and Materials Project material are related too (`structure`): Wikidata does not
+lead into the COD nor the Materials Project, `$item->related('structure')` gives their ids.
 
 ## The sky: small bodies and galaxies
 

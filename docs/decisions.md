@@ -172,3 +172,23 @@ museum specimens and the instruments' detections; *records* and *features* say n
   `follow()` takes ([occurrences](occurrences.md#not-in-the-collector)).
 - **`events()` of omnilab/usgs stays, deprecated**: it answers what it answered, through
   `occurrences()`.
+
+## A quantity's text keeps its significant digits (2026-10-16)
+
+`(string) Quantity` writes a float below 1e-4 or from 1e9 up in scientific notation, with the
+fewest digits that give the number back (all it holds, none invented), and its uncertainty in the
+same exponent: `1.67262192595e-27 ± 0.00000000052e-27 kg`, `1.98841e30 ± 0.00004e30 kg`. Between
+the two, as before: ten decimals at most, the trailing zeros dropped (`194.19 g/mol`,
+`0.9223592225 ± 0.0000000003 au`); an integer as it is (`61000000000 kg`). An uncertainty that ten
+decimals would round to 0 while the value is ordinary is written in scientific notation of its own
+(`1.5 ± 3e-13`).
+
+**Why**: the text was `%.10F`, ten fixed decimals. omnilab/codata's proton mass, 1.67262192595e-27
+kg with an uncertainty of 5.2e-37, read `0 ± 0 kg`, and the Sun's mass the binary noise of a
+31-digit integer: a reader saw nothing, or digits nobody measured. **Why the same exponent**: as
+CODATA writes them (`1.672 621 925 95 e-27`, `0.000 000 000 52 e-27`): the uncertainty is read
+against the value's last digits, and each side stays a number a parser reads. **Why 1e-4 and 1e9**:
+below 1e-4 ten decimals keep fewer than seven significant digits; from 1e9 a float's ten decimals
+are mostly noise. **Why nothing else moves**: callers and tests compare these texts; every value
+of ordinary magnitude, the numbers themselves (`value`, `uncertainty`, `number()`) and a source's
+text as published (`value_text`) are unchanged.

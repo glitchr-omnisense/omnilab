@@ -47,7 +47,10 @@ one; a key may hold several values of one source (`properties('has_role')`).
 
 A number, its unit as the source spells it (`g/mol`, `Å²`, `°C`, `mm`), and an uncertainty when
 given. No conversion is made; `scaled($factor, $unit)` gives another unit when the caller knows
-the factor. `(string) new Quantity(194.19, 'g/mol')` is `194.19 g/mol`.
+the factor. `(string) new Quantity(194.19, 'g/mol')` is `194.19 g/mol`; a float below 1e-4 or from
+1e9 up is written in scientific notation with every significant digit it holds, its uncertainty in
+the same exponent: CODATA's proton mass is `1.67262192595e-27 ± 0.00000000052e-27 kg`
+([why](decisions.md)). The number itself (`value`) is never rounded.
 
 ## Series
 
