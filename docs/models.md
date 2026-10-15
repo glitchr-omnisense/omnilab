@@ -123,6 +123,41 @@ service's business (its README says).
 
 `ProductQuery(collections, place, from, to, maxCloudCover, limit, cursor, sort)`.
 
+### Reading a STAC API: `Source\Stac`
+
+The catalogues that speak the STAC API (the Copernicus Data Space's, NASA's CMR-STAC, Planetary
+Computer's, Element 84's Earth Search...) are read the same way, so the core reads them once:
+`Stac` writes a `ProductQuery` as an item search's parameters and reads its answer back into
+`Product`s. A source still makes the call itself (its own `getJson()`, throttle and errors).
+
+| | |
+|---|---|
+| `Stac::parameters($query, $collections, $maxPerPage, $cloud)` | `collections`, `bbox` (a `BBox`) or `intersects` (a `Point`, as GeoJSON), `datetime` (RFC 3339 in UTC, `..` for an open end), `limit` (capped), `sortby` (`-datetime`, or `datetime` for the oldest first: the `+` some catalogues refuse is left out), the cloud cover in the catalogue's dialect: `Stac::CQL2` (`filter=eo:cloud_cover<=30&filter-lang=cql2-text`, the Filter extension) or `Stac::QUERY` (`query[eo:cloud_cover][lte]=30`, the Query extension) |
+| `Stac::page($answer, $source, $cursor, $asked)` | a `Page`: the items as products, `next` the value of the next link's `$cursor` parameter (`token` at the Data Space, `cursor` at the CMR) - null on a short page -, `total` from `numberMatched` or the Context extension's `matched` |
+| `Stac::item($item, $source)` | a `Product`: its properties but the catalogue's private ones (`_...`), its assets with their alternates (the Alternate Assets extension, or the CMR's `s3_` twins), `file:size`, the first open thumbnail as `preview`, the `self` link as `url` |
+| `Stac::collection($collection, $source)` | a collection as a `Product` (a dataset): its id as `collection`, its extent's box and interval, title, description, keywords, licence, DOI, providers, assets |
+
+```php
+use Omnilab\Model\Point;
+use Omnilab\Source\ProductQuery;
+use Omnilab\Source\Stac;
+use Symfony\Component\HttpClient\HttpClient;
+
+$query = new ProductQuery(['HLSS30_2.0'], new Point(48.5734, 7.7521), new \DateTimeImmutable('2026-10-01T00:00:00Z'), new \DateTimeImmutable('2026-10-14T23:59:59Z'), maxCloudCover: 30, limit: 1);
+$answer = HttpClient::create()->request('GET', 'https://cmr.earthdata.nasa.gov/stac/LPCLOUD/search', ['query' => Stac::parameters($query, $query->collections, 50, Stac::QUERY)])->toArray();
+$page = Stac::page($answer, 'earthdata', 'cursor', $query->limit);
+printf("%d matched; %s, %s %% cloud, B04 at %s\n", $page->total, $page->first()->id, $page->first()->cloudCover(), $page->first()->asset('B04')->alternates['s3']);
+```
+
+```
+2 matched; HLS.S30.T32ULU.2026278T102859.v2.0, 12 % cloud, B04 at s3://lp-prod-protected/HLSS30.020/HLS.S30.T32ULU.2026278T102859.v2.0/HLS.S30.T32ULU.2026278T102859.v2.0.B04.tif
+```
+
+(as answered on 2026-10-15). omnilab/copernicus reads its catalogue so; omnilab/earthdata reads
+the CMR's STAC when configured to (`stac: LPCLOUD`, one archive a catalogue) - it keeps the CMR's
+own search by default, which answers every archive at once and was faster (3.5 to 6.5 s against 4
+to 16.6 s for the same query, three times each, that day).
+
 ## Places
 
 `Point(latitude, longitude, ?elevation)` in WGS 84 degrees and metres; `Point::parse('48.57,7.75')`,
