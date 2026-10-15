@@ -110,6 +110,73 @@ the 2011 Tohoku earthquake (Q36204) has `official20110311054624120_30`, which th
 with its M 9.1 (mww), depth 29 km and 05:46:24 UTC, joined in three calls as well - Wikidata adding
 its Richter (9) and moment (9.1) magnitudes.
 
+**A gene, from NCBI Gene or UniProt into Ensembl, and back** - human HBB (answered on 2026-10-15):
+
+```php
+$hbb = $collector->collect('ncbi', '3043', 1, ['ensembl']);      // or collect('uniprot', 'P68871', 1, ['ensembl'])
+$hbb->sources;                            // ['ncbi', 'ensembl']
+$hbb->identifiers()->keys();              // ncbi.gene:3043, uniprot:P68871, ensembl:ENSG00000244734
+$hbb->properties('genomic_location');     // 11:5225464-5227071 (minus strand), NC_000011.10, GRCh38.p14 [ncbi],
+                                          // 11:5284832-5286439 (minus strand), NC_060935.1, T2T-CHM13v2.0 [ncbi],
+                                          // 11:5225464-5229395 (minus strand), GRCh38 [ensembl]
+$hbb->properties('biotype');              // protein_coding [ensembl]
+
+$gene = $collector->collect('ensembl', 'ENSG00000244734', 1, ['ncbi', 'uniprot', 'wikidata']);
+$gene->sources;                           // ['ensembl', 'ncbi', 'uniprot', 'wikidata']
+$gene->identifier(Scheme::WIKIDATA);      // Q14905542: the HBB gene's item, by the Ensembl id (P594)
+```
+
+NCBI Gene and UniProt keep the gene's Ensembl id among their cross-references; Ensembl is offered it
+and reads the gene in four calls (its record, its species, its cross-references, its Swiss-Prot
+entries). Back, Ensembl gives NCBI Gene its GeneID (3043) and UniProt its Swiss-Prot entry
+(P68871); Wikidata finds the gene's own item by P594 (the protein has another, Q424422, which the
+path from UniProt reaches by P352). Ensembl's transcripts and proteins are other things: related.
+
+**A structure, taken alone** - the PDB entries of hemoglobin beta. A structure is not its protein:
+UniProt keeps a protein's structures as related things, and a PDB entry has no identifier another
+source shares, so nothing joins them:
+
+```php
+$hbb = $registry->get('uniprot')->entity('P68871');
+$hbb->related('structure')->keys();       // pdb:1A00, pdb:1A01, pdb:1A0U... (20 kept by omnilab/uniprot)
+$entry = $collector->collect('pdb', '4HHB');
+$entry->sources;                          // ['pdb']: one call, nothing to follow
+$entry->related('protein')->keys();       // uniprot:P69905, uniprot:P68871: its chains
+$entry->related('ligand')->keys();        // inchikey:KABFMIBPWCXCRK-RGGAHWMASA-L (heme), chebi:18367 (phosphate)
+$collector->collect('uniprot', $entry->related('protein')->get(Scheme::UNIPROT));   // back to a chain's protein
+```
+
+**A species, from GBIF or Wikidata into iNaturalist, and back** - *Panthera leo* again. iNaturalist
+gives no other base's id; Wikidata's item carries the iNaturalist taxon (P3151 = 41964):
+
+```php
+$lion = $collector->collect('gbif', '4CGXP', 2, ['ncbi', 'wikidata', 'inaturalist']);
+$lion->sources;                           // ['gbif', 'ncbi', 'wikidata', 'inaturalist']
+$lion->identifiers()->keys();             // gbif:4CGXP, gbif:5219404, ncbi.taxon:9689, wikidata:Q140, inaturalist:41964
+$lion->properties('iucn_status');         // Vulnerable (VU) [gbif], Vulnerable (VU) [inaturalist]
+$lion->properties('common_name');         // African Lion [gbif], lion [ncbi], Lion [inaturalist]
+```
+
+Nine calls, about six seconds: the first round as above (GBIF, NCBI, Wikidata), the second offers
+what Wikidata found to iNaturalist, which reads 41964 in one call. From Wikidata at depth 1
+(`collect('wikidata', 'Q140', 1, ['inaturalist'])`) it takes three calls; from iNaturalist at depth 2
+(`collect('inaturalist', '41964', 2, ['wikidata', 'gbif', 'ncbi'])`) nine: Wikidata finds the item by
+P3151, then GBIF and NCBI read the ids it carries.
+
+**An occurrence, followed** - GBIF's occurrences published by iNaturalist name the observation they
+are (their `occurrenceID` is its page), which omnilab/gbif reads as an identifier:
+
+```php
+$occurrence = $registry->get('gbif')->entity('gbif.occurrence:5007681734');
+$occurrence->identifiers->keys();         // inaturalist.observation:257284120
+$both = $collector->follow($occurrence, 1, ['inaturalist']);
+$both->sources;                           // ['gbif', 'inaturalist']: one call more
+$both->value('quality_grade');            // research [inaturalist], beside GBIF's dataset, licence and recorder
+```
+
+A page of occurrences is not followed (see [occurrences](occurrences.md#not-in-the-collector)); one
+occurrence is an entity like any.
+
 A source that is down or rate limited is skipped and named in `$incomplete`; the others still
 answer. Do not cache an answer while `$incomplete` is not empty.
 

@@ -40,13 +40,14 @@ reuses a key before it makes one:
 
 | Key | Value | Read by |
 |---|---|---|
-| `OccurrenceQuery::TAXON` (`taxon`) | an `Identifier` of the source's scheme, a key, or a scientific name | gbif |
+| `OccurrenceQuery::TAXON` (`taxon`) | an `Identifier` of the source's scheme, a key, or a scientific name | gbif, inaturalist |
 | `OccurrenceQuery::COUNTRY` (`country`) | ISO 3166-1 alpha-2 (`ZA`), or a list | gbif |
 | `OccurrenceQuery::KIND` (`kind`) | the source's word for what it is, or a list: `earthquake`, `quarry blast` (usgs); `human_observation`, `preserved_specimen` (gbif's basis of record) | usgs, gbif |
 | `OccurrenceQuery::MIN_MAGNITUDE`, `MAX_MAGNITUDE` | a magnitude, included | usgs |
+| `OccurrenceQuery::LICENSE` (`license`) | the licence a record is shared under, as Creative Commons writes it lower case (`cc0`, `cc-by`, `cc-by-nc`...), or a list | inaturalist |
 
-A source may read keys of its own besides (the USGS reads `alert`, PAGER's level); its README lists
-them.
+A source may read keys of its own besides (the USGS reads `alert`, PAGER's level; iNaturalist
+`quality_grade`); its README lists them.
 
 ## The answer: a `Page` of `Entity`
 
@@ -67,16 +68,16 @@ lion carries the lion's taxon as `related('taxon')`. The `Collector` does not fo
 `BBox` as well as a `Point`. Without the capability, `occurrences()` throws `NotSupportedException`
 (`HttpSource` does it for every source that does not override it).
 
-| | gbif | usgs |
-|---|---|---|
-| Occurrences of | organisms: observations, specimens, samples | earthquakes and the other seismic events of ComCat |
-| Place | a `BBox` (across the antimeridian too) or a `Point` and its radius (10 km by default) | a `BBox` (across the antimeridian too) or a `Point` and its radius (100 km by default) |
-| Period | whole days | to the second |
-| Filters | `taxon`, `country`, `kind` (basis of record) | `min_magnitude`, `max_magnitude`, `kind` (event type), `alert` |
-| Sort | GBIF's own order only | `newest` (the default), `oldest`, `magnitude`, `magnitude-asc` |
-| Per page, at most | 300 | 20,000 |
-| Deepest | 100,000 occurrences into a query (GBIF's search; its downloads, which need an account, go further) | none |
-| Total | yes | no (a count would cost a call more) |
+| | gbif | usgs | inaturalist |
+|---|---|---|---|
+| Occurrences of | organisms: observations, specimens, samples | earthquakes and the other seismic events of ComCat | organisms: iNaturalist's observations, research grade by default |
+| Place | a `BBox` (across the antimeridian too) or a `Point` and its radius (10 km by default) | a `BBox` (across the antimeridian too) or a `Point` and its radius (100 km by default) | a `BBox` (across the antimeridian too) or a `Point` and its radius (10 km by default) |
+| Period | whole days | to the second | to the second (a bound at midnight: its whole day) |
+| Filters | `taxon`, `country`, `kind` (basis of record) | `min_magnitude`, `max_magnitude`, `kind` (event type), `alert` | `taxon`, `license`, `quality_grade` |
+| Sort | GBIF's own order only | `newest` (the default), `oldest`, `magnitude`, `magnitude-asc` | none (the latest added first), `newest`, `oldest` (by the day observed) |
+| Per page, at most | 300 | 20,000 | 200 |
+| Deepest | 100,000 occurrences into a query (GBIF's search; its downloads, which need an account, go further) | none | none unsorted (paged by id); 10,000 sorted |
+| Total | yes | no (a count would cost a call more) | on the first page (unsorted), on every page (sorted) |
 
 ## In plain PHP
 
@@ -138,7 +139,8 @@ occurrences has no identity to follow, and two sources' pages hold different thi
 earthquake): there is nothing to join, and merging by nearness in place and time would guess -
 two lions seen at one waterhole on one day are two occurrences. An occurrence of a page is an
 entity like any: `$collector->follow($occurrence)` follows it (an earthquake of the USGS into
-Wikidata by P3196), and `$collector->collect('gbif', $occurrence->related('taxon')->get(Scheme::GBIF))`
+Wikidata by P3196; a GBIF occurrence published by iNaturalist into its observation, whose number it
+carries: `gbif.occurrence:5007681734` is `inaturalist.observation:257284120`, one call), and `$collector->collect('gbif', $occurrence->related('taxon')->get(Scheme::GBIF))`
 reads what it is of.
 
 Why this shape, its name and these choices: [decisions](decisions.md).

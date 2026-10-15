@@ -121,9 +121,10 @@ Identifier::tryOf('cas', '58-08-3');                                 // null: wr
 | `inchikey`, `inchi` | chemistry | upper case; the InChI as written |
 | `cas` | chemistry | `58-08-2`, check digit checked |
 | `unii`, `dsstox`, `kegg` | chemistry | `3G6A5W338E` (`UNII-` read), `DTXSID...`, `C00001` / `D00528` |
-| `uniprot`, `ncbi.gene`, `ensembl`, `pdb` | biology | upper case; Ensembl without its version |
+| `uniprot`, `ncbi.gene`, `ensembl`, `pdb` | biology | upper case; Ensembl without its version (`ENS...` ids only: Ensembl Genomes' are their communities'); a PDB code of four characters, or its extended form `pdb_00004hhb`, kept lower case |
 | `ncbi.taxon`, `inaturalist` | taxonomy | the number (`txid` read for NCBI) |
 | `gbif.occurrence` | taxonomy | the number of a GBIF occurrence (`5007681734`), its page `gbif.org/occurrence/` read |
+| `inaturalist.observation` | taxonomy | the number of an iNaturalist observation (`332912788`), its page `inaturalist.org/observations/` read; a GBIF occurrence published by iNaturalist carries it |
 | `gbif` | taxonomy | the key of the Catalogue of Life eXtended Release, GBIF's taxonomy since June 2026, upper case (`4CGXP`: one to six of the digits 2 to 9 and the consonants, Wikidata's P14607); or the number of the legacy GBIF Backbone (`5219404`, P846). A key of digits alone is read as a legacy number |
 | `simbad`, `jpl.sbdb` | astronomy | the name, spaces collapsed: `M 31`, `433`, `1P/Halley` |
 | `usgs.event` | earth | lower case, a network's code then the event's: `us6000u24c`, `official20110311054624120_30` (the catalogues ComCat keeps, as Wikidata's P3196 names some) |

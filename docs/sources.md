@@ -4,7 +4,7 @@ Every source implements `Omnilab\Source\SourceInterface`:
 
 | Method | Answers |
 |---|---|
-| `getName()` | its factory's name: `pubchem`, `chebi`, `wikidata`, `uniprot`, `simbad`, `usgs`, `open-meteo`, `copernicus`... |
+| `getName()` | its factory's name: `pubchem`, `chebi`, `wikidata`, `uniprot`, `ensembl`, `pdb`, `inaturalist`, `simbad`, `usgs`, `open-meteo`, `copernicus`... |
 | `capabilities()` | a list of `Capability`: what it can be asked, what its answers hold |
 | `entity($id)` | an `Entity`, or null |
 | `search(Query)` | a `Page` of `Entity`, the best match first; `$page->next` is the next cursor |
@@ -67,6 +67,17 @@ of the sources over HTTP, throws it for every operation a source does not overri
 | Cross-references | InChIKey, InChI; ChEBI, PubChem, UNII, DSSTox (UniChem) | its own id alone | its SPK-ID (a second `jpl.sbdb`) | the other networks' ids for the event |
 | Related | the targets of its mechanisms, their proteins (UniProt) | - | - | - |
 | Collector path | PubChem -> ChEMBL by the InChIKey | Wikidata -> SIMBAD (P3083) | Wikidata -> JPL (P716) | Wikidata -> USGS (P3196), and back |
+
+| | ensembl | pdb | inaturalist |
+|---|---|---|---|
+| Shape | entity | entity | entity, occurrences |
+| `entity()` by | Ensembl id (gene, transcript, protein, exon; its version dropped); a gene's symbol in a species (`HBB`, `mus_musculus/Hbb-bs`) | PDB id (`4HHB`, `pdb_00004hhb`); a removed entry gives its only replacement | taxon id, a name matched exactly (scientific, synonym, common); an observation by its number (`inaturalist.observation:332912788`) |
+| `search()` | the genes a symbol names in a species, page by offset | RCSB's full-text search (experimental structures), then GraphQL for the page | iNaturalist's search of its names, page by number |
+| `occurrences()` | - | - | the observations of a `BBox` (across the antimeridian too) or around a `Point` (10 km by default) in a period, to the second; `taxon`, `license`, `quality_grade` (research by default); unsorted (latest added first, paged by id, no depth limit) or `newest`, `oldest` (10,000 deep); 200 a page |
+| Units | bp, aa | Å, kDa | m |
+| Cross-references | a gene: NCBI Gene, its Swiss-Prot entries; a protein: its UniProt entries | its own id (and the removed id it was asked by) | none (iNaturalist gives no other base's id) |
+| Related | `organism` (NCBI taxon), a gene's canonical `transcript`, a transcript's `gene` and `protein`, a protein's `transcript` and `gene` | `protein` (its chains' UniProt), `organism`, `ligand` (ChEBI, else PubChem, else InChIKey) | `parent`, or an inactive taxon's `accepted`; an observation's `taxon` |
+| Collector path | NCBI Gene or UniProt -> Ensembl by the Ensembl gene id; Ensembl -> NCBI Gene, UniProt, Wikidata (P594) | none: an entry is taken alone, reached from UniProt's `structure`s; its `protein`s lead back | Wikidata -> iNaturalist (P3151), and back; GBIF -> Wikidata -> iNaturalist at depth 2; a GBIF occurrence -> its iNaturalist observation |
 
 Their limits and politeness are in each package's `docs/index.md`.
 
@@ -135,6 +146,23 @@ Their limits and politeness are in each package's `docs/index.md`.
   page has no `total`); no text search; no Wikidata item among an event's ids (Wikidata keeps the
   USGS id in P3196, which omnilab/wikidata reads). `events()`, its list before the contract had
   occurrences, is deprecated.
+- **Ensembl**: 15 calls a second and 55,000 an hour; every call must say `Content-Type:
+  application/json`, a GET's too (Ensembl answers HTML otherwise); an unknown id or symbol is a 400,
+  read as null; a gene costs four calls (record, species, its cross-references, its Swiss-Prot
+  entries: its own list mixes the reviewed and unreviewed with nothing to tell them apart); no
+  Wikidata item among its cross-references (Wikidata keeps the Ensembl gene id in P594); the
+  genomes of Ensembl Genomes (plants, yeasts, the fly) keep their communities' ids, which are not
+  the `ensembl` scheme.
+- **RCSB PDB**: every API is rate-limited ("a handful of calls a second" to start with, 429 beyond);
+  GraphQL answers its errors with a 200; the Search API answers ids only, and a 204 when nothing
+  matches; a removed entry replaced by several is none of them (null); no Wikidata link (P638 lists
+  a thing's structures, which are not it).
+- **iNaturalist**: 100 calls a minute at most, 60 asked, 10,000 a day, and blocks without notice a
+  use that weighs on it; "not data scraping" (its exports and GBIF are for bulk); version 1 answers
+  an observation whole (44 MB a page of 200), so the observations are read in version 2, its fields
+  chosen; paging by number stops 10,000 deep (the unsorted order pages by id instead, without a
+  limit); no identifier of another base for a taxon; each observation and photo keeps its owner's
+  licence, all rights reserved when none.
 
 ## Throttling and politeness
 
@@ -152,6 +180,9 @@ Their limits and politeness are in each package's `docs/index.md`.
 | simbad | 0.2 s (SIMBAD blacklists beyond five to ten a second) | `mailto` in the User-Agent |
 | jpl | 0.2 s (one request at a time, as JPL asks) | `mailto` in the User-Agent, as JPL asks |
 | usgs | none (no rate published) | `mailto` in the User-Agent |
+| ensembl | 0.07 s (Ensembl's 15 a second) | `mailto` in the User-Agent; `Content-Type: application/json` |
+| pdb | 0.25 s (RCSB's "a handful a second") | `mailto` in the User-Agent |
+| inaturalist | 1 s (iNaturalist's 60 a minute) | `mailto` in the User-Agent |
 
 Every factory takes `mailto`, `user_agent`, `throttle` (seconds between two calls of one source
 instance) and `base_uri`.

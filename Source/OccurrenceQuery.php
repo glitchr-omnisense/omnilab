@@ -60,7 +60,9 @@ final readonly class OccurrenceQuery
         public ?string $cursor = null,
         public ?string $sort = null,
     ) {
-        if (null !== $from && null !== $to && $from > $to) {
+        // An end at midnight is its whole day: from 08:00 to that day is a period.
+        $until = null !== $to && '00:00:00' === $to->format('H:i:s') ? \DateTimeImmutable::createFromInterface($to)->modify('+1 day -1 second') : $to;
+        if (null !== $from && null !== $until && $from > $until) {
             throw new \InvalidArgumentException(\sprintf('The period ends (%s) before it starts (%s).', $to->format(\DATE_ATOM), $from->format(\DATE_ATOM)));
         }
         if (null !== $radius && !$place instanceof Point) {

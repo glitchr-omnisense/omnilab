@@ -30,7 +30,7 @@ Every answer takes one of four shapes, not one per domain:
   species, a star, an asteroid, an earthquake - its properties with their units (`Property`,
   `Quantity`), its synonyms, and its identifiers in other bases (`Identifier`, `Scheme`: PubChem
   CID, ChEBI, ChEMBL, InChIKey, CAS, UniProt, NCBI Gene and Taxonomy, Ensembl, PDB, GBIF,
-  iNaturalist, SIMBAD, JPL SBDB, USGS events, Wikidata...); a time and a place for an event;
+  iNaturalist taxa and observations, SIMBAD, JPL SBDB, USGS events, Wikidata...); a time and a place for an event;
 - a **series** (`Model\Series`): one variable at a `Point` or over a `BBox`, its points in time,
   its unit, its step and aggregation;
 - a **product** (`Model\Product`, in the shape of a STAC item): a catalogued scene or file, its
@@ -59,6 +59,9 @@ source package `symfony/http-client`. Each source is a package of its own:
 | [`omnilab/simbad`](https://github.com/glitchr-studio/omnilab-simbad) | SIMBAD (CDS, Strasbourg), through its TAP service: objects beyond the solar system by any identifier; type, coordinates, motion, parallax, velocity, redshift, spectral type, magnitudes | entity | none |
 | [`omnilab/jpl`](https://github.com/glitchr-studio/omnilab-jpl) | NASA/JPL's Small-Body Database: asteroids and comets by number, designation, name or SPK-ID; orbit, physical parameters, NEO and PHA flags, close approaches, Sentry's impact risk | entity | none |
 | [`omnilab/usgs`](https://github.com/glitchr-studio/omnilab-usgs) | USGS earthquake catalogue (ComCat, FDSN event service): an earthquake by its id, with its time and place; the earthquakes of a box or around a point as series, or as occurrences | entity, series, occurrences | none |
+| [`omnilab/ensembl`](https://github.com/glitchr-studio/omnilab-ensembl) | Ensembl (EMBL-EBI): genes, transcripts, proteins and exons by Ensembl id, genes by symbol in a species; biotype, species, assembly, place on the genome; NCBI Gene and UniProt cross-references | entity | none (15 calls a second) |
+| [`omnilab/pdb`](https://github.com/glitchr-studio/omnilab-pdb) | RCSB PDB (GraphQL Data API, Search API): structures by PDB id; method, resolution, citation, chains and ligands; their UniProt proteins, organisms and ligands as related things; full-text search | entity | none (a handful of calls a second) |
+| [`omnilab/inaturalist`](https://github.com/glitchr-studio/omnilab-inaturalist) | iNaturalist: taxa by id or name; common name, IUCN category, lineage, default photo and its licence; the observations of a place and a period, research grade by default, each with its licence | entity, occurrences | none (60 calls a minute) |
 
 A source answers what it can - `capabilities()` says what - and throws `NotSupportedException`
 for the rest, before any call. Unknown is `null`, an empty page or a series without points; a

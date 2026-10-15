@@ -112,6 +112,7 @@ final class ModelsTest extends TestCase
         self::assertSame(25, $query->limit);
         self::assertNull($query->sort, 'the source\'s own order');
         self::assertNull((new OccurrenceQuery())->place, 'anywhere');
+        self::assertSame('2026-10-15', (new OccurrenceQuery(from: new \DateTimeImmutable('2026-10-15T08:00:00+02:00'), to: new \DateTimeImmutable('2026-10-15')))->to->format('Y-m-d'), 'an end at midnight is its whole day: a period from the morning to it');
         foreach ([
             'a radius around a box' => static fn () => new OccurrenceQuery(new BBox(-25, 35, 45, 72), radius: 10),
             'a radius without a place' => static fn () => new OccurrenceQuery(radius: 10),

@@ -17,4 +17,7 @@ return [
     'simbad' => ['Omnilab\\Simbad\\Tests\\', 'Omnilab\\Simbad\\SimbadSourceFactory'],
     'jpl' => ['Omnilab\\Jpl\\Tests\\', 'Omnilab\\Jpl\\JplSourceFactory'],
     'usgs' => ['Omnilab\\Usgs\\Tests\\', 'Omnilab\\Usgs\\UsgsSourceFactory'],
+    'ensembl' => ['Omnilab\\Ensembl\\Tests\\', 'Omnilab\\Ensembl\\EnsemblSourceFactory'],
+    'pdb' => ['Omnilab\\Pdb\\Tests\\', 'Omnilab\\Pdb\\PdbSourceFactory'],
+    'inaturalist' => ['Omnilab\\INaturalist\\Tests\\', 'Omnilab\\INaturalist\\INaturalistSourceFactory'],
 ];

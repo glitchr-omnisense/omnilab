@@ -6,11 +6,14 @@ use Omnilab\Chebi\ChebiSourceFactory;
 use Omnilab\Chembl\ChemblSourceFactory;
 use Omnilab\Collector;
 use Omnilab\Copernicus\CopernicusSourceFactory;
+use Omnilab\Ensembl\EnsemblSourceFactory;
 use Omnilab\Gbif\GbifSourceFactory;
+use Omnilab\INaturalist\INaturalistSourceFactory;
 use Omnilab\Jpl\JplSourceFactory;
 use Omnilab\Merger;
 use Omnilab\Ncbi\NcbiSourceFactory;
 use Omnilab\OpenMeteo\OpenMeteoSourceFactory;
+use Omnilab\Pdb\PdbSourceFactory;
 use Omnilab\PubChem\PubChemSourceFactory;
 use Omnilab\Registry;
 use Omnilab\Simbad\SimbadSourceFactory;
@@ -66,6 +69,9 @@ final class OmnilabBundle extends AbstractBundle
         SimbadSourceFactory::class,
         JplSourceFactory::class,
         UsgsSourceFactory::class,
+        EnsemblSourceFactory::class,
+        PdbSourceFactory::class,
+        INaturalistSourceFactory::class,
     ];
 
     public function configure(DefinitionConfigurator $definition): void
@@ -73,7 +79,7 @@ final class OmnilabBundle extends AbstractBundle
         $definition->rootNode()
             ->children()
                 ->arrayNode('sources')
-                    ->info('The sources, by name: a factory (pubchem, chebi, wikidata, uniprot, gbif, simbad, usgs, open-meteo, copernicus...) and its options.')
+                    ->info('The sources, by name: a factory (pubchem, chebi, wikidata, uniprot, ensembl, pdb, gbif, inaturalist, simbad, usgs, open-meteo, copernicus...) and its options.')
                     ->useAttributeAsKey('name')
                     ->arrayPrototype()
                         ->children()

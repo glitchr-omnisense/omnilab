@@ -5,7 +5,7 @@ or from the checkouts beside this one when `OMNILAB_PLUGINS=../..` is set in `do
 a console that asks the real services.
 
 ```sh
-cd docker && cp .env.dist .env       # OMNILAB_MAILTO, WIKIDATA_LANGUAGE, an NCBI or Open-Meteo key if you have one
+cd docker && cp .env.dist .env       # OMNILAB_MAILTO, WIKIDATA_LANGUAGE, INATURALIST_LOCALE, an NCBI or Open-Meteo key if you have one
 docker compose run --rm omnilab sources
 ```
 
@@ -41,6 +41,11 @@ docker compose run --rm omnilab entity ncbi txid9689
 docker compose run --rm omnilab search ncbi "Panthera[subtree]" --domain taxonomy
 docker compose run --rm omnilab entity gbif 4CGXP                  # or 5219404, "Panthera leo"
 docker compose run --rm omnilab collect gbif "Panthera leo"         # then NCBI Taxonomy and Wikidata, merged
+docker compose run --rm omnilab entity ensembl HBB                 # or ENSG00000244734, mus_musculus/Hbb-bs
+docker compose run --rm omnilab collect ensembl ENSG00000244734     # then NCBI Gene, UniProt and Wikidata (P594), merged
+docker compose run --rm omnilab entity pdb 4HHB                     # its chains' proteins and its ligands related
+docker compose run --rm omnilab search pdb hemoglobin --limit 5
+docker compose run --rm omnilab entity inaturalist 41964            # or "Panthera leo"
 docker compose run --rm omnilab entity chembl CHEMBL113
 docker compose run --rm omnilab entity simbad Betelgeuse
 docker compose run --rm omnilab entity jpl 433
@@ -52,6 +57,7 @@ docker compose run --rm omnilab series open-meteo 48.5734,7.7521 temperature_2m 
 docker compose run --rm omnilab series air-quality 48.5734,7.7521 pm2_5 nitrogen_dioxide european_aqi --from 2026-10-14 --to 2026-10-14
 docker compose run --rm omnilab series air-quality 48.5734,7.7521 european_aqi --daily max --from 2026-10-08 --to 2026-10-14
 docker compose run --rm omnilab occurrences gbif --point -24.99,31.59 --radius 100 --from 2025-01-01 --to 2025-12-31 -f taxon=4CGXP --max 20
+docker compose run --rm omnilab occurrences inaturalist --point -24.99,31.59 --radius 100 --from 2025-01-01 --to 2025-12-31 -f taxon=41964 --max 20
 docker compose run --rm omnilab occurrences usgs --bbox -25,35,45,72 --from 2026-10-01 --to 2026-10-07 -f min_magnitude=4 --sort magnitude
 docker compose run --rm omnilab products copernicus --point 48.5734,7.7521 --from=-10days --cloud 30
 docker compose run --rm omnilab products copernicus --bbox 7.68,48.53,7.83,48.64 --collection sentinel-1-grd --from=-3days
@@ -88,6 +94,9 @@ Omnilab in bare PHP: the registry built by hand, no bundle, no container.
   simbad       entity search
   jpl          entity search
   usgs         entity series occurrences historical area
+  ensembl      entity search cross_references
+  pdb          entity search structure
+  inaturalist  entity search occurrences area
 
 PubChem, caffeine, asked of pubchem.ncbi.nlm.nih.gov:
   pubchem.cid:2519  Caffeine

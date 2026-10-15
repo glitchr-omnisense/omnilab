@@ -27,6 +27,14 @@ doubt, ask: would two entities that share it be one?), and the rest in `related`
 that says what it is (`organism`, `parent`, `target`...), reusing a relation's name before making
 one.
 
+**Applied since**: omnilab/pdb keeps an entry's chains' proteins (`protein`), their organisms and
+its ligands as related things - a structure is not its protein, and two structures of hemoglobin
+are not one -, so a PDB entry carries no identifier another source shares and the `Collector` takes
+it alone. omnilab/ensembl relates a gene's transcripts and a transcript's protein (other things),
+and keeps among a gene's identifiers its NCBI Gene record and its Swiss-Prot entries, as NCBI and
+UniProt already joined a gene and its protein. A GBIF occurrence published by iNaturalist carries
+the observation's number among its identifiers: it is that very record (`inaturalist.observation`).
+
 ## A fourth shape: occurrences (2026-10-15)
 
 `SourceInterface::occurrences(OccurrenceQuery): Page<Entity>`, `Capability::OCCURRENCES` - the

@@ -7,10 +7,13 @@ composer require omnilab/uniprot omnilab/ncbi omnilab/gbif   # proteins, genes a
 composer require omnilab/chembl                              # bioactive molecules, their targets
 composer require omnilab/simbad omnilab/jpl                  # stars and galaxies; asteroids and comets
 composer require omnilab/usgs                                # earthquakes
+composer require omnilab/ensembl omnilab/pdb                 # genomes; protein structures
+composer require omnilab/inaturalist                         # taxa, and observations of species
 ```
 
 The weather and the air are both `omnilab/open-meteo` (`api: air_quality` for the air); the
-occurrences of a species are `omnilab/gbif`'s, those of earthquakes `omnilab/usgs`'s.
+occurrences of a species are `omnilab/gbif`'s and `omnilab/inaturalist`'s (its observations), those
+of earthquakes `omnilab/usgs`'s.
 
 PHP 8.2 or later.
 

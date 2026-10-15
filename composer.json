@@ -18,6 +18,9 @@
         "gbif",
         "simbad",
         "earthquakes",
+        "ensembl",
+        "pdb",
+        "inaturalist",
         "omnilab"
     ],
     "license": "MIT",
@@ -51,6 +54,9 @@
         "omnilab/simbad": "SIMBAD (CDS): objects beyond the solar system by any identifier, their type, coordinates, motion, parallax, velocity, redshift, spectral type and magnitudes",
         "omnilab/jpl": "NASA/JPL Small-Body Database: asteroids and comets by number, designation or name, their orbit, physical parameters, NEO and PHA flags, close approaches and impact risk",
         "omnilab/usgs": "USGS earthquake catalogue (ComCat): an earthquake by its id with its time and place, the earthquakes of a box or around a point as series",
+        "omnilab/ensembl": "Ensembl: genes, transcripts, proteins and exons by Ensembl id, genes by symbol in a species, their place on the genome, biotype and assembly, their NCBI Gene and UniProt entries",
+        "omnilab/pdb": "RCSB PDB: structures of the Protein Data Bank by PDB id, their method, resolution, citation, chains and ligands, their UniProt proteins and ligands as related things; a full-text search",
+        "omnilab/inaturalist": "iNaturalist: taxa by id or name, their common name, IUCN status, lineage and default photo with its licence; the observations of a place and a period, research grade by default",
         "symfony/config": "In a Symfony application: the configuration of Omnilab\\Bridge\\Symfony\\OmnilabBundle",
         "symfony/dependency-injection": "In a Symfony application: the services of Omnilab\\Bridge\\Symfony\\OmnilabBundle",
         "symfony/http-kernel": "In a Symfony application: Omnilab\\Bridge\\Symfony\\OmnilabBundle itself"

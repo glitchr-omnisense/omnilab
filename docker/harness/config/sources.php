@@ -23,4 +23,7 @@ return [
     'simbad' => ['factory' => 'simbad', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'jpl' => ['factory' => 'jpl', 'needs' => [], 'options' => ['mailto' => $mailto]],
     'usgs' => ['factory' => 'usgs', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'ensembl' => ['factory' => 'ensembl', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'pdb' => ['factory' => 'pdb', 'needs' => [], 'options' => ['mailto' => $mailto]],
+    'inaturalist' => ['factory' => 'inaturalist', 'needs' => [], 'options' => ['mailto' => $mailto, 'locale' => $env('INATURALIST_LOCALE')]],
 ];
