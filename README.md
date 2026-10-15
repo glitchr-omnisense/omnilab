@@ -171,4 +171,17 @@ docker compose run --rm omnilab bare      # plain PHP: no bundle, no container, 
 docker compose run --rm omnilab test
 ```
 
+## Responsibility
+
+`glitchr/omnilab` and its `omnilab/*` providers are independent, unofficial clients: none is
+affiliated with, endorsed by or sponsored by the services it reaches. Each service keeps its own
+terms (licence of its data, attribution or citation, accounts and keys, rate limits, academic or
+non-commercial restrictions), summed up in the "Terms of use" section of each provider's README.
+The MIT licence covers this code only and grants no right to any service or to its data.
+
+Whoever installs and runs these packages is responsible for complying with those terms, for
+obtaining whatever they require, and for any use made of what they return. The authors publish
+them free of charge, make no commercial use of them, and accept no liability for how they are
+used (see [LICENSE](LICENSE)).
+
 License: MIT.
