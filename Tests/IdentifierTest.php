@@ -63,6 +63,40 @@ final class IdentifierTest extends TestCase
         yield 'Reactome\'s page' => ['https://reactome.org/content/detail/R-HSA-70171', 'reactome:R-HSA-70171'];
         yield 'identifiers.org\'s Reactome' => ['https://identifiers.org/reactome:R-HSA-70171', 'reactome:R-HSA-70171'];
         yield 'not Reactome: no species' => ['reactome:R-70171', null];
+        yield 'a STRING protein' => ['9606.ENSP00000269305', 'string:9606.ENSP00000269305'];
+        yield 'a STRING protein of E. coli' => ['string:511145.b0001', 'string:511145.b0001'];
+        yield 'STRING\'s page' => ['https://string-db.org/network/9606.ENSP00000269305', 'string:9606.ENSP00000269305'];
+        yield 'not a STRING protein: a decimal number' => ['9606.5', null];
+        yield 'an InterPro entry' => ['IPR000971', 'interpro:IPR000971'];
+        yield 'InterPro\'s page' => ['https://www.ebi.ac.uk/interpro/entry/InterPro/IPR000971/', 'interpro:IPR000971'];
+        yield 'a Pfam family, its version dropped' => ['PF00042.27', 'pfam:PF00042'];
+        yield 'Pfam\'s page in InterPro' => ['https://www.ebi.ac.uk/interpro/entry/pfam/PF00042/', 'pfam:PF00042'];
+        yield 'a GO term' => ['GO:0005829', 'go:0005829'];
+        yield 'a GO term, OBO\'s short form' => ['GO_0005829', 'go:0005829'];
+        yield 'QuickGO\'s page' => ['https://www.ebi.ac.uk/QuickGO/term/GO:0005829', 'go:0005829'];
+        yield 'not a GO term: six digits' => ['GO:000582', null];
+        yield 'an HGNC gene' => ['HGNC:4827', 'hgnc:4827'];
+        yield 'HGNC\'s page' => ['https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:4827', 'hgnc:4827'];
+        yield 'an OMIM entry' => ['OMIM:141900', 'omim:141900'];
+        yield 'a MIM number of a phenotype' => ['MIM:#603903', 'omim:603903'];
+        yield 'OMIM\'s page' => ['https://omim.org/entry/141900', 'omim:141900'];
+        yield 'a MIM number needs its scheme' => ['141900', null];
+        yield 'an EFO term as Open Targets writes it' => ['EFO_0000305', 'efo:0000305'];
+        yield 'a Mondo disease' => ['MONDO:0011382', 'mondo:0011382'];
+        yield 'a Mondo disease as Open Targets writes it' => ['MONDO_0011382', 'mondo:0011382'];
+        yield 'a Mondo disease\'s page' => ['https://monarchinitiative.org/MONDO:0011382', 'mondo:0011382'];
+        yield 'an HPO term' => ['HP:0001250', 'hp:0001250'];
+        yield 'an OLS page' => ['https://www.ebi.ac.uk/ols4/ontologies/efo/classes?obo_id=EFO:0000305', 'efo:0000305'];
+        yield 'an Orphanet disease' => ['ORPHA:232', 'orphanet:232'];
+        yield 'an Orphanet disease as Open Targets writes it' => ['Orphanet_232', 'orphanet:232'];
+        yield 'Orphanet\'s page' => ['https://www.orpha.net/en/disease/detail/232', 'orphanet:232'];
+        yield 'a ClinVar variation' => ['VCV000015333.71', 'clinvar:15333'];
+        yield 'a ClinVar VariationID' => ['clinvar:15333', 'clinvar:15333'];
+        yield 'ClinVar\'s page' => ['https://www.ncbi.nlm.nih.gov/clinvar/variation/15333/', 'clinvar:15333'];
+        yield 'a dbSNP variant' => ['rs334', 'dbsnp:rs334'];
+        yield 'dbSNP\'s page' => ['https://www.ncbi.nlm.nih.gov/snp/rs334', 'dbsnp:rs334'];
+        yield 'a GWAS Catalog study' => ['GCST000854', 'gwas:GCST000854'];
+        yield 'the GWAS Catalog\'s page' => ['https://www.ebi.ac.uk/gwas/studies/GCST000854', 'gwas:GCST000854'];
         yield 'a Gaia DR3 designation' => ['Gaia DR3 4472832130942575872', 'gaia:4472832130942575872'];
         yield 'a Gaia source_id with its scheme' => ['gaia:5853498713190525696', 'gaia:5853498713190525696'];
         yield 'a Gaia source_id needs its scheme' => ['4472832130942575872', null];
@@ -137,6 +171,15 @@ final class IdentifierTest extends TestCase
         self::assertSame([Domain::BIOLOGY, Domain::ASTRONOMY, Domain::ASTRONOMY], [Scheme::REACTOME->domain(), Scheme::GAIA->domain(), Scheme::EXOPLANET->domain()]);
         self::assertSame('https://reactome.org/content/detail/R-HSA-70171', Identifier::of(Scheme::REACTOME, 'R-HSA-70171')->url());
         self::assertSame('https://exoplanetarchive.ipac.caltech.edu/overview/51%20Peg%20b', Identifier::of(Scheme::EXOPLANET, '51 Peg b')->url());
+        self::assertSame(Domain::BIOLOGY, Scheme::MONDO->domain());
+        self::assertSame(['GO:0005829', 'HGNC:4827', 'OMIM:141900', 'EFO:0000305', 'MONDO:0011382', 'ORPHA:232', 'HP:0001250', 'VCV000015333', 'rs334', '9606.ENSP00000269305'], [
+            Identifier::of(Scheme::GO, 'GO:0005829')->display(),
+            Identifier::of(Scheme::HGNC, '4827')->display(), Identifier::of(Scheme::OMIM, '141900')->display(), Identifier::of(Scheme::EFO, '0000305')->display(),
+            Identifier::of(Scheme::MONDO, 'MONDO_0011382')->display(), Identifier::of(Scheme::ORPHANET, '232')->display(), Identifier::of(Scheme::HP, '0001250')->display(),
+            Identifier::of(Scheme::CLINVAR, '15333')->display(), Identifier::of(Scheme::DBSNP, 'RS334')->display(), Identifier::of(Scheme::STRING, '9606.ENSP00000269305')->display(),
+        ]);
+        self::assertSame('https://www.ebi.ac.uk/QuickGO/term/GO:0005829', Identifier::of(Scheme::GO, '0005829')->url());
+        self::assertSame('https://www.ncbi.nlm.nih.gov/clinvar/variation/15333/', Identifier::of(Scheme::CLINVAR, 'VCV000015333')->url());
         self::assertNull(Scheme::WIKIDATA->domain());
         foreach (Scheme::cases() as $scheme) {
             self::assertNotSame('', $scheme->label());
@@ -155,7 +198,8 @@ final class IdentifierTest extends TestCase
                 Scheme::INCHIKEY => 'RYYVLZVUVIJVGH-UHFFFAOYSA-N', Scheme::INCHI => 'InChI=1S/H2O/h1H2', Scheme::CAS => '7732-18-5',
                 Scheme::CHEMBL => 'CHEMBL1098659', Scheme::UNII => '059QF0KO0R', Scheme::DSSTOX => 'DTXSID6026296', Scheme::KEGG => 'C00001',
                 Scheme::UNIPROT => 'P69905', Scheme::ENSEMBL => 'ENSG00000141510', Scheme::PDB => '1A3N', Scheme::SIMBAD => 'M 31', Scheme::JPL_SBDB => '433',
-                Scheme::USGS_EVENT => 'us6000u24c', Scheme::WIKIDATA => 'Q283', Scheme::GHCN => 'USW00094728', Scheme::NWS_STATION => 'KNYC', Scheme::REACTOME => 'R-HSA-70171', Scheme::ENSEMBL_GENOMES => 'FBgn0000008', Scheme::GAIA => '4472832130942575872', Scheme::EXOPLANET => '51 Peg b', default => '962',
+                Scheme::USGS_EVENT => 'us6000u24c', Scheme::WIKIDATA => 'Q283', Scheme::GHCN => 'USW00094728', Scheme::NWS_STATION => 'KNYC', Scheme::REACTOME => 'R-HSA-70171', Scheme::ENSEMBL_GENOMES => 'FBgn0000008', Scheme::GAIA => '4472832130942575872', Scheme::EXOPLANET => '51 Peg b',
+                Scheme::STRING => '9606.ENSP00000269305', Scheme::INTERPRO => 'IPR000971', Scheme::PFAM => 'PF00042', Scheme::GO, Scheme::EFO, Scheme::MONDO, Scheme::HP => '0005829', Scheme::OMIM => '141900', Scheme::DBSNP => 'rs334', Scheme::GWAS => 'GCST000854', default => '962',
             })?->url();
             self::assertTrue(null === $url || str_starts_with($url, 'https://'), $scheme->value);
         }

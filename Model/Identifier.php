@@ -64,6 +64,14 @@ final readonly class Identifier implements \Stringable
         'ensembl.plant' => Scheme::ENSEMBL_GENOMES, 'ensembl.fungi' => Scheme::ENSEMBL_GENOMES, 'ensembl.metazoa' => Scheme::ENSEMBL_GENOMES, 'ensembl.protist' => Scheme::ENSEMBL_GENOMES, 'ensembl.bacteria' => Scheme::ENSEMBL_GENOMES,
         'gaia.dr3' => Scheme::GAIA,
         'nasa.exoplanet' => Scheme::EXOPLANET, 'exoplanetarchive' => Scheme::EXOPLANET,
+        'string-db' => Scheme::STRING,
+        'ipr' => Scheme::INTERPRO,
+        'mim' => Scheme::OMIM,
+        'orpha' => Scheme::ORPHANET, 'ordo' => Scheme::ORPHANET, 'orphanet.ordo' => Scheme::ORPHANET,
+        'hpo' => Scheme::HP,
+        'clinvar.variation' => Scheme::CLINVAR,
+        'snp' => Scheme::DBSNP,
+        'gwas.study' => Scheme::GWAS, 'gcst' => Scheme::GWAS,
         'wd' => Scheme::WIKIDATA,
     ];
 
@@ -122,6 +130,23 @@ final readonly class Identifier implements \Stringable
             // DR3's source_id, a 64-bit number; "Gaia DR3 " before it read.
             Scheme::GAIA => preg_match('~^(?:GAIA\s*DR3\s+)?0*([1-9]\d{0,18})$~', $upper, $m) && (\strlen($m[1]) < 19 || strcmp($m[1], (string) \PHP_INT_MAX) <= 0) ? $m[1] : null,
             Scheme::EXOPLANET => self::name($value),
+            // The NCBI taxon, a dot, the protein's id in its genome as STRING writes it (9606.ENSP00000269305, 511145.b0001, 4932.YAL001C).
+            Scheme::STRING => preg_match('~^[1-9]\d{0,9}\.(?=[^.]*[A-Za-z])[A-Za-z0-9][A-Za-z0-9_.:-]{1,60}$~', $value) ? $value : null,
+            Scheme::INTERPRO => preg_match('~^(?:INTERPRO:)?(IPR\d{6})$~', $upper, $m) ? $m[1] : null,
+            Scheme::PFAM => preg_match('~^(?:PFAM:)?(PF\d{5})(?:\.\d+)?$~', $upper, $m) ? $m[1] : null,
+            // The OBO ontologies' terms: seven digits, "GO:" (or the OBO "GO_") before them read.
+            Scheme::GO => preg_match('~^(?:GO[:_])?(\d{7})$~', $upper, $m) ? $m[1] : null,
+            Scheme::EFO => preg_match('~^(?:EFO[:_])?(\d{7})$~', $upper, $m) ? $m[1] : null,
+            Scheme::MONDO => preg_match('~^(?:MONDO[:_])?(\d{7})$~', $upper, $m) ? $m[1] : null,
+            Scheme::HP => preg_match('~^(?:HP[:_])?(\d{7})$~', $upper, $m) ? $m[1] : null,
+            Scheme::HGNC => preg_match('~^(?:HGNC:)?0*([1-9]\d{0,6})$~', $upper, $m) ? $m[1] : null,
+            // A MIM number: six digits, the first 1 to 6 (its prefix, *, # or %, read).
+            Scheme::OMIM => preg_match('~^(?:(?:OMIM|MIM):?\s*)?[*#%+^]?([1-6]\d{5})$~', $upper, $m) ? $m[1] : null,
+            Scheme::ORPHANET => preg_match('~^(?:ORPHANET[:_]|ORPHA:?)?0*([1-9]\d{0,6})$~', $upper, $m) ? $m[1] : null,
+            // The VariationID, or the VCV accession that pads it to nine digits (its version dropped).
+            Scheme::CLINVAR => preg_match('~^(?:VCV)?0*([1-9]\d{0,9})(?:\.\d+)?$~', $upper, $m) && (str_starts_with($upper, 'VCV') || !str_contains($upper, '.')) ? $m[1] : null,
+            Scheme::DBSNP => preg_match('~^RS0*([1-9]\d{0,11})$~', $upper, $m) ? 'rs'.$m[1] : null,
+            Scheme::GWAS => preg_match('~^(GCST\d{6,9})$~', $upper, $m) ? $m[1] : null,
             // The country (FIPS), the network, the station's own: USW00094728, BR00A6-0010.
             Scheme::GHCN => preg_match('~^(?:GHCND:)?([A-Z]{2}[0-9A-Z][0-9A-Z-]{8})$~', $upper, $m) ? $m[1] : null,
             // A WMO index of five digits is the WIGOS id 0-20000-0-<index>.
@@ -171,6 +196,16 @@ final readonly class Identifier implements \Stringable
             null !== self::ensemblGenomes($input) => self::tryOf(Scheme::ENSEMBL_GENOMES, $input),
             (bool) preg_match('~^R-[A-Z]{3}-\d+(?:\.\d+)?$~', $upper) => self::tryOf(Scheme::REACTOME, $upper),
             (bool) preg_match('~^GAIA\s*DR3\s+\d+$~', $upper) => self::tryOf(Scheme::GAIA, $upper),
+            (bool) preg_match('~^IPR\d{6}$~', $upper) => self::tryOf(Scheme::INTERPRO, $upper),
+            (bool) preg_match('~^PF\d{5}(?:\.\d+)?$~', $upper) => self::tryOf(Scheme::PFAM, $upper),
+            // The OBO short forms, as Open Targets and the GWAS Catalog write the terms: GO_0005829, EFO_0000305, MONDO_0011382, HP_0001250, Orphanet_232.
+            (bool) preg_match('~^(GO|EFO|MONDO|HP)_\d{7}$~', $upper, $m) => self::tryOf(strtolower($m[1]), $upper),
+            (bool) preg_match('~^ORPHANET_\d+$~', $upper) => self::tryOf(Scheme::ORPHANET, $upper),
+            (bool) preg_match('~^VCV\d{9}(?:\.\d+)?$~', $upper) => self::tryOf(Scheme::CLINVAR, $upper),
+            (bool) preg_match('~^RS\d+$~', $upper) => self::tryOf(Scheme::DBSNP, $upper),
+            (bool) preg_match('~^GCST\d{6,9}$~', $upper) => self::tryOf(Scheme::GWAS, $upper),
+            // A STRING protein: an NCBI taxon of three digits or more, a dot, an id with a letter (9606.ENSP00000269305).
+            (bool) preg_match('~^[1-9]\d{2,9}\.[A-Za-z][A-Za-z0-9_.-]{2,}$~', $input) => self::tryOf(Scheme::STRING, $input),
             default => null,
         };
     }
@@ -220,6 +255,14 @@ final readonly class Identifier implements \Stringable
         return match ($this->scheme) {
             Scheme::CHEBI => 'CHEBI:'.$this->value,
             Scheme::PUBCHEM_CID => 'CID '.$this->value,
+            Scheme::GO => 'GO:'.$this->value,
+            Scheme::HGNC => 'HGNC:'.$this->value,
+            Scheme::OMIM => 'OMIM:'.$this->value,
+            Scheme::EFO => 'EFO:'.$this->value,
+            Scheme::MONDO => 'MONDO:'.$this->value,
+            Scheme::ORPHANET => 'ORPHA:'.$this->value,
+            Scheme::HP => 'HP:'.$this->value,
+            Scheme::CLINVAR => 'VCV'.str_pad($this->value, 9, '0', \STR_PAD_LEFT),
             default => $this->value,
         };
     }
@@ -257,6 +300,19 @@ final readonly class Identifier implements \Stringable
             Scheme::JPL_SBDB => 'https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr='.$v,
             Scheme::USGS_EVENT => 'https://earthquake.usgs.gov/earthquakes/eventpage/'.$v,
             Scheme::REACTOME => 'https://reactome.org/content/detail/'.$v,
+            Scheme::STRING => 'https://string-db.org/network/'.$v,
+            Scheme::INTERPRO => 'https://www.ebi.ac.uk/interpro/entry/InterPro/'.$v.'/',
+            Scheme::PFAM => 'https://www.ebi.ac.uk/interpro/entry/pfam/'.$v.'/',
+            Scheme::GO => 'https://www.ebi.ac.uk/QuickGO/term/GO:'.$v,
+            Scheme::HGNC => 'https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:'.$v,
+            Scheme::OMIM => 'https://omim.org/entry/'.$v,
+            Scheme::EFO => 'https://www.ebi.ac.uk/ols4/ontologies/efo/classes?obo_id=EFO:'.$v,
+            Scheme::MONDO => 'https://monarchinitiative.org/MONDO:'.$v,
+            Scheme::ORPHANET => 'https://www.orpha.net/en/disease/detail/'.$v,
+            Scheme::HP => 'https://www.ebi.ac.uk/ols4/ontologies/hp/classes?obo_id=HP:'.$v,
+            Scheme::CLINVAR => 'https://www.ncbi.nlm.nih.gov/clinvar/variation/'.$v.'/',
+            Scheme::DBSNP => 'https://www.ncbi.nlm.nih.gov/snp/'.$v,
+            Scheme::GWAS => 'https://www.ebi.ac.uk/gwas/studies/'.$v,
             Scheme::GAIA => 'https://vizier.cds.unistra.fr/viz-bin/VizieR-S?Gaia%20DR3%20'.$v,
             Scheme::EXOPLANET => 'https://exoplanetarchive.ipac.caltech.edu/overview/'.$v,
             Scheme::GHCN => 'https://www.ncei.noaa.gov/cdo-web/datasets/GHCND/stations/GHCND:'.$v.'/detail',
@@ -283,6 +339,17 @@ final readonly class Identifier implements \Stringable
         return match (true) {
             str_ends_with($host, 'identifiers.org') => str_contains($path, ':') ? self::parse($path) : null,
             'pubchem.ncbi.nlm.nih.gov' === $host => preg_match('~^compound/(\d+)$~', $path, $m) ? self::tryOf(Scheme::PUBCHEM_CID, $m[1]) : null,
+            str_ends_with($host, 'ebi.ac.uk') && str_starts_with($path, 'interpro/') => $found('~/(IPR\d{6})~i', Scheme::INTERPRO) ?? $found('~/(PF\d{5})~i', Scheme::PFAM),
+            str_ends_with($host, 'ebi.ac.uk') && str_starts_with(strtolower($path), 'quickgo/') => $found('~GO:(\d{7})~i', Scheme::GO),
+            str_ends_with($host, 'ebi.ac.uk') && str_starts_with($path, 'gwas/') => $found('~/(GCST\d{6,9})~i', Scheme::GWAS),
+            str_ends_with($host, 'ebi.ac.uk') && str_starts_with($path, 'ols') => preg_match('~^(GO|EFO|MONDO|HP):\d{7}$~i', (string) ($query['obo_id'] ?? ''), $m) ? self::parse((string) $query['obo_id']) : null,
+            str_ends_with($host, 'string-db.org') => $found('~/network/([1-9]\d*\.[^/?#&]+)~', Scheme::STRING),
+            str_ends_with($host, 'genenames.org') => $found('~HGNC:(\d+)~i', Scheme::HGNC),
+            'omim.org' === $host || 'www.omim.org' === $host => $found('~/entry/(\d{6})~', Scheme::OMIM),
+            str_ends_with($host, 'monarchinitiative.org') => $found('~MONDO:(\d{7})~i', Scheme::MONDO),
+            str_ends_with($host, 'orpha.net') => $found('~(?:/detail/|Expert=)(\d+)~', Scheme::ORPHANET),
+            str_ends_with($host, 'ncbi.nlm.nih.gov') && str_starts_with($path, 'clinvar/variation/') => self::tryOf(Scheme::CLINVAR, explode('/', $path)[2] ?? ''),
+            str_ends_with($host, 'ncbi.nlm.nih.gov') && str_starts_with($path, 'snp/') => self::tryOf(Scheme::DBSNP, $last),
             str_ends_with($host, 'ebi.ac.uk') && str_contains($path, 'chembl') => $found('~(CHEMBL\d+)~i', Scheme::CHEMBL),
             str_ends_with($host, 'ebi.ac.uk') && str_contains($path, 'chebi') => $found('~CHEBI:(\d+)~i', Scheme::CHEBI),
             str_ends_with($host, 'wikidata.org') => $found('~/(?:wiki|entity)/(Q\d+)~i', Scheme::WIKIDATA),

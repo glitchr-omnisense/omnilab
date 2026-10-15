@@ -63,6 +63,32 @@ enum Scheme: string
     case USGS_EVENT = 'usgs.event';
     /** A Reactome pathway, reaction or physical entity, by its stable identifier without its version: R-HSA-70171 (glycolysis, human). */
     case REACTOME = 'reactome';
+    /** A protein of STRING, the network of protein interactions, by its STRING id: the NCBI taxon, a dot, the protein's id in its genome (9606.ENSP00000269305, TP53). */
+    case STRING = 'string';
+    /** An InterPro entry (family, domain, site, repeat, homologous superfamily): IPR000971. */
+    case INTERPRO = 'interpro';
+    /** A Pfam family or domain, one of InterPro's member databases: PF00042. */
+    case PFAM = 'pfam';
+    /** A Gene Ontology term (function, process, component), its number: 0005829, written GO:0005829. */
+    case GO = 'go';
+    /** A human gene of the HUGO Gene Nomenclature Committee, its number: 4827, written HGNC:4827 (HBB). */
+    case HGNC = 'hgnc';
+    /** An entry of OMIM, Online Mendelian Inheritance in Man, a gene or a phenotype, by its MIM number: 141900. */
+    case OMIM = 'omim';
+    /** A term of the Experimental Factor Ontology (diseases, traits, measurements), its number: 0000305, written EFO:0000305. */
+    case EFO = 'efo';
+    /** A disease of the Mondo Disease Ontology, its number: 0011382, written MONDO:0011382 (sickle cell disease). */
+    case MONDO = 'mondo';
+    /** A rare disease of Orphanet, its ORPHAcode: 232, written ORPHA:232. */
+    case ORPHANET = 'orphanet';
+    /** A phenotypic abnormality of the Human Phenotype Ontology, its number: 0001250, written HP:0001250. */
+    case HP = 'hp';
+    /** A variant of ClinVar by its VariationID: 15333, written VCV000015333. */
+    case CLINVAR = 'clinvar';
+    /** A short variant of dbSNP by its reference SNP id: rs334. */
+    case DBSNP = 'dbsnp';
+    /** A study of the NHGRI-EBI GWAS Catalog: GCST000854. */
+    case GWAS = 'gwas';
     /** A source of ESA's Gaia DR3 by its source_id: 4472832130942575872, written Gaia DR3 4472832130942575872 (Barnard's star). */
     case GAIA = 'gaia';
     /** A planet or a planetary system of the NASA Exoplanet Archive, by the archive's name: 51 Peg b, Proxima Cen (Wikidata's P5667). */
@@ -102,6 +128,19 @@ enum Scheme: string
             self::JPL_SBDB => 'JPL SBDB',
             self::USGS_EVENT => 'USGS event',
             self::REACTOME => 'Reactome',
+            self::STRING => 'STRING',
+            self::INTERPRO => 'InterPro',
+            self::PFAM => 'Pfam',
+            self::GO => 'Gene Ontology',
+            self::HGNC => 'HGNC',
+            self::OMIM => 'OMIM',
+            self::EFO => 'EFO',
+            self::MONDO => 'Mondo',
+            self::ORPHANET => 'Orphanet',
+            self::HP => 'HPO',
+            self::CLINVAR => 'ClinVar',
+            self::DBSNP => 'dbSNP',
+            self::GWAS => 'GWAS Catalog',
             self::GAIA => 'Gaia DR3',
             self::EXOPLANET => 'NASA Exoplanet Archive',
             self::GHCN => 'GHCN station',
@@ -116,7 +155,8 @@ enum Scheme: string
     {
         return match ($this) {
             self::PUBCHEM_CID, self::CHEBI, self::CHEMBL, self::INCHIKEY, self::INCHI, self::CAS, self::UNII, self::DSSTOX, self::KEGG => Domain::CHEMISTRY,
-            self::UNIPROT, self::NCBI_GENE, self::ENSEMBL, self::ENSEMBL_GENOMES, self::PDB, self::REACTOME => Domain::BIOLOGY,
+            self::UNIPROT, self::NCBI_GENE, self::ENSEMBL, self::ENSEMBL_GENOMES, self::PDB, self::REACTOME,
+                self::STRING, self::INTERPRO, self::PFAM, self::GO, self::HGNC, self::OMIM, self::EFO, self::MONDO, self::ORPHANET, self::HP, self::CLINVAR, self::DBSNP, self::GWAS => Domain::BIOLOGY,
             self::NCBI_TAXON, self::GBIF, self::GBIF_OCCURRENCE, self::INATURALIST, self::INATURALIST_OBSERVATION => Domain::TAXONOMY,
             self::SIMBAD, self::JPL_SBDB, self::GAIA, self::EXOPLANET => Domain::ASTRONOMY,
             self::USGS_EVENT, self::GHCN, self::WIGOS, self::NWS_STATION => Domain::EARTH,

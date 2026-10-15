@@ -194,6 +194,14 @@ Identifier::tryOf('cas', '58-08-3');                                 // null: wr
 | `gbif` | taxonomy | the key of the Catalogue of Life eXtended Release, GBIF's taxonomy since June 2026, upper case (`4CGXP`: one to six of the digits 2 to 9 and the consonants, Wikidata's P14607); or the number of the legacy GBIF Backbone (`5219404`, P846). A key of digits alone is read as a legacy number |
 | `ensembl.genomes` | biology | an Ensembl gene, transcript or protein of a genome Ensembl annotates under its community's ids, as Ensembl and Ensembl Genomes serve them on rest.ensembl.org: `FBgn0000008` (the fly, FlyBase), `WBGene00000001` (the worm), `YAL001C` (the budding yeast, SGD), `AT5G10140` (Arabidopsis, Araport), `Os01g0100100` (rice), `Zm00001eb000010` (maize), `TraesCS1A02G000100` (wheat), `SPAC1002.01` (fission yeast, PomBase), `PF3D7_0100100` (Plasmodium), `AGAP000002` (Anopheles); told by its shape for these ten genomes, each lookup checked on 2026-10-15 (`Identifier::ensemblSpecies()` names the genome: a lookup without it took 7 to 23 s, or failed), any other with its scheme (`ensembl.genomes:...`); identifiers.org's `ensembl.plant`, `ensembl.fungi`, `ensembl.metazoa`, `ensembl.protist`, `ensembl.bacteria` read |
 | `reactome` | biology | a Reactome stable id, upper case, its version dropped: `R-HSA-70171` (a species' three letters, `ALL` for a small molecule), its page `reactome.org/content/detail/` read; Wikidata's P3937 |
+| `string` | biology | a protein of STRING by its STRING id, as written: the NCBI taxon, a dot, the protein's id in its genome (`9606.ENSP00000269305`, `511145.b0001`); read by its shape (a taxon of three digits or more, an id with a letter) and from its page `string-db.org/network/` |
+| `interpro`, `pfam` | biology | an InterPro entry `IPR000971`, a Pfam family `PF00042` (its version dropped), upper case, read by their shapes and from their pages in InterPro |
+| `go`, `efo`, `mondo`, `hp` | biology | a term of the Gene Ontology, the Experimental Factor Ontology, the Mondo Disease Ontology, the Human Phenotype Ontology: its seven digits (`display()` gives `GO:0005829`, `MONDO:0011382` back); `GO:0005829` read by its prefix, the OBO short form `MONDO_0011382` (Open Targets', the GWAS Catalog's) by its shape; QuickGO's, OLS's and Monarch's pages read |
+| `hgnc` | biology | a human gene of the HGNC, its number (`HGNC:4827` read, `display()` gives it back) |
+| `omim` | biology | a MIM number, six digits (`OMIM:141900`, `MIM:#603903` read; `display()` gives `OMIM:141900`): a gene or a phenotype; a bare one needs its scheme |
+| `orphanet` | biology | an ORPHAcode (`ORPHA:232`, `Orphanet_232` read; `display()` gives `ORPHA:232`) |
+| `clinvar` | biology | a ClinVar variation by its VariationID (`15333`; `VCV000015333`, versioned or not, read by its shape; `display()` gives the VCV accession) |
+| `dbsnp`, `gwas` | biology | a reference SNP `rs334`, lower case; a GWAS Catalog study `GCST000854`; both read by their shapes |
 | `gaia` | astronomy | a source of Gaia DR3 by its `source_id`, a 64-bit number: `4472832130942575872`; `Gaia DR3 4472832130942575872` read by its shape; Wikidata's P13228 |
 | `exoplanet` | astronomy | a planet or a system of the NASA Exoplanet Archive by the archive's name, spaces collapsed: `51 Peg b`, `Proxima Cen`; its overview page read; Wikidata's P5667 |
 | `simbad`, `jpl.sbdb` | astronomy | the name, spaces collapsed: `M 31`, `433`, `1P/Halley` |
@@ -204,7 +212,8 @@ Identifier::tryOf('cas', '58-08-3');                                 // null: wr
 `parse()` reads `scheme:value` (the schemes' names, identifiers.org's prefixes, `CHEBI:`), the
 pages of each base and identifiers.org's links, and the values whose shape tells their scheme
 (an InChIKey, a CAS number, `CHEMBL...`, `DTXSID...`, `UNII-...`, an Ensembl id, a Wikidata
-Q-number, a WIGOS id, a Reactome stable id, a Gaia DR3 designation). A bare number, a UniProt accession or a PDB code needs its scheme: other values share
+Q-number, a WIGOS id, a Reactome stable id, a Gaia DR3 designation, an InterPro or Pfam accession,
+an OBO term's short form, a VCV accession, an rs id, a GCST study, a STRING protein). A bare number, a UniProt accession or a PDB code needs its scheme: other values share
 their shapes. An entity may carry two identifiers of one scheme (GBIF's new key and its legacy
 number, a secondary accession): the `Merger` knows it by either. `Identifiers` keeps each identifier once: `get()`, `value()`, `values()`, `has()`,
 `with()`, `merge()`, `toArray()` / `fromArray()` for storage.
