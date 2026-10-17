@@ -1,7 +1,7 @@
 # Installation and first calls
 
 ```sh
-composer require glitchr/omnilab omnilab/pubchem omnilab/open-meteo omnilab/copernicus
+composer require omniscient/omnilab omnilab/pubchem omnilab/open-meteo omnilab/copernicus
 composer require omnilab/chebi omnilab/wikidata   # the sources the Collector follows a compound into
 composer require omnilab/uniprot omnilab/ncbi omnilab/gbif   # proteins, genes and taxa
 composer require omnilab/chembl                              # bioactive molecules, their targets

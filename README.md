@@ -1,9 +1,12 @@
-# glitchr/omnilab
+# omniscient/omnilab
 
 One contract for the public science-data APIs, whatever the domain - chemistry, biology, species,
 astronomy, the Earth, its weather and its air: what science knows of a thing, what it measures at a
 place, what it has catalogued over an area, what was found or happened there. Publications are not here: they are
 [glitchr/omnischolar](https://github.com/glitchr-studio/omnischolar)'s.
+
+Published as `omniscient/omnilab` (formerly `glitchr/omnilab`, which this package replaces: a
+`composer.json` that still requires the old name keeps resolving, see [decisions](docs/decisions.md)).
 
 ```php
 $caffeine = $registry->get('pubchem')->entity('caffeine');
@@ -130,7 +133,7 @@ never caches as "nothing".
 ## Plain PHP
 
 ```sh
-composer require glitchr/omnilab omnilab/pubchem omnilab/open-meteo omnilab/copernicus omnilab/chebi omnilab/wikidata
+composer require omniscient/omnilab omnilab/pubchem omnilab/open-meteo omnilab/copernicus omnilab/chebi omnilab/wikidata
 ```
 
 ```php
@@ -193,7 +196,7 @@ docker compose run --rm omnilab test
 
 ## Responsibility
 
-`glitchr/omnilab` and its `omnilab/*` providers are independent, unofficial clients: none is
+`omniscient/omnilab` and its `omnilab/*` providers are independent, unofficial clients: none is
 affiliated with, endorsed by or sponsored by the services it reaches. Each service keeps its own
 terms (licence of its data, attribution or citation, accounts and keys, rate limits, academic or
 non-commercial restrictions), summed up in the "Terms of use" section of each provider's README.
