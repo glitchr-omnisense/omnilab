@@ -193,17 +193,17 @@ are mostly noise. **Why nothing else moves**: callers and tests compare these te
 of ordinary magnitude, the numbers themselves (`value`, `uncertainty`, `number()`) and a source's
 text as published (`value_text`) are unchanged.
 
-## The core is published as omniscient/omnilab (2026-10-17)
+## The core is published as omnisense/omnilab (2026-10-17)
 
-The family's core is the Composer package `omniscient/omnilab`; it was `glitchr/omnilab`. Its
+The family's core is the Composer package `omnisense/omnilab`; it was `glitchr/omnilab`. Its
 `composer.json` declares `"replace": {"glitchr/omnilab": "self.version"}`: an application or a
 provider that still requires `glitchr/omnilab` resolves it to this package, at the same version,
 and never installs both. The providers keep their vendor (`omnilab/pubchem`...) and require
-`omniscient/omnilab`; the namespace `Omnilab\` and the GitHub repositories
-(glitchr-studio/omnilab, glitchr-studio/omnilab-<provider>) do not change.
+`omnisense/omnilab`; the namespace `Omnilab\` and the GitHub repositories
+(glitchr-omnisense/omnilab, glitchr-omnisense/omnilab-<provider>) do not change.
 
-**Why**: `omniscient/` is the vendor of every family's core (omnilab, omnibus, omnitrade,
+**Why**: `omnisense/` is the vendor of every family's core (omnilab, omnibus, omnitrade,
 omnistate...), the providers the vendor of their family (`omnilab/`), the Symfony bundles
 `omnibase/`: the vendor says which layer a package is, and the cores sit together on Packagist,
-apart from the studio's other packages. **How to apply**: require `omniscient/omnilab`; replace
+apart from the studio's other packages. **How to apply**: require `omnisense/omnilab`; replace
 `glitchr/omnilab` in an existing `composer.json` when convenient - nothing breaks meanwhile.

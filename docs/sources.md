@@ -474,7 +474,7 @@ instance) and `base_uri`.
 A source is a package `omnilab/<name>` whose factory extends `Source\SourceFactory` (its name, its
 options and their defaults in `populate()`, the source in `build()`) and whose source extends
 `Source\HttpSource`, overriding the operations it does and declaring them in `capabilities()`. It
-requires `omniscient/omnilab` and `symfony/http-client`, and accepts the client given to its factory.
+requires `omnisense/omnilab` and `symfony/http-client`, and accepts the client given to its factory.
 Its identifiers are those of `Model\Scheme`: a base without a scheme yet adds one to the core
 first. What a source reads it reads from an `Identifier` of one of its schemes, and it throws
 `NotSupportedException::identifier()` for any other before calling anything: the `Collector`

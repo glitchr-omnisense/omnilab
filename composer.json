@@ -1,5 +1,5 @@
 {
-    "name": "omniscient/omnilab",
+    "name": "omnisense/omnilab",
     "type": "library",
     "description": "Omnilab: one contract for the public science-data APIs - entities (a compound, a gene, a protein, a species, a star, an earthquake) with their properties, units and cross-references, series (a variable measured at a place over time: weather, climate, air) and catalogued products (a satellite scene, a dataset, STAC-like) - whatever the domain; a Collector that follows cross-references from one base to the next, and a Symfony bundle.",
     "keywords": [
@@ -42,6 +42,7 @@
         "symfony/http-kernel": "^6.4|^7.0|^8.0"
     },
     "replace": {
+        "omniscient/omnilab": "self.version",
         "glitchr/omnilab": "self.version"
     },
     "suggest": {

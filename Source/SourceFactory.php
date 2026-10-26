@@ -49,7 +49,7 @@ abstract class SourceFactory implements SourceFactoryInterface
     {
         $mailto = $c->get('mailto');
 
-        return $c->get('user_agent') ?? ('omnilab/1.x (+https://github.com/glitchr-studio/omnilab'.($mailto ? '; mailto:'.$mailto : '').')');
+        return $c->get('user_agent') ?? ('omnilab/1.x (+https://github.com/glitchr-omnisense/omnilab'.($mailto ? '; mailto:'.$mailto : '').')');
     }
 
     /** The factory's name, its required options, the defaults of the others. */

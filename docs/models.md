@@ -105,7 +105,7 @@ $station->value('period_start');         // the first day it has records of
 $station->properties('variable');        // each element and the period it covers: "TMAX: 1869-01-01/2026-10-10"
 ```
 
-(see [omnilab/noaa](https://github.com/glitchr-studio/omnilab-noaa) for what each API answers)
+(see [omnilab/noaa](https://github.com/glitchr-omnisense/omnilab-noaa) for what each API answers)
 
 ## Occurrences
 

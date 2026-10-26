@@ -2,7 +2,7 @@
 
 Omnilab runs without a framework ([installation](installation.md)); in a Symfony application its
 bundle does the wiring. Its components - `symfony/config`, `symfony/dependency-injection`,
-`symfony/http-kernel` - are not required by `omniscient/omnilab`: the application has them, and
+`symfony/http-kernel` - are not required by `omnisense/omnilab`: the application has them, and
 nothing of them is loaded outside Symfony.
 
 Register `Omnilab\Bridge\Symfony\OmnilabBundle` (no Flex recipe):

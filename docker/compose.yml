@@ -1,4 +1,4 @@
-# omniscient/omnilab with every source package, against the real services:
+# omnisense/omnilab with every source package, against the real services:
 #
 #   cp .env.dist .env                                          # a contact address; an Open-Meteo key if you have one
 #   docker compose run --rm omnilab sources                    # which sources are installed and configured
@@ -24,7 +24,7 @@ name: omnilab-harness
 services:
   omnilab:
     build: .
-    image: omniscient/omnilab-harness
+    image: omnisense/omnilab-harness
     env_file:
       - path: .env
         required: false
