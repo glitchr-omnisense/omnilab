@@ -61,6 +61,15 @@ Beyond `HttpSource`'s mapping, a source throws:
 - `RateLimitedException` once a retry is spent (clinvar makes a 429'd call again once, after the
   wait NCBI asks).
 
+`series()` of brightsky, noaa, tides and usgs-water answers an empty list for an unknown station, or
+when no station is near the point, where the contract gives one series per variable asked; openaq
+leaves out a variable no location measures. Read each series' `variable` rather than its position.
+
+> [!WARNING]
+> Known defect: the contract (`SourceInterface::series()`: one series per variable asked, in the
+> order asked) and these sources disagree; `[$a, $b] = $source->series(...)` then fails or takes
+> the wrong series.
+
 > [!WARNING]
 > Known defect: omnilab/emsc throws `\UnexpectedValueException` (`EmscSource.php`, `toEntity()`)
 > when the SeismicPortal answers an event whose id it cannot read, where a `ProviderException`

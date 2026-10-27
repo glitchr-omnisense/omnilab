@@ -25,6 +25,7 @@ service's documentation or schema - those packages say so, and say which.
 | 2026-10-14 to 2026-10-16 | every source but those below, while it was written: the calls of its page, the answers its fixtures keep; each page's "Verified, and not" says what and when |
 | 2026-10-15 | the Collector from PubChem into ChEBI and Wikidata, the installation's scripts ([Installation](installation.md)), the error bodies of each service ([Sources](sources.md#errors)) |
 | 2026-10-27 | the installation's plain PHP script again (PubChem, Open-Meteo, the Copernicus Data Space), in the harness image ([its output](installation.md#plain-php)) |
+| 2026-10-27 | each provider page's example, against its service: 51 answered; OQMD was down (502, time-outs); materials-project and iucn refused before any call without a key, openaq answered 401 without one, ebird answered its taxonomy and refused the rest; KEGG's ran offline on its recorded answers (academic use only). Each page's "Verified, and not" gives what that run showed |
 
 The harness keeps twelve answers recorded live (`docker/harness/recorded/`: ChEBI, the Copernicus
 Data Space, Open-Meteo, PubChem, the USGS, Wikidata) that `bare` and the core's `BareTest` replay.
