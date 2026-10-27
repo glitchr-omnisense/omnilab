@@ -1,3 +1,8 @@
+---
+title: Sources
+order: 25
+---
+
 # Sources
 
 Every source implements `Omnilab\Source\SourceInterface`:
@@ -479,3 +484,6 @@ Its identifiers are those of `Model\Scheme`: a base without a scheme yet adds on
 first. What a source reads it reads from an `Identifier` of one of its schemes, and it throws
 `NotSupportedException::identifier()` for any other before calling anything: the `Collector`
 relies on it.
+
+[Writing a provider](providers.md) takes these rules step by step: the package, the factory, the
+`HttpSource` helpers, a new scheme, where a source is registered, its tests and its page.

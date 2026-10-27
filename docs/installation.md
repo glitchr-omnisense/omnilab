@@ -1,3 +1,8 @@
+---
+title: Installation and first calls
+order: 10
+---
+
 # Installation and first calls
 
 ```sh
@@ -41,6 +46,30 @@ Omnilab needs no framework. The core requires nothing but `symfony/http-client-c
 source package `symfony/http-client`: two libraries that stand alone. It runs the same in plain
 PHP, in a worker, in Laravel or Slim, and in Symfony, where a bundle does the wiring
 ([Symfony](symfony.md)).
+
+## Requirements
+
+| | Requires |
+|---|---|
+| `omnisense/omnilab` | PHP 8.2 or later, `symfony/http-client-contracts` ^3.0 |
+| each `omnilab/<source>` | PHP 8.2 or later, `omnisense/omnilab` ^1.0@dev, `symfony/http-client` ^6.4, ^7.0 or ^8.0; `omnilab/cams` requires `omnilab/cds` besides |
+| the Symfony bundle | `symfony/config`, `symfony/dependency-injection`, `symfony/http-kernel` ^6.4, ^7.0 or ^8.0 (suggested, not required: a Symfony application has them) |
+
+No PHP extension is declared. The core decodes JSON (`ext-json`, always present since PHP 8.0);
+thirteen sources (chebi, chembl, codata, ebird, ensembl, exoplanets, gbif, inaturalist, ncbi,
+simbad, uniprot, vizier, wikidata) call `mb_strtolower()` and the other `mb_*` functions.
+
+> [!WARNING]
+> Known defect: those thirteen packages call `mb_*` functions without requiring `ext-mbstring`
+> or `symfony/polyfill-mbstring` in their `composer.json`, where a requirement is expected. A PHP
+> built without mbstring fails on their first call unless another package brought the polyfill
+> (Symfony's `http-kernel`, `var-dumper` and `filesystem` do).
+
+No version is tagged yet: every package is installed from its `1.x` branch (`1.x-dev`). An
+application that requires them either writes each constraint `1.x-dev`
+(`composer require omnisense/omnilab:1.x-dev omnilab/pubchem:1.x-dev`) or sets
+`"minimum-stability": "dev"` and `"prefer-stable": true` in its `composer.json`. The source
+packages require the core as `^1.0@dev`.
 
 ## Plain PHP
 
@@ -107,6 +136,21 @@ Sentinel-2 L2A over Strasbourg since 2026-10-04:
 ```
 
 (as answered on 2026-10-15; the scenes' times are UTC, the temperatures Strasbourg's hours)
+
+Run again on 2026-10-27, in the harness image against the workspace's checkouts: the same compound,
+another day's temperatures, and no Sentinel-2 scene under 30 % cloud in those ten days - an empty
+page, not an error:
+
+```
+Caffeine (pubchem.cid:2519): C8H10N4O2, 194.19 g/mol, XLogP -0.1, TPSA 58.4 Å²
+  CAS 58-08-2, ChEBI 27732, ChEMBL CHEMBL113, Wikidata Q60235
+  https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/2519/PNG
+
+Strasbourg, 2026-10-28, from 7.8 to 14.9 °C:
+  00h 12.7 01h 13.1 02h 12.9 03h 13.9 04h 13.5 05h 13.2 06h 12.5 07h 11.6 08h 11 09h 11.4 10h 12.2 11h 13.2 12h 14.1 13h 14.6 14h 14.9 15h 14.8 16h 14.5 17h 14 18h 13.3 19h 12.3 20h 11.1 21h 10.1 22h 8.9 23h 7.8
+
+Sentinel-2 L2A over Strasbourg since 2026-10-17:
+```
 
 No key, no account: the script asks the real services. That is all there is to it:
 
@@ -264,6 +308,8 @@ See [Following cross-references, merging](merging.md).
   autowires each source by its name, the `Collector` and the `Merger`: see [Symfony](symfony.md).
   Its components (`symfony/config`, `symfony/dependency-injection`, `symfony/http-kernel`) are
   not required by this package: a Symfony application has them.
+- **Laravel**: there is no Laravel bridge for Omnilab; a service provider of the application
+  builds the `Registry` as a singleton: see [Laravel](laravel.md).
 - **Any other**: build the `Registry` once, where the framework builds its services (a service
   provider, a container definition), as the script above does.
 

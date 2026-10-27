@@ -1,3 +1,8 @@
+---
+title: Decisions
+order: 95
+---
+
 # Decisions
 
 What the contract settled, and why. Each was taken with the family's author; a change to one is a

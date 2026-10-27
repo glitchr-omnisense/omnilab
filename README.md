@@ -120,15 +120,22 @@ never caches as "nothing".
 
 ## Documentation
 
+- [The manual's home: the providers and their capabilities](docs/index.md)
 - [Installation and first calls](docs/installation.md)
-- [Sources: what each can and cannot do](docs/sources.md)
+- [Symfony](docs/symfony.md)
+- [Laravel](docs/laravel.md)
 - [Models and identifiers](docs/models.md)
+- [Sources: what each can and cannot do](docs/sources.md)
 - [Occurrences: the things of a place and a period](docs/occurrences.md)
 - [Datasets, requests, files](docs/datasets.md)
-- [Decisions: what the contract settled, and why](docs/decisions.md)
 - [Following cross-references, merging](docs/merging.md)
-- [Symfony](docs/symfony.md)
+- [Configuration reference](docs/configuration.md)
+- [Errors](docs/errors.md)
+- [Testing](docs/testing.md)
 - [The Docker harness](docs/harness.md)
+- [Writing a provider](docs/providers.md)
+- [Verified, and not](docs/verified.md)
+- [Decisions: what the contract settled, and why](docs/decisions.md)
 
 ## Plain PHP
 

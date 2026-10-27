@@ -1,3 +1,8 @@
+---
+title: Models and identifiers
+order: 20
+---
+
 # Models and identifiers
 
 All models are read-only (`readonly` classes); `Entity::with([...])` and the queries' `with([...])`
@@ -42,6 +47,43 @@ ontology); `connectivity_smiles`, `mass`, `melting_point`, `boiling_point`, `fla
 `common_name`, `group`, `basionym`, `lineage` and one key per rank of the lineage (`kingdom`,
 `phylum`, `class`, `order`, `family`, `genus`) (NCBI; `taxon_name` as Wikidata's). A new source reuses a key that exists before it makes
 one; a key may hold several values of one source (`properties('has_role')`).
+
+## Property
+
+`Model\Property` (`readonly`, `Stringable`): one thing known of an entity.
+
+| Field | Type | |
+|---|---|---|
+| `key` | `string` | lower case, snake case, the same from one source to the next when they mean the same (above) |
+| `label` | `string` | to show: `Molecular weight` |
+| `value` | `Quantity\|string\|int\|float\|bool` | a `Quantity` when it has a unit, else a text, a number or a boolean |
+| `source` | `?string` | the source that said it: the `Merger` keeps it through a merge |
+
+`number()` gives the number (a `Quantity`'s included; null for a text or a boolean), `unit()` a
+`Quantity`'s unit (null otherwise), `with([...])` a modified copy, and `(string)` the value as
+text: `194.19 g/mol`, `C8H10N4O2`, `yes` / `no` for a boolean, a float as a `Quantity` without
+unit writes it.
+
+```php
+new Property('molecular_weight', 'Molecular weight', new Quantity(194.19, 'g/mol'), 'pubchem');
+new Property('molecular_formula', 'Molecular formula', 'C8H10N4O2', 'pubchem');
+```
+
+## Domain
+
+`Model\Domain`, a string-backed enum, says what an entity is a thing of - coarse on purpose (a
+source says what kind of thing within its domain in `Entity::$kind`, in its own word):
+
+| Case | Value | `label()` | Holds |
+|---|---|---|---|
+| `CHEMISTRY` | `chemistry` | Chemistry | compounds, substances, elements, reactions, materials |
+| `BIOLOGY` | `biology` | Biology | genes, proteins, structures, pathways, variants, diseases |
+| `TAXONOMY` | `taxonomy` | Taxonomy | species and the other ranks of the tree of life, and where they were found (occurrences) |
+| `ASTRONOMY` | `astronomy` | Astronomy | stars, galaxies, planets, small bodies, space weather events |
+| `EARTH` | `earth` | Earth sciences | the solid earth, its oceans and its atmosphere: earthquakes, stations, places |
+| `OTHER` | `other` | Other | what none of the above holds: a physical constant, a launch |
+
+`Query::$domain` narrows a search to one domain; `Scheme::domain()` gives a scheme's.
 
 ## Quantity
 
@@ -244,3 +286,122 @@ an OBO term's short form, a VCV accession, an rs id, a GCST study, a STRING prot
 their shapes. An entity may carry two identifiers of one scheme (GBIF's new key and its legacy
 number, a secondary accession): the `Merger` knows it by either. `Identifiers` keeps each identifier once: `get()`, `value()`, `values()`, `has()`,
 `with()`, `merge()`, `toArray()` / `fromArray()` for storage.
+
+### The methods of `Identifier`
+
+An `Identifier` (`readonly`, `Stringable`) is a `scheme` (`Scheme`) and a normalised `value`
+(`string`); its constructor is private: it is made by one of these, so that every value is valid
+for its scheme.
+
+| Method | |
+|---|---|
+| `Identifier::of(Scheme\|string $scheme, string $value)` | the identifier; `\InvalidArgumentException` when the scheme is unknown (`"x" is not a scheme Omnilab knows.`) or the value is not one of it (`"58-08-3" is not a valid CAS number.`) |
+| `Identifier::tryOf(Scheme\|string\|null $scheme, int\|string\|null $value)` | the same, null in place of the exception (a null scheme or value included) |
+| `Identifier::parse(string $input)` | `scheme:value`, a base's page, an identifiers.org link, or a value whose shape tells its scheme (above); null when nothing is recognised |
+| `Identifier::scheme(string $name)` | the `Scheme` a name or prefix stands for (`chebi`, `pubchem.cid`, `ncbigene`, `CHEBI`...); null otherwise |
+| `Identifier::cid()`, `chebi()`, `inchikey()`, `cas()`, `wikidata()` | shortcuts for `of()` with that scheme |
+| `Identifier::ensemblSpecies(Identifier\|string $id)` | the genome (Ensembl's production name) an `ensembl.genomes` id's shape tells: `drosophila_melanogaster` for `FBgn0000008`; null otherwise |
+| `key()` | `chebi:27732`: what the `Merger` and `Identifiers` key on; also `(string) $identifier` |
+| `display()` | as its base writes it: `CHEBI:27732`, `CID 2519`, `GO:0005829`, `HGNC:4827`, `OMIM:141900`, `EFO:`, `MONDO:`, `ORPHA:232`, `HP:`, `VCV000015333`, `RHEA:18157`, `EC 2.7.1.40`; the value as it is for every other scheme |
+| `url()` | the page of the base that holds it; null when the base has none (a DWD station, an OBIS record's has its API address) |
+| `equals(Identifier $other)` | same scheme, same value |
+
+`Identifiers` (`readonly`, iterable, countable) keeps each identifier once, in the order learnt
+(a null given to it, an identifier that did not parse, is skipped):
+
+| Method | |
+|---|---|
+| `new Identifiers(iterable $identifiers)`, `Identifiers::of(?Identifier ...)` | from a list |
+| `get(Scheme)`, `value(Scheme)` | the first identifier of a scheme, its value; null when none |
+| `all(?Scheme)`, `values(Scheme)` | every identifier, or those of one scheme; their values |
+| `has(Scheme\|Identifier)` | one of that scheme, or that very identifier |
+| `with(?Identifier ...)`, `merge(Identifiers)` | a copy with more (each still once) |
+| `keys()` | `['chebi:27732', ...]` |
+| `toArray()`, `Identifiers::fromArray()` | values by scheme (`['chebi' => ['27732']]`) for storage, and back |
+
+### The methods of `Scheme`
+
+`Model\Scheme` is a string-backed enum of 67 cases (the table above gives every value). Besides
+`Scheme::from()` and `tryFrom()` on its values:
+
+- `label()`: its name for a reader (`PubChem CID`, `ChEBI`, `Launch Library 2 launch`...), used
+  in the messages of the exceptions;
+- `domain()`: the `Domain` of the things it names; null for `wikidata`, which names anything.
+
+> [!WARNING]
+> Known defect: `Scheme::LAUNCH_LIBRARY->domain()` throws `\UnhandledMatchError` (the case is
+> missing from the `match` of `Model/Scheme.php`), where `Domain::OTHER` is expected, as the
+> table above gives. No source calls it for that scheme today (omnilab/wikidata calls
+> `domain()` only for the schemes it reads, which do not include `launchlibrary`); a caller that
+> loops over `Scheme::cases()` meets it.
+
+## Page
+
+`Source\Page` (`readonly`, iterable, countable) is one page of `search()`, `occurrences()`,
+`products()`, `datasets()` or `jobs()`:
+
+| Field or method | Type | |
+|---|---|---|
+| `items` | `list<Entity\|Product>` | the page's answers, in the order the source gives (best match first, newest first...) |
+| `next` | `?string` | the cursor of the next page, to pass as the query's `cursor`; null on the last page |
+| `total` | `?int` | how many the whole query matches, when the service counts them; null otherwise |
+| `isLast()` | `bool` | `next` is null |
+| `first()` | `Entity\|Product\|null` | the first item |
+| `count()`, `foreach` | | the items of this page (not `total`) |
+
+A cursor is the source's own: an offset, a page number, a token. Pass it back unchanged.
+
+## The queries
+
+All are `readonly` with a `with([...])` that gives a modified copy
+(`$query->with(['cursor' => $page->next])`).
+
+`Source\Query`, for `search()` and `datasets()`:
+
+| Field | Type | Default | |
+|---|---|---|---|
+| `text` | `string` | required | what to look for |
+| `domain` | `?Domain` | null | the domain the caller means: a source that spans several (Wikidata) narrows to it, a source of one domain answers an empty page for another |
+| `limit` | `int` | 25 | answers a page; each source caps it |
+| `cursor` | `?string` | null | the `Page::$next` of the page before |
+
+`Source\SeriesQuery`, for `series()`:
+
+| Field | Type | Default | |
+|---|---|---|---|
+| `variables` | `list<string>` | required, not empty | in the source's names |
+| `place` | `Point\|BBox\|Identifier` | required | a box needs `Capability::AREA`; an identifier must be a station's, of `SeriesQuery::STATIONS` (`ghcn`, `wigos`, `nws.station`, `usgs.site`, `coops.station`, `dwd.station`) |
+| `from`, `to` | `?\DateTimeInterface` | null | both ends included; a date without a time stands for its whole day; null: the source's default |
+| `step` | `string` | `SeriesQuery::HOURLY` (`PT1H`) | `SeriesQuery::DAILY` (`P1D`) or another ISO 8601 duration the source knows |
+| `aggregation` | `?string` | null | for a step longer than the measure: `Series::MEAN`, `MAX`, `MIN`, `SUM` |
+| `timezone` | `?string` | null | the time zone the times and days are given in; null: the source's default |
+
+Its constructor throws `\InvalidArgumentException` for no variable (`A series query names at least
+one variable.`), an identifier that is no station (`A series is asked at a place or a station, not
+at ...`), and a period that ends before it starts.
+
+`Source\ProductQuery`, for `products()` and `jobs()`:
+
+| Field | Type | Default | |
+|---|---|---|---|
+| `collections` | `list<string>` | `[]` | the source's collection ids (`sentinel-2-l2a`); empty: the source's default ones, or all |
+| `place` | `Point\|BBox\|null` | null | a box needs `Capability::AREA` |
+| `from`, `to` | `?\DateTimeInterface` | null | the period; one that ends before it starts is an `\InvalidArgumentException` |
+| `maxCloudCover` | `?float` | null | percent, included; needs `Capability::CLOUD_COVER`, refused otherwise |
+| `limit` | `int` | 25 | products a page; each source caps it |
+| `cursor` | `?string` | null | the `Page::$next` of the page before |
+| `sort` | `string` | `ProductQuery::NEWEST` | or `ProductQuery::OLDEST` |
+
+`Source\OccurrenceQuery`, for `occurrences()`: [its fields, its filter keys](occurrences.md#the-query-sourceoccurrencequery);
+its `limit` is 25 by default, its `sort` null (the source's order).
+
+## The contracts
+
+| Interface | Methods | |
+|---|---|---|
+| `Source\SourceInterface` | `getName()`, `capabilities()`, `entity()`, `search()`, `series()`, `products()`, `occurrences()`, `datasets()`, `open()` | every source ([Sources](sources.md)) |
+| `Source\JobSourceInterface` (extends it) | `submit(string $dataset, array $request): Job`, `job(string $id): ?Job`, `jobs(ProductQuery $query = new ProductQuery()): Page` | a source that makes files on request ([datasets](datasets.md#asynchronous-requests-job)) |
+| `Source\SourceFactoryInterface` | `getName(): string`, `create(array $options = []): SourceInterface` | what the `Registry` and the bundle take ([Writing a provider](providers.md)) |
+
+`Source\SourceFactory` and `Source\HttpSource` are the abstract bases every `omnilab/*` package
+extends; `Config` is the options a factory fills; `Source\Stac` reads the STAC APIs (above).

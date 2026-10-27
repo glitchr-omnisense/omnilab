@@ -1,3 +1,8 @@
+---
+title: 'Following cross-references, merging'
+order: 33
+---
+
 # Following cross-references, merging
 
 ## The Collector

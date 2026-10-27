@@ -1,3 +1,8 @@
+---
+title: 'Occurrences: the things of a place and a period'
+order: 31
+---
+
 # Occurrences: the things of a place and a period
 
 The fourth shape. The three others answer "what is this thing" (an entity), "how does this variable
