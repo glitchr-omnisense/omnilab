@@ -187,7 +187,7 @@ Run from the workspace that holds every checkout (`~/Sites/omnilab`: its `phpuni
 one test suite per package), or in the harness (`docker compose run --rm omnilab test`):
 
 ```sh
-docker run --rm --network none -v "$PWD":/w:ro -w /w --entrypoint "" omniscient/omnilab-harness \
+docker run --rm --network none -v "$PWD":/w:ro -w /w --entrypoint "" omnisense/omnilab-harness \
     php vendor/bin/phpunit --do-not-cache-result
 ```
 

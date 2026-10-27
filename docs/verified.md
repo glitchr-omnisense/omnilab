@@ -9,7 +9,7 @@ order: 90
 
 Every package's tests run on recorded answers, with no network: 781 tests, 6195 assertions, all
 green on 2026-10-27 (the workspace `~/Sites/omnilab` mounted read-only in the
-`omniscient/omnilab-harness` image, `--network none`). The core's 245 prove the contract itself:
+`omnisense/omnilab-harness` image, `--network none`). The core's 245 prove the contract itself:
 the identifiers of every scheme, the error mapping of `HttpSource`, the models and queries, the
 `Registry`, the `Collector` and the `Merger` on stub sources, the STAC reader, plain PHP without a
 framework, and the Symfony bundle in a booted kernel ([Testing](testing.md#the-packages-own-tests)).
