@@ -47,6 +47,12 @@ Every exception of `Omnilab\Exception` implements `OmnilabException` (an interfa
 The `\InvalidArgumentException`s are the caller's mistakes, thrown before anything is asked of a
 service; they do not implement `OmnilabException`.
 
+A source's key stays out of what `HttpSource` throws: in the query (`api_key=`) or a header (a
+bearer, CDS's `PRIVATE-TOKEN`), it is masked in the HTTP client's message (`Http\Redaction::text()`),
+the previous exception is a copy of the client's (`Redaction::copy()`: the same class and code),
+and no trace of the chain keeps its arguments, where `fetch()`'s query and headers stood
+(`zend.exception_ignore_args` off).
+
 ## What the sources add
 
 Beyond `HttpSource`'s mapping, a source throws:

@@ -6,6 +6,7 @@ use Omnilab\Exception\NotSupportedException;
 use Omnilab\Exception\ProviderException;
 use Omnilab\Exception\RateLimitedException;
 use Omnilab\Exception\UnavailableException;
+use Omnilab\Http\Redaction;
 use Omnilab\Model\Asset;
 use Omnilab\Model\Entity;
 use Omnilab\Model\Identifier;
@@ -191,13 +192,13 @@ abstract class HttpSource implements SourceInterface
         } catch (\JsonException $e) {
             // A web page where JSON was asked: the service's maintenance or downtime page (the ESA Gaia Archive's, answered 200), not an error of the call.
             if (str_starts_with(ltrim($answer[0]), '<') && preg_match('~<html~i', $answer[0])) {
-                throw new UnavailableException($this->getName(), 'it answered a web page, not JSON: '.self::reason($answer[0]), null, $e);
+                throw Redaction::withoutArguments(new UnavailableException($this->getName(), 'it answered a web page, not JSON: '.self::reason($answer[0]), null, $e));
             }
 
-            throw new ProviderException($this->getName(), 'the answer is not JSON: '.$e->getMessage(), null, $e);
+            throw Redaction::withoutArguments(new ProviderException($this->getName(), 'the answer is not JSON: '.$e->getMessage(), null, $e));
         }
 
-        return \is_array($data) ? [$data, $answer[1]] : throw new ProviderException($this->getName(), 'the answer is not a JSON object');
+        return \is_array($data) ? [$data, $answer[1]] : throw Redaction::withoutArguments(new ProviderException($this->getName(), 'the answer is not a JSON object'));
     }
 
     /**
@@ -235,29 +236,35 @@ abstract class HttpSource implements SourceInterface
         if ($pairs) {
             $url .= (str_contains($url, '?') ? '&' : '?').implode('&', $pairs);
         }
+        $options = ['headers' => $headers + $this->headers] + (null === $body ? [] : ['body' => $body]);
         try {
-            $response = $this->http->request($method, $url, ['headers' => $headers + $this->headers] + (null === $body ? [] : ['body' => $body]));
+            $response = $this->http->request($method, $url, $options);
             $status = $response->getStatusCode();
             if (404 === $status || 410 === $status || 204 === $status) {
                 return null;
             }
             if (429 === $status) {
                 $retry = $response->getHeaders(false)['retry-after'][0] ?? null;
-                throw new RateLimitedException($this->getName(), null !== $retry && is_numeric($retry) ? (int) $retry : null);
+                throw Redaction::withoutArguments(new RateLimitedException($this->getName(), null !== $retry && is_numeric($retry) ? (int) $retry : null));
             }
             if ($status >= 500) {
-                throw new UnavailableException($this->getName(), \sprintf('the service answered %d', $status), $status);
+                throw Redaction::withoutArguments(new UnavailableException($this->getName(), \sprintf('the service answered %d', $status), $status));
             }
             if ($status >= 400) {
-                throw new ProviderException($this->getName(), \sprintf('the service answered %d: %s', $status, self::reason($response->getContent(false))), $status);
+                throw Redaction::withoutArguments(new ProviderException($this->getName(), \sprintf('the service answered %d: %s', $status, self::reason($response->getContent(false))), $status));
             }
 
             // A redirection the client did not follow (MockHttpClient, max_redirects 0) gives its own body.
             return [$response->getContent(false), $response->getHeaders(false)];
         } catch (TransportExceptionInterface $e) {
-            throw new UnavailableException($this->getName(), 'unreachable: '.$e->getMessage(), null, $e);
+            // The key (in the query, a header) masked in the message and the previous, a copy; no trace keeps the arguments.
+            $secrets = Redaction::secrets($url, $options);
+
+            throw Redaction::withoutArguments(new UnavailableException($this->getName(), 'unreachable: '.Redaction::text($e->getMessage(), $secrets), null, Redaction::copy($e, $secrets)));
         } catch (ExceptionInterface $e) {
-            throw new ProviderException($this->getName(), $e->getMessage(), null, $e);
+            $secrets = Redaction::secrets($url, $options);
+
+            throw Redaction::withoutArguments(new ProviderException($this->getName(), Redaction::text($e->getMessage(), $secrets), null, Redaction::copy($e, $secrets)));
         }
     }
 
