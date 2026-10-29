@@ -59,11 +59,7 @@ No PHP extension is declared. The core decodes JSON (`ext-json`, always present 
 thirteen sources (chebi, chembl, codata, ebird, ensembl, exoplanets, gbif, inaturalist, ncbi,
 simbad, uniprot, vizier, wikidata) call `mb_strtolower()` and the other `mb_*` functions.
 
-> [!WARNING]
-> Known defect: those thirteen packages call `mb_*` functions without requiring `ext-mbstring`
-> or `symfony/polyfill-mbstring` in their `composer.json`, where a requirement is expected. A PHP
-> built without mbstring fails on their first call unless another package brought the polyfill
-> (Symfony's `http-kernel`, `var-dumper` and `filesystem` do).
+Each of them requires `ext-mbstring` in its `composer.json`.
 
 No version is tagged yet: every package is installed from its `1.x` branch (`1.x-dev`). An
 application that requires them either writes each constraint `1.x-dev`
