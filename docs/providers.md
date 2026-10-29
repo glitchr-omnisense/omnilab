@@ -143,7 +143,8 @@ says. A call a source makes by itself (`$this->http->request()`) maps its own er
 - **Refuse before any call.** An identifier of a scheme it does not read, an operation, a filter,
   a box, a station, a step it cannot serve: `NotSupportedException`, before calling anything. The
   `Collector` offers every identifier to every source and relies on it.
-- **Unknown is null**, an empty page, a series without points; never an exception. Down is an
+- **Unknown is null**, an empty page, a series without points (one per variable asked, in the
+  order asked; an empty list only for a station the source does not know); never an exception. Down is an
   `UnavailableException`, never null: a caller caches null.
 - **Identifiers name the thing itself**; other things it is tied to go in `related`, under a
   relation that says what (`organism`, `parent`, `target`, `taxon`...), reusing a relation's name

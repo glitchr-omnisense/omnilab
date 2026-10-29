@@ -107,9 +107,9 @@ Data Space, Open-Meteo, PubChem, the USGS, Wikidata) that `bare` and the core's 
 
 The core: 245 tests, 766 assertions.
 
-The defects found while writing this manual are said where the behaviour is documented
-(`Known defect` callouts): the `mb_*` requirement left undeclared
-([Installation](installation.md#requirements)), the bundle's normalised source names
-([Symfony](symfony.md#the-configuration-tree)), `Scheme::LAUNCH_LIBRARY->domain()`
-([Models](models.md#the-methods-of-scheme)), omnilab/emsc's `\UnexpectedValueException`
+The defects found while writing this manual are fixed since, each with its test: the `mb_*`
+requirement left undeclared ([Installation](installation.md#requirements)), the bundle's
+normalised source names ([Symfony](symfony.md#the-configuration-tree)),
+`Scheme::LAUNCH_LIBRARY->domain()` ([Models](models.md#the-methods-of-scheme)), omnilab/emsc's
+`\UnexpectedValueException` and the series left out or answered as an empty list
 ([Errors](errors.md#what-the-sources-add)).

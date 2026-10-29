@@ -6,7 +6,8 @@ order: 50
 # Errors
 
 Unknown is not an error: `entity()` answers null, `search()`, `occurrences()`, `products()` and
-`datasets()` an empty `Page`, `series()` a series without points. Everything else a source
+`datasets()` an empty `Page`, `series()` a series without points (an empty list for a station it
+does not know). Everything else a source
 cannot or will not answer is an exception.
 
 ## The exceptions
@@ -61,19 +62,15 @@ Beyond `HttpSource`'s mapping, a source throws:
 - `RateLimitedException` once a retry is spent (clinvar makes a 429'd call again once, after the
   wait NCBI asks).
 
-`series()` of brightsky, noaa, tides and usgs-water answers an empty list for an unknown station, or
-when no station is near the point, where the contract gives one series per variable asked; openaq
-leaves out a variable no location measures. Read each series' `variable` rather than its position.
+`series()` gives one series per variable asked, in the order asked, at a `Point`: a variable the
+source has no value for there - no station near (noaa, tides, usgs-water), no location that
+measures it (openaq), a product the station does not have - is a series without points, at the
+point asked, so `[$a, $b] = $source->series(...)` holds. A station named by its `Identifier` that
+the source does not know (brightsky, noaa, tides, usgs-water) answers an empty list: there is no
+place to give the series at.
 
-> [!WARNING]
-> Known defect: the contract (`SourceInterface::series()`: one series per variable asked, in the
-> order asked) and these sources disagree; `[$a, $b] = $source->series(...)` then fails or takes
-> the wrong series.
-
-> [!WARNING]
-> Known defect: omnilab/emsc throws `\UnexpectedValueException` (`EmscSource.php`, `toEntity()`)
-> when the SeismicPortal answers an event whose id it cannot read, where a `ProviderException`
-> (an `OmnilabException`) is expected: a `catch (OmnilabException)` does not catch it.
+omnilab/emsc's event whose id it cannot read is a `ProviderException` (`The SeismicPortal answered
+an event without an id it reads`), as every answer a source cannot read.
 
 ## What to catch
 

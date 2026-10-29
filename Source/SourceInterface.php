@@ -40,7 +40,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * ("https://pubchem.ncbi.nlm.nih.gov/compound/2519") or, for the sources
  * that look things up by name, a name ("caffeine").
  *
- * Unknown is null (or an empty page, or a series without points); a
+ * Unknown is null (or an empty page, a series without points, no series
+ * for an unknown station); a
  * service that is down or refuses is an UnavailableException
  * (RateLimitedException when asked to slow down); any other error answer a
  * ProviderException.
@@ -68,7 +69,11 @@ interface SourceInterface
     public function search(Query $query): Page;
 
     /**
-     * One series per variable asked, in the order asked.
+     * One series per variable asked, in the order asked: a variable the
+     * source has no value for there (no station near the Point, no sensor
+     * of it) is a series without points, at the place asked. A station the
+     * source does not know (an Identifier it reads, unknown, or without a
+     * place to give a series) is an empty list.
      *
      * @return list<Series>
      */

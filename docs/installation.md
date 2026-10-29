@@ -320,4 +320,4 @@ See [Following cross-references, merging](merging.md).
 | `InvalidConfigException` | a source not configured, a factory not installed, an option missing |
 
 All implement `Omnilab\Exception\OmnilabException`. Not found is `null`, an empty page, or a
-series without points.
+series without points (no series for a station the source does not know).
