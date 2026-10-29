@@ -64,7 +64,7 @@ omnilab:
 
 | Key | Type | Default | |
 |---|---|---|---|
-| `sources` | map, by source name | `{}` | the sources the `Registry` builds; their order is the order `names()`, `all()` and the `Collector` follow |
+| `sources` | map, by source name | `{}` | the sources the `Registry` builds; their order is the order `names()`, `all()` and the `Collector` follow; a name is kept as written (`air-quality` is the `Registry`'s `air-quality` and the service `omnilab.source.air-quality`: the keys are not normalised) |
 | `sources.<name>.factory` | string, required, not empty | - | the factory's name (`pubchem`, `open-meteo`...: [every one](configuration.md#each-sources-own-options)) or an application's own factory |
 | `sources.<name>.options` | any (a map) | `[]` | handed to the factory's `create()` as they are: the options every source takes and the source's own ([Configuration reference](configuration.md)) |
 | `merger.preferences` | map of lists of strings | `{}` | for a field (`label`, `kind`, `description`, `url`, `image`, `time`, `place`) or a property key, the sources in the order they are trusted; `default` for every other ([the Merger](merging.md#the-merger)) |
@@ -72,15 +72,6 @@ omnilab:
 One source package may be configured several times under different names, each with its own
 options: Open-Meteo's weather and its air quality (`api: air_quality`), a CDS source with an
 account's key beside one without.
-
-> [!WARNING]
-> Known defect: Symfony's configuration normalises the dashes of a source's name to underscores
-> (`sources` is a prototyped map whose keys are normalised), where the name is expected to be kept
-> as written. A source configured as `air-quality:` is the `Registry`'s `air_quality`
-> (`$registry->get('air-quality')` throws `InvalidConfigException`), its service
-> `omnilab.source.air_quality`; and a `merger.preferences` list that names `air-quality` matches
-> no source. Name the sources without dashes (`meteo`, `air`). A factory's name in `factory:` is
-> a value, not a key: `factory: open-meteo` is read as written.
 
 ## Services
 

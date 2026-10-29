@@ -58,6 +58,21 @@ final class OmnilabBundleTest extends TestCase
         self::assertSame(['chebi', 'pubchem'], $caffeine->sources, 'the configured preferences: chebi first');
         self::assertSame('caffeine', $caffeine->label);
     }
+
+    /** A source's name is kept as written: Symfony normalises the dashes of a map's keys unless told not to. */
+    public function testASourceNameWithADashIsKeptAsWritten(): void
+    {
+        $container = new ContainerBuilder();
+        $container->register('http_client', MockHttpClient::class);
+        $container->register(StubSourceFactory::class)->setAutoconfigured(true);
+        $container->registerExtension((new OmnilabBundle())->getContainerExtension());
+        $container->loadFromExtension('omnilab', ['sources' => ['air-quality' => ['factory' => 'stub', 'options' => ['name' => 'air-quality']]]]);
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
+        $container->compile();
+
+        self::assertSame(['air-quality'], $container->get(Registry::class)->names());
+        self::assertTrue($container->has('omnilab.source.air-quality'));
+    }
 }
 
 final class Lab

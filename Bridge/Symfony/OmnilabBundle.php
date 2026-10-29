@@ -163,6 +163,7 @@ final class OmnilabBundle extends AbstractBundle
                 ->arrayNode('sources')
                     ->info('The sources, by name: a factory (pubchem, chebi, wikidata, uniprot, ensembl, pdb, reactome, string, interpro, quickgo, hgnc, opentargets, clinvar, gwas, gbif, inaturalist, simbad, gaia, exoplanets, ned, vizier, mpc, horizons, donki, launches, usgs, open-meteo, noaa, copernicus, cds, cams, earthdata, kegg, rhea, cod, cactus, codata, materials-project, oqmd, emsc, usgs-water, tides, swpc, brightsky, elevation, openaq, obis, worms, itis, col, pbdb, ebird, iucn...) and its options.')
                     ->useAttributeAsKey('name')
+                    ->normalizeKeys(false) // a source's name as written: "air-quality", not "air_quality"
                     ->arrayPrototype()
                         ->children()
                             ->scalarNode('factory')->isRequired()->cannotBeEmpty()->end()
