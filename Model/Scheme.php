@@ -237,7 +237,7 @@ enum Scheme: string
                 self::WORMS, self::OBIS_OCCURRENCE, self::ITIS, self::COL, self::PBDB, self::PBDB_OCCURRENCE, self::EBIRD, self::EBIRD_CHECKLIST, self::IUCN => Domain::TAXONOMY,
             self::SIMBAD, self::JPL_SBDB, self::MPC, self::NED, self::DONKI, self::GAIA, self::EXOPLANET => Domain::ASTRONOMY,
             self::USGS_EVENT, self::GHCN, self::WIGOS, self::NWS_STATION, self::EMSC_EVENT, self::USGS_SITE, self::COOPS_STATION, self::DWD_STATION => Domain::EARTH,
-            self::CODATA => Domain::OTHER,
+            self::CODATA, self::LAUNCH_LIBRARY => Domain::OTHER,
             self::WIKIDATA => null,
         };
     }

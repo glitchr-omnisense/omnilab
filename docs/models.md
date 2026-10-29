@@ -328,13 +328,6 @@ for its scheme.
   in the messages of the exceptions;
 - `domain()`: the `Domain` of the things it names; null for `wikidata`, which names anything.
 
-> [!WARNING]
-> Known defect: `Scheme::LAUNCH_LIBRARY->domain()` throws `\UnhandledMatchError` (the case is
-> missing from the `match` of `Model/Scheme.php`), where `Domain::OTHER` is expected, as the
-> table above gives. No source calls it for that scheme today (omnilab/wikidata calls
-> `domain()` only for the schemes it reads, which do not include `launchlibrary`); a caller that
-> loops over `Scheme::cases()` meets it.
-
 ## Page
 
 `Source\Page` (`readonly`, iterable, countable) is one page of `search()`, `occurrences()`,

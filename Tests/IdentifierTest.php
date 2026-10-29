@@ -264,6 +264,15 @@ final class IdentifierTest extends TestCase
         }
     }
 
+    public function testEverySchemeHasADomain(): void
+    {
+        foreach (Scheme::cases() as $scheme) {
+            $scheme->domain();
+        }
+        self::assertSame(Domain::OTHER, Scheme::LAUNCH_LIBRARY->domain());
+        self::assertNull(Scheme::WIKIDATA->domain());
+    }
+
     public function testAnEnsemblGenomesIdSaysItsGenome(): void
     {
         self::assertSame('drosophila_melanogaster', Identifier::ensemblSpecies(Identifier::of(Scheme::ENSEMBL_GENOMES, 'FBgn0000008')));
