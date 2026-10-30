@@ -93,8 +93,8 @@ final class CompoundController
 - No source is injected by its name: there is no `SourceInterface $pubchem` alias. Inject the
   `Registry` and ask it (`$registry->get('pubchem')`), or bind a name of the application's own
   (`$this->app->bind('lab.pubchem', fn ($app) => $app->make(Registry::class)->get('pubchem'))`).
-- The source names are kept as written: `air-quality` stays `air-quality` (the bundle's
-  configuration turns it into `air_quality`, [a known defect](symfony.md#the-configuration-tree)).
+- The source names are kept as written: `air-quality` stays `air-quality`, as under the Symfony
+  bundle ([its configuration tree](symfony.md#the-configuration-tree)).
 - The HTTP client is Symfony's (`symfony/http-client`, which every source package requires),
   not Laravel's `Http` facade: the factories take a `Symfony\Contracts\HttpClient\HttpClientInterface`.
 

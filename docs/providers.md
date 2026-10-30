@@ -39,8 +39,8 @@ omnilab-<slug>/
 }
 ```
 
-A package that calls `mb_*` functions requires `ext-mbstring` or `symfony/polyfill-mbstring`
-(the thirteen that do today do not: [a known defect](installation.md#requirements)).
+A package that calls `mb_*` functions requires `ext-mbstring` or `symfony/polyfill-mbstring`, as
+the thirteen source packages that call them now do ([Requirements](installation.md#requirements)).
 
 ## The factory
 
@@ -166,8 +166,8 @@ change of `omnisense/omnilab`:
 
 - the case and its value (lower case, dots for a sub-kind: `ebird.checklist`);
 - its `label()` and its `domain()` (both are `match` expressions over every case: a case
-  missing from either throws `\UnhandledMatchError`, as `LAUNCH_LIBRARY` does from `domain()`
-  today, [a known defect](models.md#the-methods-of-scheme));
+  missing from either throws `\UnhandledMatchError`, as `LAUNCH_LIBRARY` did from `domain()`
+  until it was added ([the methods of Scheme](models.md#the-methods-of-scheme));
 - its normalisation in `Identifier::tryOf()`, its page in `url()`, its pages read back in
   `fromUrl()`, its prefixes (identifiers.org's, the base's own) in `Identifier::PREFIXES`, and
   its shape in `parse()` only when no other scheme shares it;
