@@ -3,7 +3,7 @@
 One contract for the public science-data APIs, whatever the domain - chemistry, biology, species,
 astronomy, the Earth, its weather and its air: what science knows of a thing, what it measures at a
 place, what it has catalogued over an area, what was found or happened there. Publications are not here: they are
-[glitchr/omnischolar](https://github.com/glitchr-omnisense/omnischolar)'s.
+[omnisense/omnischolar](https://github.com/glitchr-omnisense/omnischolar)'s.
 
 Published as `omnisense/omnilab` (formerly `glitchr/omnilab`, which this package replaces: a
 `composer.json` that still requires the old name keeps resolving, see [decisions](docs/decisions.md)).
