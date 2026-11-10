@@ -7,13 +7,20 @@ use Omnilab\Exception\InvalidConfigException;
 /**
  * A source's configuration while its factory builds it: the options
  * given, the factory's defaults under them, and the keys that must be filled.
- *
- * @extends \ArrayObject<string, mixed>
+ * omnisense/contracts' Config with the family's prefix ("omnilab.factory_name",
+ * "omnilab.required_options", "omnilab.name", "omnilab.limiter"), its
+ * messages and its InvalidConfigException; a null counts as not set.
  */
-final class Config extends \ArrayObject
+final class Config extends \Omnisense\Contracts\Provider\Config
 {
-    /** Sets each key not set yet (a null counts as not set). */
-    public function defaults(array $defaults): self
+    public const PREFIX = 'omnilab';
+
+    /**
+     * Sets each key not set yet (a null counts as not set).
+     *
+     * @param array<string, mixed> $defaults
+     */
+    public function defaults(array $defaults): static
     {
         foreach ($defaults as $key => $value) {
             if (!$this->offsetExists($key) || null === $this[$key]) {
@@ -36,5 +43,10 @@ final class Config extends \ArrayObject
     public function get(string $key, mixed $default = null): mixed
     {
         return $this->offsetExists($key) && null !== $this[$key] ? $this[$key] : $default;
+    }
+
+    protected function invalid(string $message): \Throwable
+    {
+        return new InvalidConfigException(str_replace(' provider', ' source', $message));
     }
 }

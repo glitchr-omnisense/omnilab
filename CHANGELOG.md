@@ -4,6 +4,56 @@
 
 ### Added
 
+- On omnisense/contracts, the kernel of the omni families, with usage policies. Every HTTP request
+  a source makes goes through its usage policy (`Policy\SourceGuard`): the `policy.json` its
+  package declares (`extra.omnisense.policy`; `HttpSource::usagePolicy()`, the kernel's
+  `DeclaresUsagePolicyInterface`; cams' is its own though it runs on cds' class), tightened by
+  the site's (`policy`, never looser), checked against what the site is (`usage`: a use the terms
+  forbid fails at the first request, `UsageNotPermitted`), counted in the registry's limiter (in
+  memory by default, a shared one as `Registry`'s new third argument). `Registry::guard()`,
+  `policy()`, `policies()`; `HttpSource::guard()`, `sourceGuard()`, `operation()`, `governed()`
+  (a request a source sends itself: a file opened, a form posted); `Policy\PackagePolicy`; the
+  options `policy`, `usage`, `max_wait`; the bundle's `policy`, `usage` (per source) and `limiter`.
+- `RateLimitedException::notSent()`, `wasSent()`, `$limit`, and a fourth and fifth optional
+  constructor argument (the limit, the message).
+- Every source (56) declares its policy, read at the service's pages on 2026-11-10
+  (docs/policies.md): PubChem's 5 a second and 400 a minute, NCBI's E-utilities (3 a second per
+  address, 10 with a key) and Datasets (5, 10 with a key) counted apart, Ensembl's 15 a second and
+  55,000 an hour, iNaturalist's 60 a minute and 10,000 a day, Open-Meteo's free tier, GWAS's,
+  MPC's, KEGG's, HGNC's, STRING's, SIMBAD's, Wikidata's, Open Topo Data's, OpenAQ's, Materials
+  Project's and Launch Library's figures; the data's licences (CC0, CC BY, ODbL, US public domain,
+  per dataset for GBIF and OBIS), the credits, keys and User-Agents asked; unknown where nothing is
+  published.
+- `Testing\BareTestCase` (the kernel's bare check, the family's core allowed) and
+  `Tests/LoadAllTest`: every class of the core loads with omnisense/contracts and the HTTP client
+  contracts alone - symfony/dependency-injection, config and http-kernel stay suggested; the
+  Symfony bundle throws a `LogicException` naming them when they are missing.
+- PHPStan at level max on the core and every source (`phpstan.neon`), each baseline what was there
+  on 2026-11-10; the harness runs it (`phpstan`), installs omnisense/contracts from its checkout
+  (`OMNISENSE_CONTRACTS`) or GitHub, and runs on Docker's default bridge.
+
+### Changed
+
+- **A limit reached waits or refuses.** A request over a limit of the source's policy waits when
+  the limit's window ends within `max_wait` seconds (10 by default) - the sleep the sources'
+  `throttle` did, now read from the policy, kept for the callers that relied on it (the
+  Collector's walks) - and refuses beyond: a `RateLimitedException` (an `UnavailableException`, as
+  the service's 429 was) with `wasSent()` false. A source whose `throttle` was 0 now keeps to the
+  figures its service publishes (GWAS, MPC, Open-Meteo, Launch Library, Materials Project...);
+  Launch Library's sixteenth request of an hour is refused before it is sent. The `throttle`
+  defaults stay, as the site's spacing on top.
+- **A 429 holds the next requests** for its Retry-After (and a 503's Retry-After, a `RateLimit`
+  field with nothing left): waited out within `max_wait`, refused beyond, where they were sent
+  before. Its `retryAfter` reads a Retry-After given as a date too (null before).
+- `Registry::get()` gives the factory the options configured plus `omnilab.name` and
+  `omnilab.limiter`; `options()` is unchanged.
+- `OmnilabException` extends omnisense/contracts' `ExceptionInterface`; `InvalidConfigException`
+  its `InvalidConfigException` (an `\InvalidArgumentException`, a `\LogicException` as before);
+  `Config` its `Config` (prefix `omnilab`, the same methods and messages); `Http\Redaction` its
+  `Redaction`.
+
+### Added
+
 - `Omnilab\Http\Redaction`: a request's secrets (`secrets()`), a text without them (`text()`), a
   failure's copy to wrap in its place (`copy()`), a trace without arguments (`withoutArguments()`).
 

@@ -11,6 +11,11 @@ use Omnilab\Model\Asset;
 use Omnilab\Model\Entity;
 use Omnilab\Model\Identifier;
 use Omnilab\Model\Scheme;
+use Omnilab\Policy\PackagePolicy;
+use Omnilab\Policy\SourceGuard;
+use Omnisense\Contracts\Policy\DeclaresUsagePolicyInterface;
+use Omnisense\Contracts\Policy\PolicyGuard;
+use Omnisense\Contracts\Policy\UsagePolicy;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -21,13 +26,28 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * services that take a query as a JSON body), their errors mapped the same
  * way (404 and 204 are null; 429 a RateLimitedException; 5xx and transport
  * errors an UnavailableException; any other 4xx a ProviderException), a minimum
- * interval between two calls when the service asks for one (PubChem: five
- * calls a second at most), and the reading of identifiers given as strings.
- * What a source does not override it does not do: NotSupportedException.
+ * interval between two calls (the throttle option: the site's spacing), and
+ * the reading of identifiers given as strings. What a source does not
+ * override it does not do: NotSupportedException.
+ *
+ * Every request goes through the source's usage policy (SourceGuard): the
+ * policy.json of its package (usagePolicy()), as the site tightens it; a
+ * limit reached waits when its window ends within max_wait seconds (PubChem's
+ * five calls a second), else the request is not sent
+ * (RateLimitedException::notSent()). A request is counted as the operation
+ * operation() names ("request" unless a source calls several APIs with their
+ * own limits); one a source sends itself goes through governed() first.
  */
-abstract class HttpSource implements SourceInterface
+abstract class HttpSource implements SourceInterface, DeclaresUsagePolicyInterface
 {
+    /** The operation every request counts as, unless operation() names another. */
+    public const REQUEST = 'request';
+
     private float $lastCall = 0.0;
+
+    private ?UsagePolicy $declared = null;
+
+    private ?SourceGuard $sourceGuard = null;
 
     /**
      * @param array<string, string> $headers  sent with every call (User-Agent...)
@@ -39,6 +59,70 @@ abstract class HttpSource implements SourceInterface
         protected readonly array $headers = [],
         protected readonly float $throttle = 0.0,
     ) {
+    }
+
+    /**
+     * The usage policy the source declares: its package's policy.json
+     * (extra.omnisense.policy in its composer.json), unknown when it has
+     * none. A source whose limits depend on its options (a key) overrides it.
+     */
+    public function usagePolicy(): UsagePolicy
+    {
+        return $this->declared ??= PackagePolicy::of(static::class) ?? UsagePolicy::unknown($this->getName());
+    }
+
+    /**
+     * The guard the source's requests go through: its factory gives it the
+     * site's tightening, usage and limiter; built on first use otherwise.
+     */
+    public function sourceGuard(): SourceGuard
+    {
+        return $this->sourceGuard ??= new SourceGuard($this->getName(), fn (): UsagePolicy => $this->usagePolicy());
+    }
+
+    /** The kernel's guard: the policy as the site runs it, remaining(), cacheTtl(). */
+    public function guard(): PolicyGuard
+    {
+        return $this->sourceGuard()->guard();
+    }
+
+    /**
+     * Set by the factory once the source is built: the guard its requests
+     * go through, the policy its package declares (that of the factory's
+     * package, for a source class another package also builds: cams on cds).
+     *
+     * @internal
+     */
+    public function governedBy(SourceGuard $guard, ?UsagePolicy $declared = null): static
+    {
+        $this->sourceGuard = $guard;
+        if (null !== $declared) {
+            $this->declared = $declared;
+        }
+
+        return $this;
+    }
+
+    /** The operation a request counts as in the policy: "request", or the API it goes to. */
+    protected function operation(string $method, string $url): string
+    {
+        return self::REQUEST;
+    }
+
+    /**
+     * A request the source sends itself (a file opened, a form posted):
+     * admitted by its usage policy (waited for, or RateLimitedException with
+     * nothing sent), and counted.
+     */
+    protected function governed(string $method, string $url): void
+    {
+        $operation = $this->operation($method, $url);
+        try {
+            $this->sourceGuard()->admit($operation);
+        } catch (RateLimitedException $e) {
+            throw Redaction::withoutArguments($e);
+        }
+        $this->sourceGuard()->record($operation);
     }
 
     public function entity(Identifier|string $id): ?Entity
@@ -237,15 +321,23 @@ abstract class HttpSource implements SourceInterface
             $url .= (str_contains($url, '?') ? '&' : '?').implode('&', $pairs);
         }
         $options = ['headers' => $headers + $this->headers] + (null === $body ? [] : ['body' => $body]);
+        $operation = $this->operation($method, $url);
+        $guard = $this->sourceGuard();
+        try {
+            $guard->admit($operation);
+        } catch (RateLimitedException $e) {
+            throw Redaction::withoutArguments($e);
+        }
         try {
             $response = $this->http->request($method, $url, $options);
             $status = $response->getStatusCode();
+            try {
+                $guard->observe($status, $response->getHeaders(false));
+            } catch (RateLimitedException $e) {
+                throw Redaction::withoutArguments($e);
+            }
             if (404 === $status || 410 === $status || 204 === $status) {
                 return null;
-            }
-            if (429 === $status) {
-                $retry = $response->getHeaders(false)['retry-after'][0] ?? null;
-                throw Redaction::withoutArguments(new RateLimitedException($this->getName(), null !== $retry && is_numeric($retry) ? (int) $retry : null));
             }
             if ($status >= 500) {
                 throw Redaction::withoutArguments(new UnavailableException($this->getName(), \sprintf('the service answered %d', $status), $status));
@@ -265,6 +357,8 @@ abstract class HttpSource implements SourceInterface
             $secrets = Redaction::secrets($url, $options);
 
             throw Redaction::withoutArguments(new ProviderException($this->getName(), Redaction::text($e->getMessage(), $secrets), null, Redaction::copy($e, $secrets)));
+        } finally {
+            $guard->record($operation);
         }
     }
 

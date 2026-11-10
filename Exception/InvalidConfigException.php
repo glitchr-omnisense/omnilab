@@ -2,7 +2,10 @@
 
 namespace Omnilab\Exception;
 
-/** A source misconfigured: a key missing, an unknown factory. */
-final class InvalidConfigException extends \LogicException implements OmnilabException
+/**
+ * A source misconfigured: a key missing, an unknown factory. omnisense/contracts'
+ * InvalidConfigException, an \InvalidArgumentException (a \LogicException as before).
+ */
+final class InvalidConfigException extends \Omnisense\Contracts\Exception\InvalidConfigException implements OmnilabException
 {
 }

@@ -385,7 +385,7 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
   without a key, ten with one, per address (two 429s came on 2026-10-15 while other clients shared
   it: the source makes such a call again once, after the wait NCBI asks); an rs id names a site
   (rs334: two alleles and eight haplotypes), not a variation.
-- **GWAS Catalog**: the v1 API is retired (410); v2 has no rate published; a p-value is kept as
+- **GWAS Catalog**: the v1 API is retired (410); v2 publishes 15 requests a second and 100 a minute per address (2026-11-10); a p-value is kept as
   its mantissa and exponent (`1e-323`: a float underflows past about 1e-308); `studies?disease_trait=`
   matched nothing for "sickle" on 2026-10-15: the search goes through the traits.
 - **COD**: no rate published; a slow server (0.3 to 7.6 s a call) that answered 403 to eight calls in ten seconds (0.5 s between two calls by default) and dropped a few connections; a search costs two calls (the ids, then the page's rows), its total is the number of ids; an id names an entry whatever COD flags it (duplicates, errors, theoretical: asked with `include_*=1`).
@@ -416,6 +416,10 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
 
 ## Throttling and politeness
 
+Each source's limits are declared in its `policy.json` and honoured on every request
+([Usage policies](policies.md)): a limit reached waits within `max_wait`, else the request is not
+sent. The default `throttle` below is the spacing each source keeps on top of that, as before.
+
 | Source | Default `throttle` | Contact |
 |---|---|---|
 | pubchem | 0.2 s (PubChem's five a second) | `mailto` in the User-Agent |
@@ -444,7 +448,7 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
 | hgnc | 0.1 s (HGNC's ten a second) | `mailto` in the User-Agent |
 | opentargets | none (no rate published) | `mailto` in the User-Agent |
 | clinvar | 0.34 s without a key, 0.1 s with one (`auto`) | `tool` and `email` (from `mailto`) on every call; `api_key` |
-| gwas | none (no rate published) | `mailto` in the User-Agent |
+| gwas | none (the policy: 15 a second, 100 a minute) | `mailto` in the User-Agent |
 | cod | 0.5 s (COD answered 403 to eight calls in ten seconds) | `mailto` in the User-Agent |
 | cactus | none (no rate published) | `mailto` in the User-Agent |
 | codata | none (two calls in all) | `mailto` in the User-Agent |
@@ -464,7 +468,7 @@ reads `Bad Request (dataset: Unsupported dataset.)`, the CMR's `{"errors":["[foo
 | pbdb | none (no rate published) | `mailto` in the User-Agent |
 | ebird | none | the user's key as `X-eBirdApiToken`; `mailto` in the User-Agent |
 | iucn | 0.5 s (the IUCN's half second) | the user's token in `Authorization`; `mailto` in the User-Agent |
-| mpc | none (no rate published) | `mailto` in the User-Agent |
+| mpc | none (the policy: 5 a second) | `mailto` in the User-Agent |
 | horizons | 0.2 s (one request at a time, as JPL asks) | `mailto` in the User-Agent, as JPL asks |
 | ned | none (no rate published) | `mailto` in the User-Agent |
 | vizier | none (no rate published) | `mailto` in the User-Agent |

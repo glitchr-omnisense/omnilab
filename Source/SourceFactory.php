@@ -3,6 +3,10 @@
 namespace Omnilab\Source;
 
 use Omnilab\Config;
+use Omnilab\Policy\PackagePolicy;
+use Omnilab\Policy\SourceGuard;
+use Omnisense\Contracts\Policy\RateLimiterInterface;
+use Omnisense\Contracts\Policy\UsagePolicy;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -13,7 +17,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * Options every source takes: base_uri, mailto (a contact address, sent in
  * the User-Agent so that a service can reach the caller before it blocks
- * them), user_agent, throttle (seconds between two calls).
+ * them), user_agent, throttle (seconds between two calls: the site's
+ * spacing, on top of the source's usage policy), policy (the site's
+ * tightening of that policy, in omnisense/contracts' schema: never looser),
+ * usage (what the site is: commercial, open_source, contract), max_wait (the
+ * seconds a request may wait for a limit, 10 by default; a longer wait
+ * refuses it). The registry gives "omnilab.limiter", where the requests are
+ * counted, and "omnilab.name".
  */
 abstract class SourceFactory implements SourceFactoryInterface
 {
@@ -30,8 +40,20 @@ abstract class SourceFactory implements SourceFactoryInterface
     {
         $config = $this->createConfig($options);
         $config->validateNotEmpty($config->get('omnilab.required_options', []));
+        $source = $this->build($config);
+        if ($source instanceof HttpSource) {
+            $limiter = $config->get('omnilab.limiter');
+            $source->governedBy(new SourceGuard(
+                $source->getName(),
+                static fn (): UsagePolicy => $source->usagePolicy(),
+                $config->map('policy'),
+                $config->map('usage'),
+                $limiter instanceof RateLimiterInterface ? $limiter : null,
+                $config->float('max_wait', SourceGuard::DEFAULT_MAX_WAIT),
+            ), PackagePolicy::of(static::class));
+        }
 
-        return $this->build($config);
+        return $source;
     }
 
     /** @param array<string, mixed> $options */

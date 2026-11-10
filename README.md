@@ -131,6 +131,7 @@ never caches as "nothing".
 - [Following cross-references, merging](docs/merging.md)
 - [Configuration reference](docs/configuration.md)
 - [Errors](docs/errors.md)
+- [Usage policies: each source\'s limits, licence and credit](docs/policies.md)
 - [Testing](docs/testing.md)
 - [The Docker harness](docs/harness.md)
 - [Writing a provider](docs/providers.md)
@@ -207,7 +208,9 @@ docker compose run --rm omnilab test
 affiliated with, endorsed by or sponsored by the services it reaches. Each service keeps its own
 terms (licence of its data, attribution or citation, accounts and keys, rate limits, academic or
 non-commercial restrictions), summed up in the "Terms of use" section of each provider's README.
-The MIT licence covers this code only and grants no right to any service or to its data.
+The MIT licence covers this code only and grants no right to any service or to its data. What was read of
+each service's terms is declared in its provider's `policy.json` ([Usage policies](docs/policies.md)),
+and every request honours it.
 
 Whoever installs and runs these packages is responsible for complying with those terms, for
 obtaining whatever they require, and for any use made of what they return. The authors publish

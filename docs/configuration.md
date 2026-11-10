@@ -64,6 +64,9 @@ it makes its own (`HttpClient::create()`).
 | `mailto` | `?string` | null | a contact address, sent in the User-Agent so that a service can write to the caller before it blocks them; NCBI's and ClinVar's E-utilities also send it as `email` |
 | `user_agent` | `?string` | null | the whole User-Agent, in place of the one made from `mailto` |
 | `throttle` | `float` (`ncbi`, `clinvar`: `'auto'`) | each source's, below (`SourceFactory` sets 0.0 when the factory sets none) | seconds left between two calls of one source instance (`HttpSource` sleeps the rest); 0: none |
+| `max_wait` | float | `10.0` | seconds a request may wait for a limit of the source's usage policy (or a wait the service asked for); a longer wait refuses it, `RateLimitedException` with `wasSent()` false ([Usage policies](policies.md)) |
+| `policy` | map | none | the site's tightening of the source's usage policy, in omnisense/contracts' schema (`rateLimits`, `concurrency`, `rights`, `requirements`); never looser |
+| `usage` | map | none | what the site is: `commercial`, `open_source`, `contract`; a use the source's terms forbid fails at the first request |
 
 The User-Agent sent when `user_agent` is null is
 `omnilab/1.x (+https://github.com/glitchr-omnisense/omnilab; mailto:you@example.org)`, without

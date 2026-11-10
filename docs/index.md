@@ -177,6 +177,7 @@ operations: its `at()` and `profile()` are methods of its own.
 - [Configuration reference](configuration.md): the registry's shape, the options every source
   takes, each source's own options with their defaults.
 - [Errors](errors.md): every exception, when it is thrown, what to catch.
+- [Usage policies](policies.md): each source\'s limits, licence and credit, as data; wait or refuse.
 - [Testing](testing.md): testing an application that uses Omnilab, and the packages' own tests.
 - [The Docker harness](harness.md): every source installed, a console that asks the real services.
 - [Writing a provider](providers.md): a new `omnilab/<name>` package, step by step.

@@ -21,7 +21,7 @@ Every exception of `Omnilab\Exception` implements `OmnilabException` (an interfa
 | `InvalidConfigException` | `\LogicException` | a source not configured, a factory not installed, a required option empty (`Registry::get()`, `SourceFactory::create()`); and at call time, a key a call needs (iucn, ebird) | its message |
 | `ProviderException` | `\RuntimeException` | the service answered an error (a 4xx other than 404, 410 and 429), or an answer that is not what was asked (not JSON, not a JSON object) | `source` (`string`), `status` (`?int`, the HTTP status), the message prefixed `[source]` |
 | `UnavailableException` | `ProviderException` | the service is down or unreachable: a 5xx, a timeout, a network error, a web page answered where JSON was asked (a maintenance page) | as `ProviderException`; never "not found" |
-| `RateLimitedException` | `UnavailableException` | 429, or a budget spent | `retryAfter` (`?int`, seconds, from `Retry-After` when numeric), `status` 429 |
+| `RateLimitedException` | `UnavailableException` | 429, or a budget spent; or not sent: a limit of the source's [usage policy](policies.md) reached, or the service's wait not over, longer than `max_wait` | `retryAfter` (`?int`, seconds: a `Retry-After` in seconds or as a date, the end of a limit's window), `limit` (the policy's limit, when one refused it), `wasSent()` (false when not sent), `status` 429 |
 
 `NotSupportedException::identifier($source, $identifier, $what = 'look up')` and
 `::operation($source, $operation)` make its two messages; a source uses them so that the
@@ -36,7 +36,7 @@ Every exception of `Omnilab\Exception` implements `OmnilabException` (an interfa
 | `HttpSource::entity()`, `search()`, `series()`, `products()`, `occurrences()`, `datasets()`, `open()` not overridden | `NotSupportedException` | `The "x" source does not look up entities.` (`search`, `serve series`, `list products`, `list occurrences`, `search datasets`, `open files`) |
 | `HttpSource::station()` | `NotSupportedException` | a series asked at a station of a scheme the source does not read |
 | `HttpSource::filters()` | `NotSupportedException` | an occurrence filter key the source does not read (`... (it reads "taxon", "country")`) |
-| every call of `HttpSource` | `RateLimitedException`, `UnavailableException`, `ProviderException` | 404, 410 and 204 are null; 429 rate limited; 5xx and transport errors unavailable; any other 4xx a provider error with what the service said ([how each service writes it](sources.md#errors)) |
+| every call of `HttpSource` | `RateLimitedException`, `UnavailableException`, `ProviderException` | 404, 410 and 204 are null; 429 rate limited (and the next requests held for its Retry-After); 5xx and transport errors unavailable; any other 4xx a provider error with what the service said ([how each service writes it](sources.md#errors)) |
 | `HttpSource::postForJson()`, `getForJson()` | `\InvalidArgumentException` | a body that cannot be written as JSON |
 | `SeriesQuery`, `ProductQuery`, `OccurrenceQuery` constructors | `\InvalidArgumentException` | no variable, a place that is no station, a period that ends before it starts, a radius without a `Point` or not above 0 |
 | `Point`, `BBox` (constructors and `parse()`) | `\InvalidArgumentException` | coordinates out of range, a south above the north, a text that is not `lat,lon` / `west,south,east,north` |

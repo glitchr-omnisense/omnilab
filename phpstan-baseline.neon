@@ -1,0 +1,1045 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Call to function is_subclass_of\(\) with ''Omnilab\\\\BrightSky\\\\BrightSkySourceFactory''\|''Omnilab\\\\Cactus\\\\CactusSourceFactory''\|''Omnilab\\\\Cams\\\\CamsSourceFactory''\|''Omnilab\\\\Cds\\\\CdsSourceFactory''\|''Omnilab\\\\Chebi\\\\ChebiSourceFactory''\|''Omnilab\\\\Chembl\\\\ChemblSourceFactory''\|''Omnilab\\\\ClinVar\\\\ClinVarSourceFactory''\|''Omnilab\\\\Cod\\\\CodSourceFactory''\|''Omnilab\\\\Codata\\\\CodataSourceFactory''\|''Omnilab\\\\Col\\\\ColSourceFactory''\|''Omnilab\\\\Copernicus\\\\CopernicusSourceFactory''\|''Omnilab\\\\Donki\\\\DonkiSourceFactory''\|''Omnilab\\\\Earthdata\\\\EarthdataSourceFactory''\|''Omnilab\\\\Ebird\\\\EbirdSourceFactory''\|''Omnilab\\\\Elevation\\\\ElevationSourceFactory''\|''Omnilab\\\\Emsc\\\\EmscSourceFactory''\|''Omnilab\\\\Ensembl\\\\EnsemblSourceFactory''\|''Omnilab\\\\Exoplanets\\\\ExoplanetsSourceFactory''\|''Omnilab\\\\Gaia\\\\GaiaSourceFactory''\|''Omnilab\\\\Gbif\\\\GbifSourceFactory''\|''Omnilab\\\\Gwas\\\\GwasSourceFactory''\|''Omnilab\\\\Hgnc\\\\HgncSourceFactory''\|''Omnilab\\\\Horizons\\\\HorizonsSourceFactory''\|''Omnilab\\\\INaturalist\\\\INaturalistSourceFactory''\|''Omnilab\\\\InterPro\\\\InterProSourceFactory''\|''Omnilab\\\\Itis\\\\ItisSourceFactory''\|''Omnilab\\\\Iucn\\\\IucnSourceFactory''\|''Omnilab\\\\Jpl\\\\JplSourceFactory''\|''Omnilab\\\\Kegg\\\\KeggSourceFactory''\|''Omnilab\\\\Launches\\\\LaunchesSourceFactory''\|''Omnilab\\\\MaterialsProject\\\\MaterialsProjectSourceFactory''\|''Omnilab\\\\Mpc\\\\MpcSourceFactory''\|''Omnilab\\\\Ncbi\\\\NcbiSourceFactory''\|''Omnilab\\\\Ned\\\\NedSourceFactory''\|''Omnilab\\\\Noaa\\\\NoaaSourceFactory''\|''Omnilab\\\\Obis\\\\ObisSourceFactory''\|''Omnilab\\\\OpenAq\\\\OpenAqSourceFactory''\|''Omnilab\\\\OpenMeteo\\\\OpenMeteoSourceFactory''\|''Omnilab\\\\OpenTargets\\\\OpenTargetsSourceFactory''\|''Omnilab\\\\Oqmd\\\\OqmdSourceFactory''\|''Omnilab\\\\Pbdb\\\\PbdbSourceFactory''\|''Omnilab\\\\Pdb\\\\PdbSourceFactory''\|''Omnilab\\\\PubChem\\\\PubChemSourceFactory''\|''Omnilab\\\\QuickGo\\\\QuickGoSourceFactory''\|''Omnilab\\\\Reactome\\\\ReactomeSourceFactory''\|''Omnilab\\\\Rhea\\\\RheaSourceFactory''\|''Omnilab\\\\Simbad\\\\SimbadSourceFactory''\|''Omnilab\\\\StringDb\\\\StringSourceFactory''\|''Omnilab\\\\Swpc\\\\SwpcSourceFactory''\|''Omnilab\\\\Tides\\\\TidesSourceFactory''\|''Omnilab\\\\UniProt\\\\UniProtSourceFactory''\|''Omnilab\\\\Usgs\\\\UsgsSourceFactory''\|''Omnilab\\\\UsgsWater\\\\UsgsWaterSourceFactory''\|''Omnilab\\\\Vizier\\\\VizierSourceFactory''\|''Omnilab\\\\Wikidata\\\\WikidataSourceFactory''\|''Omnilab\\\\Worms\\\\WormsSourceFactory'' and ''Omnilab\\\\Source\\\\SourceFactoryInterface'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: Bridge/Symfony/OmnilabBundle.php
+
+		-
+			message: '#^Cannot call method key\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: Collector.php
+
+		-
+			message: '#^Parameter \#3 \$identifiers of method Omnilab\\Collector\:\:ask\(\) expects list\<Omnilab\\Model\\Identifier\>, list\<mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Collector.php
+
+		-
+			message: '#^Possibly invalid array key type mixed\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 2
+			path: Collector.php
+
+		-
+			message: '#^Parameter \#2 \.\.\.\$values of function sprintf expects bool\|float\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Config.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: Merger.php
+
+		-
+			message: '#^Cannot call method identifiers\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: Merger.php
+
+		-
+			message: '#^Cannot call method keys\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: Merger.php
+
+		-
+			message: '#^Method Omnilab\\Merger\:\:merge\(\) has parameter \$lists with generic class Omnilab\\Source\\Page but does not specify its types\: T$#'
+			identifier: missingType.generics
+			count: 1
+			path: Merger.php
+
+		-
+			message: '#^Parameter \#1 \$a of method Omnilab\\Merger\:\:conflicts\(\) expects list\<Omnilab\\Model\\Entity\>, non\-empty\-list\<mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Merger.php
+
+		-
+			message: '#^Parameter \#1 \$array \(array\{0\?\: non\-falsy\-string\}\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: Merger.php
+
+		-
+			message: '#^Parameter \#1 \$entities of method Omnilab\\Merger\:\:ordered\(\) expects list\<Omnilab\\Model\\Entity\>, non\-empty\-array\<int\<0, max\>\|string, Omnilab\\Model\\Entity\> given\.$#'
+			identifier: argument.type
+			count: 3
+			path: Merger.php
+
+		-
+			message: '#^Parameter \#1 \$entities of method Omnilab\\Merger\:\:properties\(\) expects list\<Omnilab\\Model\\Entity\>, non\-empty\-array\<int\<0, max\>\|string, Omnilab\\Model\\Entity\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Merger.php
+
+		-
+			message: '#^Parameter \#1 \.\.\.\$entities of method Omnilab\\Merger\:\:combine\(\) expects Omnilab\\Model\\Entity, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Merger.php
+
+		-
+			message: '#^Parameter \#2 \$b of method Omnilab\\Merger\:\:conflicts\(\) expects list\<Omnilab\\Model\\Entity\>, non\-empty\-list\<mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Merger.php
+
+		-
+			message: '#^Possibly invalid array key type mixed\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 3
+			path: Merger.php
+
+		-
+			message: '#^Method Omnilab\\Model\\BBox\:\:toGeoJson\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Model/BBox.php
+
+		-
+			message: '#^Parameter \#1 \$array \(list\<float\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: Model/BBox.php
+
+		-
+			message: '#^Method Omnilab\\Model\\Entity\:\:with\(\) has parameter \$changes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Model/Entity.php
+
+		-
+			message: '#^Parameter \#1 \$id of class Omnilab\\Model\\Entity constructor expects Omnilab\\Model\\Identifier, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Model/Entity.php
+
+		-
+			message: '#^Cannot cast array\<mixed\>\|string to string\.$#'
+			identifier: cast.string
+			count: 17
+			path: Model/Identifier.php
+
+		-
+			message: '#^Parameter \#1 \$input of static method Omnilab\\Model\\Identifier\:\:parse\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: Model/Identifier.php
+
+		-
+			message: '#^Parameter \#2 \$subject of function preg_match expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Model/Identifier.php
+
+		-
+			message: '#^Parameter \#2 \$value of static method Omnilab\\Model\\Identifier\:\:tryOf\(\) expects int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 14
+			path: Model/Identifier.php
+
+		-
+			message: '#^Method Omnilab\\Model\\Identifiers\:\:getIterator\(\) return type with generic class ArrayIterator does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: Model/Identifiers.php
+
+		-
+			message: '#^Method Omnilab\\Model\\Point\:\:toGeoJson\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Model/Point.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: Model/Product.php
+
+		-
+			message: '#^Method Omnilab\\Model\\Property\:\:with\(\) has parameter \$changes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Model/Property.php
+
+		-
+			message: '#^Parameter \#1 \$key of class Omnilab\\Model\\Property constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Model/Property.php
+
+		-
+			message: '#^Method Omnilab\\Model\\Series\:\:getIterator\(\) return type with generic class ArrayIterator does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: Model/Series.php
+
+		-
+			message: '#^Method Omnilab\\Registry\:\:options\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Registry.php
+
+		-
+			message: '#^Cannot access offset ''Details'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Source/HttpSource.php
+
+		-
+			message: '#^Cannot access offset ''Message'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Source/HttpSource.php
+
+		-
+			message: '#^Cannot access offset ''message'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Source/HttpSource.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: Source/HttpSource.php
+
+		-
+			message: '#^Method Omnilab\\Source\\HttpSource\:\:getForJson\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Source/HttpSource.php
+
+		-
+			message: '#^Method Omnilab\\Source\\HttpSource\:\:getJson\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Source/HttpSource.php
+
+		-
+			message: '#^Method Omnilab\\Source\\HttpSource\:\:postForJson\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Source/HttpSource.php
+
+		-
+			message: '#^Method Omnilab\\Source\\OccurrenceQuery\:\:with\(\) has parameter \$changes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Source/OccurrenceQuery.php
+
+		-
+			message: '#^Parameter \#1 \$place of class Omnilab\\Source\\OccurrenceQuery constructor expects Omnilab\\Model\\BBox\|Omnilab\\Model\\Point\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Source/OccurrenceQuery.php
+
+		-
+			message: '#^Method Omnilab\\Source\\Page\:\:getIterator\(\) return type with generic class ArrayIterator does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: Source/Page.php
+
+		-
+			message: '#^Method Omnilab\\Source\\ProductQuery\:\:with\(\) has parameter \$changes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Source/ProductQuery.php
+
+		-
+			message: '#^Parameter \#1 \$collections of class Omnilab\\Source\\ProductQuery constructor expects list\<string\>, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Source/ProductQuery.php
+
+		-
+			message: '#^Method Omnilab\\Source\\Query\:\:with\(\) has parameter \$changes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Source/Query.php
+
+		-
+			message: '#^Parameter \#1 \$text of class Omnilab\\Source\\Query constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Source/Query.php
+
+		-
+			message: '#^Method Omnilab\\Source\\SeriesQuery\:\:with\(\) has parameter \$changes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Source/SeriesQuery.php
+
+		-
+			message: '#^Parameter \#1 \$variables of class Omnilab\\Source\\SeriesQuery constructor expects list\<string\>, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Source/SeriesQuery.php
+
+		-
+			message: '#^Binary operation "\." between ''; mailto\:'' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: Source/SourceFactory.php
+
+		-
+			message: '#^Method Omnilab\\Source\\SourceFactory\:\:getName\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: Source/SourceFactory.php
+
+		-
+			message: '#^Method Omnilab\\Source\\SourceFactory\:\:userAgent\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: Source/SourceFactory.php
+
+		-
+			message: '#^Parameter \#1 \$keys of method Omnilab\\Config\:\:validateNotEmpty\(\) expects array\<string\>, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Source/SourceFactory.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 2
+			path: Source/Stac.php
+
+		-
+			message: '#^Cannot access offset ''bbox'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Source/Stac.php
+
+		-
+			message: '#^Cannot access offset ''href'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 4
+			path: Source/Stac.php
+
+		-
+			message: '#^Cannot access offset ''interval'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Source/Stac.php
+
+		-
+			message: '#^Cannot access offset ''matched'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Source/Stac.php
+
+		-
+			message: '#^Cannot access offset ''rel'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: Source/Stac.php
+
+		-
+			message: '#^Cannot access offset ''spatial'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Source/Stac.php
+
+		-
+			message: '#^Cannot access offset ''temporal'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Source/Stac.php
+
+		-
+			message: '#^Cannot access offset 0 on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: Source/Stac.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 5
+			path: Source/Stac.php
+
+		-
+			message: '#^Parameter \#1 \$callback of function array_map expects \(callable\(mixed\)\: mixed\)\|null, ''floatval'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Source/Stac.php
+
+		-
+			message: '#^Parameter \#1 \$callback of function array_map expects \(callable\(mixed\)\: mixed\)\|null, ''strval'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Source/Stac.php
+
+		-
+			message: '#^Parameter \#1 \$item of static method Omnilab\\Source\\Stac\:\:item\(\) expects array\<string, mixed\>, array\<mixed, mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Source/Stac.php
+
+		-
+			message: '#^Parameter \#1 \$raw of static method Omnilab\\Source\\Stac\:\:assets\(\) expects array\<string, mixed\>, array\<mixed\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: Source/Stac.php
+
+		-
+			message: '#^Parameter \$geometry of class Omnilab\\Model\\Product constructor expects array\<string, mixed\>\|null, array\<mixed, mixed\>\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Source/Stac.php
+
+		-
+			message: '#^Parameter \$properties of class Omnilab\\Model\\Product constructor expects array\<string, mixed\>, array\<mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Source/Stac.php
+
+		-
+			message: '#^Cannot access offset ''day'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''id'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''identifiers'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 4
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''incomplete'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''is_a'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''label'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''magnitude'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''melting_point'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''molecular_formula'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''molecular_weight'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''place'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''points'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''properties'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 6
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''pubchem'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''sources'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''time'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''tpsa'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''unit'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''usgs'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset ''variable'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset 0 on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 5
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Cannot access offset 17 on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Method Omnilab\\Tests\\BareTest\:\:framework\(\) should return list\<string\> but returns array\<mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Method Omnilab\\Tests\\BareTest\:\:php\(\) should return array\{int, array\<string, mixed\>\} but returns array\{int, array\<mixed\>\}\.$#'
+			identifier: return.type
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Only iterables can be unpacked, mixed given\.$#'
+			identifier: arrayUnpacking.nonIterable
+			count: 2
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_column expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 4
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_values expects array, array\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Parameter \#1 \$report of static method Omnilab\\Tests\\BareTest\:\:framework\(\) expects array\{symbols\: list\<string\>, files\: list\<string\>\}, array\<string, mixed\> given\.$#'
+			identifier: argument.type
+			count: 4
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Parameter \#1 \$report of static method Omnilab\\Tests\\BareTest\:\:framework\(\) expects array\{symbols\: list\<string\>, files\: list\<string\>\}, non\-empty\-array\<string, mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Parameter \#2 \$callback of function array_filter expects \(callable\(mixed\)\: bool\)\|null, ''class_exists'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Parameter \#2 \$haystack of static method PHPUnit\\Framework\\Assert\:\:assertContains\(\) expects iterable, mixed given\.$#'
+			identifier: argument.type
+			count: 8
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Parameter \#2 \$haystack of static method PHPUnit\\Framework\\Assert\:\:assertCount\(\) expects Countable\|iterable, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/BareTest.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$chebi\.$#'
+			identifier: property.notFound
+			count: 1
+			path: Tests/Bridge/OmnilabBundleTest.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$collector\.$#'
+			identifier: property.notFound
+			count: 1
+			path: Tests/Bridge/OmnilabBundleTest.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$pubchem\.$#'
+			identifier: property.notFound
+			count: 1
+			path: Tests/Bridge/OmnilabBundleTest.php
+
+		-
+			message: '#^Call to an undefined method object\:\:factories\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: Tests/Bridge/OmnilabBundleTest.php
+
+		-
+			message: '#^Call to an undefined method object\:\:names\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: Tests/Bridge/OmnilabBundleTest.php
+
+		-
+			message: '#^Cannot access property \$label on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/Bridge/OmnilabBundleTest.php
+
+		-
+			message: '#^Cannot access property \$sources on mixed\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/Bridge/OmnilabBundleTest.php
+
+		-
+			message: '#^Cannot call method collect\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: Tests/Bridge/OmnilabBundleTest.php
+
+		-
+			message: '#^Cannot call method getName\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: Tests/Bridge/OmnilabBundleTest.php
+
+		-
+			message: '#^Cannot call method getPathname\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: Tests/Bridge/OmnilabBundleTest.php
+
+		-
+			message: '#^Cannot call method isDir\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: Tests/Bridge/OmnilabBundleTest.php
+
+		-
+			message: '#^Parameter \#1 \$directory of function rmdir expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/Bridge/OmnilabBundleTest.php
+
+		-
+			message: '#^Parameter \#1 \$extension of method Symfony\\Component\\DependencyInjection\\ContainerBuilder\:\:registerExtension\(\) expects Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface, Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/Bridge/OmnilabBundleTest.php
+
+		-
+			message: '#^Parameter \#1 \$filename of function unlink expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/Bridge/OmnilabBundleTest.php
+
+		-
+			message: '#^Parameter \#2 \$haystack of static method PHPUnit\\Framework\\Assert\:\:assertContains\(\) expects iterable, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: Tests/Bridge/OmnilabBundleTest.php
+
+		-
+			message: '#^Method Omnilab\\Source\\HttpSource@anonymous//omnilab/core/Tests/HttpSourceErrorsTest\.php\:101\:\:read\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Tests/HttpSourceErrorsTest.php
+
+		-
+			message: '#^Method Omnilab\\Source\\HttpSource@anonymous//omnilab/core/Tests/HttpSourceErrorsTest\.php\:51\:\:read\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Tests/HttpSourceErrorsTest.php
+
+		-
+			message: '#^Method Omnilab\\Source\\HttpSource@anonymous//omnilab/core/Tests/HttpSourceErrorsTest\.php\:78\:\:read\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Tests/HttpSourceErrorsTest.php
+
+		-
+			message: '#^Call to method Omnilab\\Model\\Scheme\:\:domain\(\) on a separate line has no effect\.$#'
+			identifier: method.resultUnused
+			count: 1
+			path: Tests/IdentifierTest.php
+
+		-
+			message: '#^Method Omnilab\\Tests\\MergerTest\:\:caffeine\(\) has parameter \$fields with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Tests/MergerTest.php
+
+		-
+			message: '#^Method Omnilab\\Tests\\MergerTest\:\:caffeine\(\) has parameter \$others with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Tests/MergerTest.php
+
+		-
+			message: '#^Method Omnilab\\Tests\\MergerTest\:\:caffeine\(\) has parameter \$properties with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Tests/MergerTest.php
+
+		-
+			message: '#^Parameter \#1 \$id of class Omnilab\\Model\\Entity constructor expects Omnilab\\Model\\Identifier, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/MergerTest.php
+
+		-
+			message: '#^Parameter \#1 \$identifiers of class Omnilab\\Model\\Identifiers constructor expects iterable\<Omnilab\\Model\\Identifier\|null\>, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/MergerTest.php
+
+		-
+			message: '#^Anonymous function should return Symfony\\Component\\HttpClient\\Response\\MockResponse but returns Symfony\\Component\\HttpClient\\Response\\MockResponse\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: Tests/ModelsTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertNull\(\) with null will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: Tests/ModelsTest.php
+
+		-
+			message: '#^Cannot access offset ''content\-type'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: Tests/ModelsTest.php
+
+		-
+			message: '#^Cannot access offset 0 on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: Tests/ModelsTest.php
+
+		-
+			message: '#^Cannot call method format\(\) on DateTimeImmutable\|null\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: Tests/ModelsTest.php
+
+		-
+			message: '#^Cannot call method format\(\) on DateTimeInterface\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: Tests/ModelsTest.php
+
+		-
+			message: '#^Cannot call method httpsHref\(\) on Omnilab\\Model\\Asset\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: Tests/ModelsTest.php
+
+		-
+			message: '#^Cannot use array destructuring on mixed\.$#'
+			identifier: offsetAccess.nonArray
+			count: 1
+			path: Tests/ModelsTest.php
+
+		-
+			message: '#^Method Omnilab\\Source\\HttpSource@anonymous//omnilab/core/Tests/ModelsTest\.php\:284\:\:post\(\) has parameter \$query with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Tests/ModelsTest.php
+
+		-
+			message: '#^Method Omnilab\\Source\\HttpSource@anonymous//omnilab/core/Tests/ModelsTest\.php\:284\:\:post\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Tests/ModelsTest.php
+
+		-
+			message: '#^Method Omnilab\\Source\\HttpSource@anonymous//omnilab/core/Tests/ModelsTest\.php\:284\:\:read\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Tests/ModelsTest.php
+
+		-
+			message: '#^Method Omnilab\\Source\\HttpSource@anonymous//omnilab/core/Tests/ModelsTest\.php\:327\:\:orbit\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Tests/ModelsTest.php
+
+		-
+			message: '#^Parameter \#3 \$query of method Omnilab\\Source\\HttpSource\:\:postForJson\(\) expects array\<string, mixed\>, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/ModelsTest.php
+
+		-
+			message: '#^Cannot access property \$label on Omnilab\\Model\\Entity\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/RegistryTest.php
+
+		-
+			message: '#^Cannot access property \$sources on Omnilab\\Model\\Entity\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: Tests/RegistryTest.php
+
+		-
+			message: '#^Cannot call method identifier\(\) on Omnilab\\Model\\Entity\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: Tests/RegistryTest.php
+
+		-
+			message: '#^Cannot call method properties\(\) on Omnilab\\Model\\Entity\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: Tests/RegistryTest.php
+
+		-
+			message: '#^Cannot call method property\(\) on Omnilab\\Model\\Entity\|null\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: Tests/RegistryTest.php
+
+		-
+			message: '#^Parameter \#1 \$entity of method Omnilab\\Collector\:\:follow\(\) expects Omnilab\\Model\\Entity, Omnilab\\Model\\Entity\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/RegistryTest.php
+
+		-
+			message: '#^Cannot access property \$alternates on Omnilab\\Model\\Asset\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/StacTest.php
+
+		-
+			message: '#^Cannot access property \$assets on Omnilab\\Model\\Product\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/StacTest.php
+
+		-
+			message: '#^Cannot access property \$bbox on Omnilab\\Model\\Product\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/StacTest.php
+
+		-
+			message: '#^Cannot access property \$collection on Omnilab\\Model\\Product\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/StacTest.php
+
+		-
+			message: '#^Cannot access property \$datetime on Omnilab\\Model\\Product\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/StacTest.php
+
+		-
+			message: '#^Cannot access property \$id on Omnilab\\Model\\Product\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/StacTest.php
+
+		-
+			message: '#^Cannot access property \$preview on Omnilab\\Model\\Product\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/StacTest.php
+
+		-
+			message: '#^Cannot access property \$properties on Omnilab\\Model\\Product\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/StacTest.php
+
+		-
+			message: '#^Cannot access property \$size on Omnilab\\Model\\Asset\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/StacTest.php
+
+		-
+			message: '#^Cannot access property \$source on Omnilab\\Model\\Product\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/StacTest.php
+
+		-
+			message: '#^Cannot access property \$url on Omnilab\\Model\\Product\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/StacTest.php
+
+		-
+			message: '#^Cannot call method asset\(\) on Omnilab\\Model\\Product\|null\.$#'
+			identifier: method.nonObject
+			count: 3
+			path: Tests/StacTest.php
+
+		-
+			message: '#^Cannot call method cloudCover\(\) on Omnilab\\Model\\Product\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: Tests/StacTest.php
+
+		-
+			message: '#^Cannot call method contains\(\) on Omnilab\\Model\\BBox\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: Tests/StacTest.php
+
+		-
+			message: '#^Cannot call method format\(\) on DateTimeImmutable\|null\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: Tests/StacTest.php
+
+		-
+			message: '#^Cannot call method httpsHref\(\) on Omnilab\\Model\\Asset\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: Tests/StacTest.php
+
+		-
+			message: '#^Cannot call method toArray\(\) on Omnilab\\Model\\BBox\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: Tests/StacTest.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: Tests/StubSourceFactory.php
+
+		-
+			message: '#^Parameter \#1 \$callback of function array_map expects \(callable\(mixed\)\: mixed\)\|null, Closure\(array\)\: Omnilab\\Model\\Entity given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/StubSourceFactory.php
+
+		-
+			message: '#^Parameter \#1 \$callback of function array_map expects \(callable\(mixed\)\: mixed\)\|null, Closure\(string\)\: \(Omnilab\\Model\\Scheme\|null\) given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/StubSourceFactory.php
+
+		-
+			message: '#^Parameter \#1 \$callback of function array_map expects \(callable\(mixed\)\: mixed\)\|null, Closure\(string\)\: Omnilab\\Model\\Identifier given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/StubSourceFactory.php
+
+		-
+			message: '#^Parameter \#1 \$key of class Omnilab\\Model\\Property constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/StubSourceFactory.php
+
+		-
+			message: '#^Parameter \#1 \$name of class Omnilab\\Tests\\StubSource constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/StubSourceFactory.php
+
+		-
+			message: '#^Parameter \#2 \$array of function array_map expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 3
+			path: Tests/StubSourceFactory.php
+
+		-
+			message: '#^Parameter \#2 \$entities of class Omnilab\\Tests\\StubSource constructor expects list\<Omnilab\\Model\\Entity\>, array\<Omnilab\\Model\\Entity\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/StubSourceFactory.php
+
+		-
+			message: '#^Parameter \#2 \$label of class Omnilab\\Model\\Entity constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/StubSourceFactory.php
+
+		-
+			message: '#^Parameter \#3 \$schemes of class Omnilab\\Tests\\StubSource constructor expects list\<Omnilab\\Model\\Scheme\>, array\<Omnilab\\Model\\Scheme\|null\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/StubSourceFactory.php
+
+		-
+			message: '#^Parameter \#3 \$subject of function str_replace expects array\<string\>\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/StubSourceFactory.php
+
+		-
+			message: '#^Parameter \#3 \$value of class Omnilab\\Model\\Property constructor expects bool\|float\|int\|Omnilab\\Model\\Quantity\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/StubSourceFactory.php
+
+		-
+			message: '#^Parameter \#4 \$source of class Omnilab\\Model\\Property constructor expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/StubSourceFactory.php
+
+		-
+			message: '#^Parameter \$source of class Omnilab\\Model\\Entity constructor expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/StubSourceFactory.php
+
+		-
+			message: '#^Call to an undefined method Omnilab\\Source\\HttpSource\:\:read\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: Tests/UnreachableChainTest.php
