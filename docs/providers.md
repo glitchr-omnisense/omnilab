@@ -30,7 +30,7 @@ omnilab-<slug>/
     "license": "MIT",
     "require": {
         "php": ">=8.2",
-        "omnisense/omnilab": "^1.0@dev",
+        "omnisense/omnilab": "^1.0",
         "symfony/http-client": "^6.4|^7.0|^8.0"
     },
     "require-dev": { "phpunit/phpunit": "^11.0" },

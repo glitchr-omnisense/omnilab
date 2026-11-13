@@ -11,3 +11,15 @@ parameters:
     excludePaths:
         - vendor (?)
         - docker (?)
+    # The bundle names every source's factory (Bridge/Symfony/OmnilabBundle::FACTORIES) and registers
+    # those installed. Installed alone (this package's CI), they are unknown classes; with every
+    # source (the family's harness), PHPStan knows each is a SourceFactoryInterface. Both hold.
+    ignoreErrors:
+        -
+            identifier: class.notFound
+            path: Bridge/Symfony/OmnilabBundle.php
+            reportUnmatched: false
+        -
+            identifier: function.alreadyNarrowedType
+            path: Bridge/Symfony/OmnilabBundle.php
+            reportUnmatched: false

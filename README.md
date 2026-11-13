@@ -118,6 +118,39 @@ for the rest, before any call. Unknown is `null`, an empty page or a series with
 service down or rate limited is an `UnavailableException` (`RateLimitedException`), which a caller
 never caches as "nothing".
 
+## Install and a first call
+
+```sh
+composer require omnisense/omnilab omnilab/pubchem
+```
+
+The core holds the contract, the models, the `Collector` and the `Merger`; each source is a package of its
+own (the table above). A first call through the registry, with PubChem: a real call, no account and no
+key. `mailto` is your address, sent in the User-Agent so that a service can reach you before it blocks
+a caller; every source keeps to the limits its package's `policy.json` declares
+([usage policies](docs/policies.md)).
+
+```php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+use Omnilab\PubChem\PubChemSourceFactory;
+use Omnilab\Registry;
+
+$registry = new Registry([new PubChemSourceFactory()], [
+    'pubchem' => ['factory' => 'pubchem', 'options' => ['mailto' => 'you@example.org', 'synonyms' => 0, 'description' => false]],
+]);
+$caffeine = $registry->get('pubchem')->entity('2519');   // caffeine, by its PubChem CID
+echo $caffeine->label, ', ', $caffeine->value('molecular_formula'), ', ', $caffeine->property('molecular_weight'), "\n";
+```
+
+Its output on 2026-11-13:
+
+```
+Caffeine, C8H10N4O2, 194.19 g/mol
+```
+
 ## Documentation
 
 - [The manual's home: the providers and their capabilities](docs/index.md)

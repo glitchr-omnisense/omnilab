@@ -52,7 +52,7 @@ PHP, in a worker, in Laravel or Slim, and in Symfony, where a bundle does the wi
 | | Requires |
 |---|---|
 | `omnisense/omnilab` | PHP 8.2 or later, `symfony/http-client-contracts` ^3.0 |
-| each `omnilab/<source>` | PHP 8.2 or later, `omnisense/omnilab` ^1.0@dev, `symfony/http-client` ^6.4, ^7.0 or ^8.0; `omnilab/cams` requires `omnilab/cds` besides |
+| each `omnilab/<source>` | PHP 8.2 or later, `omnisense/omnilab` ^1.0, `symfony/http-client` ^6.4, ^7.0 or ^8.0; `omnilab/cams` requires `omnilab/cds` besides |
 | the Symfony bundle | `symfony/config`, `symfony/dependency-injection`, `symfony/http-kernel` ^6.4, ^7.0 or ^8.0 (suggested, not required: a Symfony application has them) |
 
 No PHP extension is declared. The core decodes JSON (`ext-json`, always present since PHP 8.0);
@@ -61,11 +61,11 @@ simbad, uniprot, vizier, wikidata) call `mb_strtolower()` and the other `mb_*` f
 
 Each of them requires `ext-mbstring` in its `composer.json`.
 
-No version is tagged yet: every package is installed from its `1.x` branch (`1.x-dev`). An
-application that requires them either writes each constraint `1.x-dev`
-(`composer require omnisense/omnilab:1.x-dev omnilab/pubchem:1.x-dev`) or sets
-`"minimum-stability": "dev"` and `"prefer-stable": true` in its `composer.json`. The source
-packages require the core as `^1.0@dev`.
+Every package is tagged from 1.0.0 on: `composer require` installs them in a project at
+Composer's default minimum-stability (stable), with no stability flag. The source packages require
+the core as `^1.0`, `omnilab/cams` `omnilab/cds` as `^1.0` too, and the core
+`omnisense/contracts` `^1.0`. The `1.x` branch is `1.x-dev` (`extra.branch-alias`), for whoever
+wants what is not tagged yet.
 
 ## Plain PHP
 

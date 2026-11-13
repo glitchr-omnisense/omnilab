@@ -3,8 +3,10 @@
 namespace Omnilab\Tests\Bridge;
 
 use Omnilab\Bridge\Symfony\OmnilabBundle;
+use Omnilab\Chebi\ChebiSourceFactory;
 use Omnilab\Collector;
 use Omnilab\Merger;
+use Omnilab\PubChem\PubChemSourceFactory;
 use Omnilab\Registry;
 use Omnilab\Source\SourceInterface;
 use Omnilab\Tests\StubSource;
@@ -39,6 +41,10 @@ final class OmnilabBundleTest extends TestCase
 
     public function testAKernelBootsWithTheSourcesByName(): void
     {
+        // Every source package installed: the family's harness. This package's CI installs it alone.
+        if (!class_exists(PubChemSourceFactory::class) || !class_exists(ChebiSourceFactory::class)) {
+            self::markTestSkipped('The source packages are not installed (omnilab/pubchem, omnilab/chebi and the others).');
+        }
         $this->kernel = new OmnilabTestKernel('test', false);
         $this->kernel->boot();
         $container = $this->kernel->getContainer();
